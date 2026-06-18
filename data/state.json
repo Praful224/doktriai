@@ -1,0 +1,1120 @@
+{
+  "workloads": {},
+  "audit": [],
+  "events": [
+    {
+      "id": 159,
+      "time": "2026-06-18T16:26:59.7488716Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 158,
+      "time": "2026-06-18T16:26:54.7441018Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 157,
+      "time": "2026-06-18T16:26:49.7531683Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 156,
+      "time": "2026-06-18T16:26:44.7510245Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 155,
+      "time": "2026-06-18T16:26:39.7452452Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 154,
+      "time": "2026-06-18T16:26:34.7874308Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 153,
+      "time": "2026-06-18T16:26:29.7556749Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 152,
+      "time": "2026-06-18T16:26:24.7503095Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 151,
+      "time": "2026-06-18T16:26:19.7418174Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 150,
+      "time": "2026-06-18T16:26:14.7465243Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 149,
+      "time": "2026-06-18T16:26:09.761886Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 148,
+      "time": "2026-06-18T16:26:05.0538829Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 147,
+      "time": "2026-06-18T16:25:59.7563868Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 146,
+      "time": "2026-06-18T16:25:54.7529135Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 145,
+      "time": "2026-06-18T16:25:49.7494227Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 144,
+      "time": "2026-06-18T16:25:44.7461336Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 143,
+      "time": "2026-06-18T16:25:39.7836235Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 142,
+      "time": "2026-06-18T16:25:34.7494349Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 141,
+      "time": "2026-06-18T16:25:29.7443411Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 140,
+      "time": "2026-06-18T16:25:24.7616144Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 139,
+      "time": "2026-06-18T16:25:20.1681753Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 138,
+      "time": "2026-06-18T16:25:14.7457049Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 137,
+      "time": "2026-06-18T16:25:09.7487535Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 136,
+      "time": "2026-06-18T16:25:04.7529524Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 135,
+      "time": "2026-06-18T16:24:59.7381859Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 134,
+      "time": "2026-06-18T16:24:54.7444019Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 133,
+      "time": "2026-06-18T16:24:49.7555868Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 132,
+      "time": "2026-06-18T16:24:44.7588446Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 131,
+      "time": "2026-06-18T16:24:39.7505736Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 130,
+      "time": "2026-06-18T16:24:34.8313035Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 129,
+      "time": "2026-06-18T16:24:29.7540226Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 128,
+      "time": "2026-06-18T16:24:24.7671517Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 127,
+      "time": "2026-06-18T16:24:19.8819458Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 126,
+      "time": "2026-06-18T16:24:14.8580109Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 125,
+      "time": "2026-06-18T16:24:09.7932305Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 124,
+      "time": "2026-06-18T16:24:04.7766175Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 123,
+      "time": "2026-06-18T16:23:59.7504643Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 122,
+      "time": "2026-06-18T16:23:54.8475573Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 121,
+      "time": "2026-06-18T16:23:49.980105Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 120,
+      "time": "2026-06-18T16:23:44.8529693Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 119,
+      "time": "2026-06-18T16:23:39.935813Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 118,
+      "time": "2026-06-18T16:23:34.8885642Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 117,
+      "time": "2026-06-18T16:23:29.8677391Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 116,
+      "time": "2026-06-18T16:23:24.9179439Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 115,
+      "time": "2026-06-18T16:23:19.7584912Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 114,
+      "time": "2026-06-18T16:23:14.7658729Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 113,
+      "time": "2026-06-18T16:23:09.818749Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 112,
+      "time": "2026-06-18T16:23:04.7630491Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 111,
+      "time": "2026-06-18T16:22:59.7521321Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 110,
+      "time": "2026-06-18T16:22:54.87401Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 109,
+      "time": "2026-06-18T16:22:49.7697464Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 108,
+      "time": "2026-06-18T16:22:44.7565661Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 107,
+      "time": "2026-06-18T16:22:39.7545387Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 106,
+      "time": "2026-06-18T16:22:34.8818399Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 105,
+      "time": "2026-06-18T16:22:29.7592022Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 104,
+      "time": "2026-06-18T16:22:24.7638008Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 103,
+      "time": "2026-06-18T16:22:19.855355Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 102,
+      "time": "2026-06-18T16:22:14.7745625Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 101,
+      "time": "2026-06-18T16:22:09.7871083Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 100,
+      "time": "2026-06-18T16:22:04.7957718Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 99,
+      "time": "2026-06-18T16:21:59.7556997Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 98,
+      "time": "2026-06-18T16:21:54.759658Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 97,
+      "time": "2026-06-18T16:21:49.7844534Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 96,
+      "time": "2026-06-18T16:21:44.7907558Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 95,
+      "time": "2026-06-18T16:21:39.838357Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 94,
+      "time": "2026-06-18T16:21:34.9829981Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 93,
+      "time": "2026-06-18T16:21:29.7900359Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 92,
+      "time": "2026-06-18T16:21:24.7726293Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 91,
+      "time": "2026-06-18T16:21:19.7489571Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 90,
+      "time": "2026-06-18T16:21:14.7499511Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 89,
+      "time": "2026-06-18T16:21:09.755064Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 88,
+      "time": "2026-06-18T16:21:04.7621296Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 87,
+      "time": "2026-06-18T16:20:59.7715952Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 86,
+      "time": "2026-06-18T16:20:54.7407822Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 85,
+      "time": "2026-06-18T16:20:49.7467668Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 84,
+      "time": "2026-06-18T16:20:44.7550772Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 83,
+      "time": "2026-06-18T16:20:39.784711Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 82,
+      "time": "2026-06-18T16:20:34.7748617Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 81,
+      "time": "2026-06-18T16:20:29.8423364Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 80,
+      "time": "2026-06-18T16:20:24.7495756Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 79,
+      "time": "2026-06-18T16:20:19.7494991Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 78,
+      "time": "2026-06-18T16:20:14.7530671Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 77,
+      "time": "2026-06-18T16:20:09.7484339Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 76,
+      "time": "2026-06-18T16:20:04.7442313Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 75,
+      "time": "2026-06-18T16:19:59.7568826Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 74,
+      "time": "2026-06-18T16:19:54.7419491Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 73,
+      "time": "2026-06-18T16:19:49.7511457Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 72,
+      "time": "2026-06-18T16:19:44.7423695Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 71,
+      "time": "2026-06-18T16:19:39.738665Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 70,
+      "time": "2026-06-18T16:19:34.7505214Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 69,
+      "time": "2026-06-18T16:19:29.8275769Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 68,
+      "time": "2026-06-18T16:19:24.7534447Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 67,
+      "time": "2026-06-18T16:19:19.9682458Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 66,
+      "time": "2026-06-18T16:19:14.7591423Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 65,
+      "time": "2026-06-18T16:19:09.7631043Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 64,
+      "time": "2026-06-18T16:19:04.7760823Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 63,
+      "time": "2026-06-18T16:18:59.7532182Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 62,
+      "time": "2026-06-18T16:18:54.7400522Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 61,
+      "time": "2026-06-18T16:18:49.7526038Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 60,
+      "time": "2026-06-18T16:18:44.7334446Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 59,
+      "time": "2026-06-18T16:18:39.7522864Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 58,
+      "time": "2026-06-18T16:18:34.7543639Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 57,
+      "time": "2026-06-18T16:18:29.7534506Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 56,
+      "time": "2026-06-18T16:18:24.7585693Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 55,
+      "time": "2026-06-18T16:18:19.7480019Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 54,
+      "time": "2026-06-18T16:18:14.7562362Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 53,
+      "time": "2026-06-18T16:18:09.7898446Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 52,
+      "time": "2026-06-18T16:18:04.7482102Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 51,
+      "time": "2026-06-18T16:17:59.748331Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 50,
+      "time": "2026-06-18T16:17:54.7673948Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 49,
+      "time": "2026-06-18T16:17:50.188704Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 48,
+      "time": "2026-06-18T16:17:45.0538034Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 47,
+      "time": "2026-06-18T16:17:39.7606763Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 46,
+      "time": "2026-06-18T16:17:34.7510638Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 45,
+      "time": "2026-06-18T16:17:29.7804887Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 44,
+      "time": "2026-06-18T16:17:24.7449928Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 43,
+      "time": "2026-06-18T16:17:19.740336Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 42,
+      "time": "2026-06-18T16:17:14.8138526Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 41,
+      "time": "2026-06-18T16:17:09.7381986Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 40,
+      "time": "2026-06-18T16:17:04.7450766Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 39,
+      "time": "2026-06-18T16:16:59.7564972Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 38,
+      "time": "2026-06-18T16:16:54.746552Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 37,
+      "time": "2026-06-18T16:16:49.753542Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 36,
+      "time": "2026-06-18T16:16:44.7492Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 35,
+      "time": "2026-06-18T16:16:39.7569094Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 34,
+      "time": "2026-06-18T16:16:34.7512199Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 33,
+      "time": "2026-06-18T16:16:29.7617371Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 32,
+      "time": "2026-06-18T16:16:24.7650348Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 31,
+      "time": "2026-06-18T16:16:19.7605956Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 30,
+      "time": "2026-06-18T16:16:14.7487879Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 29,
+      "time": "2026-06-18T16:16:09.7739982Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 28,
+      "time": "2026-06-18T16:16:04.7768686Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 27,
+      "time": "2026-06-18T16:15:59.7555299Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 26,
+      "time": "2026-06-18T16:15:54.765325Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 25,
+      "time": "2026-06-18T16:15:49.7492829Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 24,
+      "time": "2026-06-18T16:15:44.7565204Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 23,
+      "time": "2026-06-18T16:15:39.7579776Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 22,
+      "time": "2026-06-18T16:15:34.7516626Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 21,
+      "time": "2026-06-18T16:15:29.758385Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 20,
+      "time": "2026-06-18T16:15:24.760436Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 19,
+      "time": "2026-06-18T16:15:19.766936Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 18,
+      "time": "2026-06-18T16:15:17.344889Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 17,
+      "time": "2026-06-18T16:15:14.770728Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 16,
+      "time": "2026-06-18T16:15:09.7766124Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 15,
+      "time": "2026-06-18T16:15:04.7539813Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 14,
+      "time": "2026-06-18T16:14:59.7552374Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 13,
+      "time": "2026-06-18T16:14:54.7557434Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 12,
+      "time": "2026-06-18T16:14:49.7520213Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 11,
+      "time": "2026-06-18T16:14:44.8497106Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 10,
+      "time": "2026-06-18T16:14:39.798026Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 9,
+      "time": "2026-06-18T16:14:34.951523Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 8,
+      "time": "2026-06-18T16:14:30.4083638Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 7,
+      "time": "2026-06-18T16:14:24.7510461Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 6,
+      "time": "2026-06-18T16:14:19.7787286Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 5,
+      "time": "2026-06-18T16:14:14.8246551Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 4,
+      "time": "2026-06-18T16:14:09.8461526Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 3,
+      "time": "2026-06-18T16:14:04.7596687Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 2,
+      "time": "2026-06-18T16:14:00.1632811Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "id": 1,
+      "time": "2026-06-18T16:13:55.1091922Z",
+      "level": "error",
+      "source": "runtime",
+      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    }
+  ],
+  "nextId": 160
+}

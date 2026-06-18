@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KRANIX-IO / control-plane</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="ide">
+      <header class="menubar">
+        <div class="chrome-icons">
+          <span>▣</span>
+          <span>▸_</span>
+        </div>
+        <div class="brand"><strong>KRANIX-IO</strong><span>/</span><span>control-plane</span></div>
+        <label class="search"><span>⌘</span><input id="commandSearch" placeholder="Search control plane..." /><kbd>⌘K</kbd></label>
+        <div class="system-tray">
+          <span class="wifi">◒</span>
+          <span>4G</span>
+          <span>⚡</span>
+          <span>▰ 56%</span>
+          <span id="clock">Thu, Jun 18 21:13:58</span>
+          <span>◌</span>
+          <span>Ⅱ</span>
+        </div>
+      </header>
+
+      <aside class="explorer">
+        <h2>EXPLORER</h2>
+        <section>
+          <h3>⌄ WORKSPACE</h3>
+          <button class="tree active" data-view="overview">⌂ Overview</button>
+        </section>
+        <section>
+          <h3>⌄ CONTENT</h3>
+          <button class="tree" data-view="projects">□ Projects</button>
+          <button class="tree" data-view="experiments">♙ Experiments</button>
+          <button class="tree" data-view="writing">▤ Writing</button>
+          <button class="tree" data-view="notes">▣ Notes</button>
+          <button class="tree" data-view="gallery">▧ Gallery</button>
+        </section>
+        <section>
+          <h3>⌄ SYSTEM</h3>
+          <button class="tree" data-view="activity">⌁ Activity</button>
+          <button class="tree" data-view="contact">✉ Contact</button>
+          <button class="tree" data-view="settings">⚙ Settings</button>
+        </section>
+        <div class="explorer-status">
+          <p><span class="dot"></span> <span id="statusText">connecting...</span></p>
+          <small id="mcpStatus">MCP pending · alpha-v1</small>
+        </div>
+      </aside>
+
+      <main class="main">
+        <nav class="tabs">
+          <button class="tab active" data-view="overview">Overview <span>×</span></button>
+          <button class="tab" data-view="writing">Writing</button>
+          <button class="tab" data-view="mcp">kranix-mcp — AI Agent Interface</button>
+          <button class="tab spacer">···</button>
+        </nav>
+
+        <section class="editor">
+          <article id="overview" class="view active-view">
+            <div class="doc-title"><span>&gt;_</span><h1>workspace://overview</h1></div>
+            <p class="lede">Open-source control plane for containers and clusters. CLI and MCP clients call kranix-api; core reconciles intent against Docker, Kubernetes, and remote runtimes.</p>
+            <div class="hero-panel">
+              <pre class="ascii ascii-light">██╗  ██╗██████╗  █████╗ ███╗   ██╗██╗██╗  ██╗
+██║ ██╔╝██╔══██╗██╔══██╗████╗  ██║██║╚██╗██╔╝
+█████╔╝ ██████╔╝███████║██╔██╗ ██║██║ ╚███╔╝
+██╔═██╗ ██╔══██╗██╔══██║██║╚██╗██║██║ ██╔██╗
+██║  ██╗██║  ██║██║  ██║██║ ╚████║██║██╔╝ ██╗
+╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝</pre>
+            </div>
+            <div class="repo-grid">
+              <button class="repo-card" data-view="projects"><strong>kranix-api</strong><span>REST/gRPC front door, auth, audit, SSE</span></button>
+              <button class="repo-card" data-view="activity"><strong>kranix-core</strong><span>Reconcile, schedule, policy, events</span></button>
+              <button class="repo-card" data-view="projects"><strong>kranix-runtime</strong><span>Docker driver active in this build</span></button>
+              <button class="repo-card" data-view="mcp"><strong>kranix-mcp</strong><span>AI agent tools over JSON-RPC</span></button>
+            </div>
+          </article>
+
+          <article id="projects" class="view">
+            <div class="doc-title"><span>□</span><h1>workspace://projects</h1></div>
+            <form id="deployForm" class="deploy-grid">
+              <label>Name<input name="name" placeholder="hello-nginx" required /></label>
+              <label>Image<input name="image" placeholder="nginx:alpine" required /></label>
+              <label>Replicas<input name="replicas" type="number" min="1" max="50" value="1" required /></label>
+              <label>Port<input name="port" type="number" min="0" max="65535" value="8080" /></label>
+              <label>Container port<input name="containerPort" type="number" min="0" max="65535" value="80" /></label>
+              <button type="submit">deploy</button>
+            </form>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Workload</th><th>Image</th><th>Desired</th><th>Actual</th><th>Runtime</th><th>Drift</th><th></th></tr></thead>
+                <tbody id="workloadRows"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article id="experiments" class="view">
+            <div class="doc-title"><span>♙</span><h1>workspace://experiments</h1></div>
+            <p class="lede">Run one-shot core operations against real desired state.</p>
+            <div class="action-row">
+              <button id="reconcileBtn">reconcile now</button>
+              <button id="healthBtn">check health</button>
+            </div>
+            <pre id="experimentOutput" class="code-output"></pre>
+          </article>
+
+          <article id="writing" class="view">
+            <div class="doc-title"><span>▤</span><h1>workspace://writing/ecosystem</h1></div>
+            <div class="markdown">
+              <h2>Ecosystem Architecture</h2>
+              <pre>Developer / AI Agent
+        │
+   kranix-cli  |  kranix-mcp
+        │
+   kranix-api          ← REST/gRPC, auth, audit, SSE
+        │
+   kranix-core         ← reconcile, schedule, policy, events
+        │
+   ┌────┼────────────┐
+   ▼    ▼            ▼
+runtime  operator   packages
+   │
+Docker · K8s · Podman · Remote · Compose</pre>
+              <p>CLI ≡ API ≡ MCP. The same backend capabilities are exposed through different surfaces.</p>
+            </div>
+          </article>
+
+          <article id="notes" class="view">
+            <div class="doc-title"><span>▣</span><h1>workspace://notes/audit</h1></div>
+            <div id="auditList" class="audit-list"></div>
+          </article>
+
+          <article id="gallery" class="view">
+            <div class="doc-title"><span>▧</span><h1>workspace://gallery/runtime-map</h1></div>
+            <canvas id="architectureCanvas" width="1100" height="420"></canvas>
+          </article>
+
+          <article id="activity" class="view">
+            <div class="doc-title"><span>⌁</span><h1>workspace://system/activity</h1></div>
+            <div id="eventList" class="event-list"></div>
+          </article>
+
+          <article id="mcp" class="view">
+            <div class="doc-title"><span>&lt;/&gt;</span><h1>workspace://kranix-mcp</h1></div>
+            <div class="mcp-grid">
+              <button data-rpc="initialize">initialize</button>
+              <button data-rpc="tools/list">tools/list</button>
+              <button data-tool="list_workloads">call list_workloads</button>
+              <button data-tool="get_logs">call get_logs</button>
+            </div>
+            <pre id="mcpOutput" class="code-output"></pre>
+          </article>
+
+          <article id="contact" class="view">
+            <div class="doc-title"><span>✉</span><h1>workspace://contact</h1></div>
+            <p class="lede">This local build talks only to the Go API running on your machine.</p>
+          </article>
+
+          <article id="settings" class="view">
+            <div class="doc-title"><span>⚙</span><h1>workspace://settings</h1></div>
+            <label class="role-field">Role<select id="role"><option>admin</option><option>operator</option><option>viewer</option></select></label>
+          </article>
+        </section>
+
+        <section class="terminal">
+          <div class="terminal-title"><span>&gt;_</span><strong>TERMINAL</strong><span class="terminal-session"><i></i> kranix-sh</span><button id="closeTerminal">×</button></div>
+          <div class="terminal-body" id="terminalBody">
+            <pre class="ascii ascii-dark">██╗  ██╗██████╗  █████╗ ███╗   ██╗██╗██╗  ██╗
+██║ ██╔╝██╔══██╗██╔══██╗████╗  ██║██║╚██╗██╔╝
+█████╔╝ ██████╔╝███████║██╔██╗ ██║██║ ╚███╔╝
+██╔═██╗ ██╔══██╗██╔══██║██║╚██╗██║██║ ██╔██╗
+██║  ██╗██║  ██║██║  ██║██║ ╚████║██║██╔╝ ██╗
+╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝</pre>
+            <p>Kranix Control Plane v0.2.0 loaded.</p>
+            <p>API, reconciler, SSE, audit, and MCP endpoints ready.</p>
+            <p>Type "help" to see available commands.</p>
+          </div>
+          <form id="terminalForm" class="terminal-input"><span>›</span><input id="terminalCommand" autocomplete="off" placeholder="type a command..." /></form>
+        </section>
+      </main>
+
+      <footer class="statusbar">
+        <span>⌘ alpha-v1</span>
+        <span><i class="dot"></i> reconciler online</span>
+        <span>◎ <span id="issueCount">0</span> issues</span>
+        <span class="right">▤ ? &nbsp; &lt;/&gt; Overview &nbsp; UTF-8 &nbsp; kranix-io v0.2.0</span>
+      </footer>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>
