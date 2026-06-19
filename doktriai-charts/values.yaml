@@ -1,0 +1,36 @@
+replicaCount: 1
+
+image:
+  repository: doktriai/control-plane
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 18080
+
+ingress:
+  enabled: false
+  className: ""
+  hosts:
+    - host: doktriai.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

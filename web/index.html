@@ -1,195 +1,766 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KRANIX-IO / control-plane</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data:;">
+    <title>DOKTRIAI / control-plane</title>
     <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body>
+</head>
+
+<body>
     <div class="ide">
-      <header class="menubar">
-        <div class="chrome-icons">
-          <span>▣</span>
-          <span>▸_</span>
-        </div>
-        <div class="brand"><strong>KRANIX-IO</strong><span>/</span><span>control-plane</span></div>
-        <label class="search"><span>⌘</span><input id="commandSearch" placeholder="Search control plane..." /><kbd>⌘K</kbd></label>
-        <div class="system-tray">
-          <span class="wifi">◒</span>
-          <span>4G</span>
-          <span>⚡</span>
-          <span>▰ 56%</span>
-          <span id="clock">Thu, Jun 18 21:13:58</span>
-          <span>◌</span>
-          <span>Ⅱ</span>
-        </div>
-      </header>
-
-      <aside class="explorer">
-        <h2>EXPLORER</h2>
-        <section>
-          <h3>⌄ WORKSPACE</h3>
-          <button class="tree active" data-view="overview">⌂ Overview</button>
-        </section>
-        <section>
-          <h3>⌄ CONTENT</h3>
-          <button class="tree" data-view="projects">□ Projects</button>
-          <button class="tree" data-view="experiments">♙ Experiments</button>
-          <button class="tree" data-view="writing">▤ Writing</button>
-          <button class="tree" data-view="notes">▣ Notes</button>
-          <button class="tree" data-view="gallery">▧ Gallery</button>
-        </section>
-        <section>
-          <h3>⌄ SYSTEM</h3>
-          <button class="tree" data-view="activity">⌁ Activity</button>
-          <button class="tree" data-view="contact">✉ Contact</button>
-          <button class="tree" data-view="settings">⚙ Settings</button>
-        </section>
-        <div class="explorer-status">
-          <p><span class="dot"></span> <span id="statusText">connecting...</span></p>
-          <small id="mcpStatus">MCP pending · alpha-v1</small>
-        </div>
-      </aside>
-
-      <main class="main">
-        <nav class="tabs">
-          <button class="tab active" data-view="overview">Overview <span>×</span></button>
-          <button class="tab" data-view="writing">Writing</button>
-          <button class="tab" data-view="mcp">kranix-mcp — AI Agent Interface</button>
-          <button class="tab spacer">···</button>
-        </nav>
-
-        <section class="editor">
-          <article id="overview" class="view active-view">
-            <div class="doc-title"><span>&gt;_</span><h1>workspace://overview</h1></div>
-            <p class="lede">Open-source control plane for containers and clusters. CLI and MCP clients call kranix-api; core reconciles intent against Docker, Kubernetes, and remote runtimes.</p>
-            <div class="hero-panel">
-              <pre class="ascii ascii-light">██╗  ██╗██████╗  █████╗ ███╗   ██╗██╗██╗  ██╗
-██║ ██╔╝██╔══██╗██╔══██╗████╗  ██║██║╚██╗██╔╝
-█████╔╝ ██████╔╝███████║██╔██╗ ██║██║ ╚███╔╝
-██╔═██╗ ██╔══██╗██╔══██║██║╚██╗██║██║ ██╔██╗
-██║  ██╗██║  ██║██║  ██║██║ ╚████║██║██╔╝ ██╗
-╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝</pre>
+        <header class="menubar">
+            <div class="chrome-icons">
+                <button id="sidebarToggleBtn" title="Toggle Sidebar Explorer" class="menubar-btn">
+                    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="12" height="12" rx="1.5"></rect>
+                        <line x1="6" y1="2" x2="6" y2="14"></line>
+                        <circle cx="4" cy="5" r="0.75" fill="currentColor"></circle>
+                        <circle cx="4" cy="8" r="0.75" fill="currentColor"></circle>
+                        <circle cx="4" cy="11" r="0.75" fill="currentColor"></circle>
+                    </svg>
+                </button>
+                <button id="terminalToggleBtn" title="Toggle Terminal Drawer" class="menubar-btn">
+                    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="4,4 9,8 4,12"></polyline>
+                        <line x1="10" y1="12" x2="12" y2="12"></line>
+                    </svg>
+                </button>
             </div>
-            <div class="repo-grid">
-              <button class="repo-card" data-view="projects"><strong>kranix-api</strong><span>REST/gRPC front door, auth, audit, SSE</span></button>
-              <button class="repo-card" data-view="activity"><strong>kranix-core</strong><span>Reconcile, schedule, policy, events</span></button>
-              <button class="repo-card" data-view="projects"><strong>kranix-runtime</strong><span>Docker driver active in this build</span></button>
-              <button class="repo-card" data-view="mcp"><strong>kranix-mcp</strong><span>AI agent tools over JSON-RPC</span></button>
+            <div class="brand"><strong>DOKTRIAI</strong><span>/</span><span>control-plane</span></div>
+            <label class="search">
+                <span>⌘</span>
+                <input id="commandSearch" placeholder="Search or press ⌘K..." autocomplete="off" />
+                <kbd>⌘K</kbd>
+                <div class="search-results" id="searchResults"></div>
+            </label>
+            <div class="system-tray">
+                <span class="wifi">◒</span>
+                <span>4G</span>
+                <span>⚡</span>
+                <span>▰ 99%</span>
+                <span id="clock">Thu, Jun 18 22:14:25</span>
+                <div class="theme-menu-container">
+                    <button id="themeDropdownBtn" title="Workspace Theme" class="icon-btn">🎨</button>
+                    <div class="theme-dropdown" id="themeDropdown">
+                        <div class="theme-dropdown-header">
+                            <h3>WORKSPACE THEME</h3>
+                            <span id="activeThemeName">Linen</span>
+                        </div>
+                        <div class="theme-list">
+                            <div class="theme-item" data-theme="linen">
+                                <div class="theme-preview linen">
+                                    <span class="dot"></span>
+                                    <div class="preview-layout">
+                                        <div class="preview-sidebar"></div>
+                                        <div class="preview-content">
+                                            <div class="preview-line"></div>
+                                            <div class="preview-line"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="theme-label">Linen <span class="checkmark">✓</span></span>
+                            </div>
+                            <div class="theme-item" data-theme="graphite">
+                                <div class="theme-preview graphite">
+                                    <span class="dot"></span>
+                                    <div class="preview-layout">
+                                        <div class="preview-sidebar"></div>
+                                        <div class="preview-content">
+                                            <div class="preview-line"></div>
+                                            <div class="preview-line"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="theme-label">Graphite <span class="checkmark">✓</span></span>
+                            </div>
+                            <div class="theme-item" data-theme="vesper">
+                                <div class="theme-preview vesper">
+                                    <span class="dot"></span>
+                                    <div class="preview-layout">
+                                        <div class="preview-sidebar"></div>
+                                        <div class="preview-content">
+                                            <div class="preview-line"></div>
+                                            <div class="preview-line"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="theme-label">Vesper <span class="checkmark">✓</span></span>
+                            </div>
+                            <div class="theme-item" data-theme="nord">
+                                <div class="theme-preview nord">
+                                    <span class="dot"></span>
+                                    <div class="preview-layout">
+                                        <div class="preview-sidebar"></div>
+                                        <div class="preview-content">
+                                            <div class="preview-line"></div>
+                                            <div class="preview-line"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="theme-label">Nord <span class="checkmark">✓</span></span>
+                            </div>
+                            <div class="theme-item" data-theme="catppuccin">
+                                <div class="theme-preview catppuccin">
+                                    <span class="dot"></span>
+                                    <div class="preview-layout">
+                                        <div class="preview-sidebar"></div>
+                                        <div class="preview-content">
+                                            <div class="preview-line"></div>
+                                            <div class="preview-line"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="theme-label">Catppuccin <span class="checkmark">✓</span></span>
+                            </div>
+                            <div class="theme-item" data-theme="tokyo-night">
+                                <div class="theme-preview tokyo-night">
+                                    <span class="dot"></span>
+                                    <div class="preview-layout">
+                                        <div class="preview-sidebar"></div>
+                                        <div class="preview-content">
+                                            <div class="preview-line"></div>
+                                            <div class="preview-line"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="theme-label">Tokyo Night <span class="checkmark">✓</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </article>
+        </header>
 
-          <article id="projects" class="view">
-            <div class="doc-title"><span>□</span><h1>workspace://projects</h1></div>
-            <form id="deployForm" class="deploy-grid">
-              <label>Name<input name="name" placeholder="hello-nginx" required /></label>
-              <label>Image<input name="image" placeholder="nginx:alpine" required /></label>
-              <label>Replicas<input name="replicas" type="number" min="1" max="50" value="1" required /></label>
-              <label>Port<input name="port" type="number" min="0" max="65535" value="8080" /></label>
-              <label>Container port<input name="containerPort" type="number" min="0" max="65535" value="80" /></label>
-              <button type="submit">deploy</button>
-            </form>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Workload</th><th>Image</th><th>Desired</th><th>Actual</th><th>Runtime</th><th>Drift</th><th></th></tr></thead>
-                <tbody id="workloadRows"></tbody>
-              </table>
+        <aside class="explorer">
+            <h2>EXPLORER</h2>
+            <section>
+                <h3>⌄ WORKSPACE</h3>
+                <button class="tree active" data-view="overview">⌂ Overview</button>
+            </section>
+            <section>
+                <h3>⌄ COMPUTE</h3>
+                <button class="tree" data-view="workloads">▦ Workloads</button>
+                <button class="tree" data-view="core">⟳ Reconciler</button>
+                <button class="tree" data-view="operator">☸ Operator/GitOps</button>
+                <button class="tree" data-view="runtime">⬡ Runtime Drivers</button>
+            </section>
+            <section>
+                <h3>⌄ INTEGRATIONS</h3>
+                <button class="tree" data-view="mcp">✦ AI Agent Hub</button>
+                <button class="tree" data-view="cli">🐚 CLI Reference</button>
+                <button class="tree" data-view="packages">{ } Schema Browser</button>
+                <button class="tree" data-view="charts">⛵ Helm Charts</button>
+                <button class="tree" data-view="examples">⚡ Examples</button>
+            </section>
+            <section>
+                <h3>⌄ SYSTEM</h3>
+                <button class="tree" data-view="security">🔒 Security</button>
+                <button class="tree" data-view="activity">⌁ Activity</button>
+                <button class="tree" data-view="settings">⚙ Settings</button>
+            </section>
+            <div class="explorer-status">
+                <p><span class="dot" id="connectionDot"></span> <span id="statusText">connecting...</span></p>
+                <p><span class="dot" id="lockDot"></span> <span id="lockStatusText">system unlocked</span></p>
+                <small id="mcpStatus">MCP pending · alpha-v1</small>
             </div>
-          </article>
+        </aside>
 
-          <article id="experiments" class="view">
-            <div class="doc-title"><span>♙</span><h1>workspace://experiments</h1></div>
-            <p class="lede">Run one-shot core operations against real desired state.</p>
-            <div class="action-row">
-              <button id="reconcileBtn">reconcile now</button>
-              <button id="healthBtn">check health</button>
-            </div>
-            <pre id="experimentOutput" class="code-output"></pre>
-          </article>
+        <main class="main">
+            <nav class="tabs">
+                <button class="tab active" data-view="overview">Overview <span>×</span></button>
+                <button class="tab" data-view="workloads">Workloads</button>
+                <button class="tab" data-view="security">Security <span id="planBadge" class="plan-badge" style="display:none">0</span></button>
+                <button class="tab" data-view="mcp">doktriai-mcp</button>
+                <button class="tab spacer">···</button>
+            </nav>
 
-          <article id="writing" class="view">
-            <div class="doc-title"><span>▤</span><h1>workspace://writing/ecosystem</h1></div>
-            <div class="markdown">
-              <h2>Ecosystem Architecture</h2>
-              <pre>Developer / AI Agent
-        │
-   kranix-cli  |  kranix-mcp
-        │
-   kranix-api          ← REST/gRPC, auth, audit, SSE
-        │
-   kranix-core         ← reconcile, schedule, policy, events
-        │
-   ┌────┼────────────┐
-   ▼    ▼            ▼
-runtime  operator   packages
-   │
-Docker · K8s · Podman · Remote · Compose</pre>
-              <p>CLI ≡ API ≡ MCP. The same backend capabilities are exposed through different surfaces.</p>
-            </div>
-          </article>
+            <section class="editor">
+                <!-- Overview View -->
+                <article id="overview" class="view active-view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://overview</h1>
+                    </div>
+                    <p class="lede">Autonomous control plane for declarative container clusters. Doktriai-api coordinates multi-tenant workload requests, and doktriai-core reconciles desired state against local and remote Docker runtimes.</p>
+                    <div class="hero-panel">
+                        <pre class="ascii">
+██████╗  ██████╗ ██╗  ██╗████████╗██████╗ ██╗ █████╗ ██╗
+██╔══██╗██╔═══██╗██║ ██╔╝╚══██╔══╝██╔══██╗██║██╔══██╗██║
+██║  ██║██║   ██║█████╔╝    ██║   ██████╔╝██║███████║██║
+██║  ██║██║   ██║██╔═██╗    ██║   ██╔══██╗██║██╔══██║██║
+██████╔╝╚██████╔╝██║  ██╗   ██║   ██║  ██║██║██║  ██║██║
+╚═════╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚═╝</pre>
+                    </div>
 
-          <article id="notes" class="view">
-            <div class="doc-title"><span>▣</span><h1>workspace://notes/audit</h1></div>
-            <div id="auditList" class="audit-list"></div>
-          </article>
+                    <!-- Live Stats Dashboard Cards -->
+                    <div class="security-status-grid" style="margin-bottom: 24px;">
+                        <div class="security-status-card">
+                            <div class="status-icon">⟳</div>
+                            <strong>Reconciler Loop</strong>
+                            <span>Active · 5s interval</span>
+                        </div>
+                        <div class="security-status-card">
+                            <div class="status-icon">▦</div>
+                            <strong>Active Workloads</strong>
+                            <span id="overviewWorkloadsCount">0 running</span>
+                        </div>
+                        <div class="security-status-card">
+                            <div class="status-icon">🛡️</div>
+                            <strong>Security Gate</strong>
+                            <span>PTE Gate Enabled</span>
+                        </div>
+                        <div class="security-status-card">
+                            <div class="status-icon">⚠️</div>
+                            <strong>Drift Anomalies</strong>
+                            <span id="overviewDriftCount">0 deviations</span>
+                        </div>
+                    </div>
 
-          <article id="gallery" class="view">
-            <div class="doc-title"><span>▧</span><h1>workspace://gallery/runtime-map</h1></div>
-            <canvas id="architectureCanvas" width="1100" height="420"></canvas>
-          </article>
+                    <div class="repo-grid">
+                        <button class="repo-card" data-view="workloads"><strong>doktriai-api</strong><span>REST/gRPC front door, mTLS auth, audit logs, SSE event streaming</span></button>
+                        <button class="repo-card" data-view="core"><strong>doktriai-core</strong><span>Declarative reconciler compliance loop preventing environment drift</span></button>
+                        <button class="repo-card" data-view="mcp"><strong>doktriai-mcp</strong><span>Model Context Protocol server exposing tools to AI agents</span></button>
+                        <button class="repo-card" data-view="cli"><strong>doktriai-cli</strong><span>Native developer CLI binary interface for local scaling & logs</span></button>
+                        <button class="repo-card" data-view="operator"><strong>doktriai-operator</strong><span>Kubernetes GitOps operator syncing custom manifests (CRDs)</span></button>
+                        <button class="repo-card" data-view="runtime"><strong>doktriai-runtime</strong><span>Universal adapter driver engine virtualizing container platforms</span></button>
+                        <button class="repo-card" data-view="packages"><strong>doktriai-packages</strong><span>Shared common schemas, configuration maps, and specifications</span></button>
+                        <button class="repo-card" data-view="charts"><strong>doktriai-charts</strong><span>Official Helm 3 packages for secure cluster deployment distributions</span></button>
+                        <button class="repo-card" data-view="examples"><strong>doktriai-examples</strong><span>Reference tutorials, quickstart scripts, and sample agent clients</span></button>
+                        <button class="repo-card" data-view="settings"><strong>doktriai-web</strong><span>Static workspace interface served natively by the Go API engine</span></button>
+                    </div>
+                </article>
 
-          <article id="activity" class="view">
-            <div class="doc-title"><span>⌁</span><h1>workspace://system/activity</h1></div>
-            <div id="eventList" class="event-list"></div>
-          </article>
+                <!-- Workloads View -->
+                <article id="workloads" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://workloads</h1>
+                    </div>
+                    <div class="projects-header">
+                        <p class="lede">Manage, deploy, and scale container workloads. Desired state specifications are saved, reconciled, and audited automatically.</p>
+                        <span class="issue-badge" id="issueCountBadge">Issues: <span id="issueCount">0</span></span>
+                    </div>
 
-          <article id="mcp" class="view">
-            <div class="doc-title"><span>&lt;/&gt;</span><h1>workspace://kranix-mcp</h1></div>
-            <div class="mcp-grid">
-              <button data-rpc="initialize">initialize</button>
-              <button data-rpc="tools/list">tools/list</button>
-              <button data-tool="list_workloads">call list_workloads</button>
-              <button data-tool="get_logs">call get_logs</button>
-            </div>
-            <pre id="mcpOutput" class="code-output"></pre>
-          </article>
+                    <h2 class="section-title">Deploy Container Workload</h2>
+                    <form id="deployForm" class="deploy-grid">
+                        <label>Name
+                            <input name="name" required placeholder="e.g. hello-web" autocomplete="off" />
+                        </label>
+                        <label>Image
+                            <input name="image" required placeholder="e.g. nginx:alpine" autocomplete="off" />
+                        </label>
+                        <label>Replicas
+                            <input name="replicas" type="number" value="1" min="1" max="10" />
+                        </label>
+                        <label>Port
+                            <input name="port" type="number" placeholder="8080" />
+                        </label>
+                        <label>Container Port
+                            <input name="containerPort" type="number" placeholder="80" />
+                        </label>
+                        <button type="submit">Deploy App</button>
+                    </form>
 
-          <article id="contact" class="view">
-            <div class="doc-title"><span>✉</span><h1>workspace://contact</h1></div>
-            <p class="lede">This local build talks only to the Go API running on your machine.</p>
-          </article>
+                    <h2 class="section-title">Active Workloads Status</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Workload Name</th>
+                                    <th>Target Image</th>
+                                    <th>Desired</th>
+                                    <th>Actual Count</th>
+                                    <th>Runtime</th>
+                                    <th>Drift Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="workloadRows">
+                                <tr>
+                                    <td colspan="7">Querying active workloads...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
 
-          <article id="settings" class="view">
-            <div class="doc-title"><span>⚙</span><h1>workspace://settings</h1></div>
-            <label class="role-field">Role<select id="role"><option>admin</option><option>operator</option><option>viewer</option></select></label>
-          </article>
-        </section>
+                <!-- Reconciler Core View -->
+                <article id="core" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://core</h1>
+                    </div>
+                    <p class="lede">Declarative compliance loop of the DOKTRIAI core engine. Compares target workload specs against actual environment state, reconciling any detected drift.</p>
+                    
+                    <div class="experiments-layout" style="margin-bottom: 24px;">
+                        <div class="card-sidebar">
+                            <h3>⌄ DIAGNOSTICS</h3>
+                            <button id="forceReconcileBtn" style="width:100%; margin-bottom:8px;" class="btn-primary">Force Reconcile Loop</button>
+                            <button id="queryHealthBtn" style="width:100%; margin-bottom:16px;">Query Engine Health</button>
 
-        <section class="terminal">
-          <div class="terminal-title"><span>&gt;_</span><strong>TERMINAL</strong><span class="terminal-session"><i></i> kranix-sh</span><button id="closeTerminal">×</button></div>
-          <div class="terminal-body" id="terminalBody">
-            <pre class="ascii ascii-dark">██╗  ██╗██████╗  █████╗ ███╗   ██╗██╗██╗  ██╗
-██║ ██╔╝██╔══██╗██╔══██╗████╗  ██║██║╚██╗██╔╝
-█████╔╝ ██████╔╝███████║██╔██╗ ██║██║ ╚███╔╝
-██╔═██╗ ██╔══██╗██╔══██║██║╚██╗██║██║ ██╔██╗
-██║  ██╗██║  ██║██║  ██║██║ ╚████║██║██╔╝ ██╗
-╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝</pre>
-            <p>Kranix Control Plane v0.2.0 loaded.</p>
-            <p>API, reconciler, SSE, audit, and MCP endpoints ready.</p>
-            <p>Type "help" to see available commands.</p>
-          </div>
-          <form id="terminalForm" class="terminal-input"><span>›</span><input id="terminalCommand" autocomplete="off" placeholder="type a command..." /></form>
-        </section>
-      </main>
+                            <h3>⌄ CONTROL PLANE LOCK</h3>
+                            <p style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">Lock desired state updates to prevent automated deployment changes.</p>
+                            <label>Lock Reason
+                                <input id="coreLockReasonInput" placeholder="e.g. Agent Hotfix Patching" style="margin-bottom:8px;" />
+                            </label>
+                            <button id="coreAcquireLockBtn" class="btn-primary" style="width:100%; margin-bottom:8px; height:38px;">Acquire Lock</button>
+                            <button id="coreReleaseLockBtn" class="btn-secondary" style="width:100%; margin-bottom:16px; height:38px;">Release Lock</button>
+                        </div>
+                        <div class="card-main" style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="security-status-grid">
+                                <div class="security-status-card">
+                                    <div class="status-icon" style="color: var(--green);">⬤</div>
+                                    <strong>Reconciler Loop</strong>
+                                    <span>Ticks: Every 5s</span>
+                                </div>
+                                <div class="security-status-card">
+                                    <div class="status-icon" style="color: var(--orange);">⚡</div>
+                                    <strong>Circuit Breakers</strong>
+                                    <span id="circuitBreakerDisplay">Healthy (0 open)</span>
+                                </div>
+                            </div>
+                            <h3>Diagnostic Execution Logs</h3>
+                            <pre class="code-output" id="coreDiagnosticsOutput" style="flex: 1; min-height: 180px; font-family:'JetBrains Mono', monospace; font-size:12px;">Click Reconcile or Health check to generate execution outputs...</pre>
+                        </div>
+                    </div>
 
-      <footer class="statusbar">
-        <span>⌘ alpha-v1</span>
-        <span><i class="dot"></i> reconciler online</span>
-        <span>◎ <span id="issueCount">0</span> issues</span>
-        <span class="right">▤ ? &nbsp; &lt;/&gt; Overview &nbsp; UTF-8 &nbsp; kranix-io v0.2.0</span>
-      </footer>
+                    <h2 class="section-title">Reconciliation Loop State &amp; Drift</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Workload</th>
+                                    <th>Desired State</th>
+                                    <th>Actual State</th>
+                                    <th>Drift Status</th>
+                                    <th>Circuit Breaker</th>
+                                </tr>
+                            </thead>
+                            <tbody id="coreDriftRows">
+                                <tr><td colspan="5">Loading reconciler state...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <!-- K8s Operator View -->
+                <article id="operator" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://operator</h1>
+                    </div>
+                    <p class="lede">Synchronizes Custom Resource Definitions (CRDs) and custom declarative resources into Kubernetes target runtimes.</p>
+                    
+                    <div class="experiments-layout" style="margin-bottom: 24px;">
+                        <div class="card-sidebar">
+                            <h3>⌄ CRD TEMPLATE</h3>
+                            <label>Select Deployment Spec
+                                <select id="crdTemplateSelect" style="margin-bottom:12px;">
+                                    <option value="nginx">Nginx Web Server App</option>
+                                    <option value="redis">Redis Cache Node</option>
+                                    <option value="postgres">PostgreSQL Database</option>
+                                </select>
+                            </label>
+                            <button id="simulateCrdBtn" class="btn-primary" style="width:100%; height:38px;">Apply CRD Resource</button>
+                        </div>
+                        <div class="card-main" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="doc-title" style="margin-bottom:4px; padding-bottom:4px;">
+                                <span>yaml</span><strong>CRD Manifest Preview (apiVersion: doktri.io/v1alpha1)</strong>
+                            </div>
+                            <pre class="code-output" id="crdManifestPreview" style="flex: 1; font-size:11px; min-height: 220px; line-height: 1.35; padding: 12px; font-family:'JetBrains Mono', monospace;">Select template...</pre>
+                        </div>
+                    </div>
+
+                    <h2 class="section-title">Active CRDs Registered in Operator Scope</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Resource Name</th>
+                                    <th>Kind</th>
+                                    <th>Namespace</th>
+                                    <th>Status</th>
+                                    <th>Synced At</th>
+                                </tr>
+                            </thead>
+                            <tbody id="crdTableRows">
+                                <tr>
+                                    <td><strong>secure-nginx-crd</strong></td>
+                                    <td>DoktriApp</td>
+                                    <td>default</td>
+                                    <td><span class="ok">✓ Synced</span></td>
+                                    <td>Just now</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <!-- Runtime View -->
+                <article id="runtime" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://runtime</h1>
+                    </div>
+                    <p class="lede">Universal virtualization driver layer for target host nodes. Interfaces with local Docker sockets and Kubernetes runtimes.</p>
+
+                    <div class="security-status-grid" style="margin-bottom: 24px;">
+                        <div class="security-status-card" id="dockerDriverCard">
+                            <div class="status-icon">⬡</div>
+                            <strong>Docker Driver</strong>
+                            <span class="ok">Active (Connected)</span>
+                            <small id="dockerDriverDetail">Host socket: /var/run/docker.sock</small>
+                        </div>
+                        <div class="security-status-card" id="k8sDriverCard">
+                            <div class="status-icon">☸</div>
+                            <strong>Kubernetes Driver</strong>
+                            <span class="ok">Simulated Mode</span>
+                            <small>Host context: minikube</small>
+                        </div>
+                    </div>
+
+                    <div class="experiments-layout" style="margin-bottom:24px;">
+                        <div class="card-sidebar">
+                            <h3>⌄ DRIVER UTILS</h3>
+                            <button id="pingDockerBtn" style="width:100%; margin-bottom:8px;" class="btn-primary">Ping Docker Socket</button>
+                            <button id="toggleDriverSimBtn" style="width:100%;" class="btn-secondary">Driver Selector</button>
+                        </div>
+                        <div class="card-main">
+                            <h3>Driver Output Console</h3>
+                            <pre class="code-output" id="driverConsoleOutput" style="min-height: 100px; font-family:'JetBrains Mono', monospace; font-size:12px;">Awaiting action...</pre>
+                        </div>
+                    </div>
+
+                    <h2 class="section-title">Observed Container Processes</h2>
+                    <div class="table-wrap" style="margin-bottom: 24px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Container ID</th>
+                                    <th>Workload Name</th>
+                                    <th>Replica</th>
+                                    <th>Image</th>
+                                    <th>Virtual Runtime</th>
+                                    <th>Runtime Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="runtimeContainerRows">
+                                <tr><td colspan="6">Querying driver processes...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2 class="section-title">System Architecture Connections Mapping</h2>
+                    <div class="gallery-layout">
+                        <canvas id="architectureCanvas" width="1100" height="420"></canvas>
+                    </div>
+                </article>
+
+                <!-- CLI View -->
+                <article id="cli" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://cli</h1>
+                    </div>
+                    <p class="lede">Reference guide for interacting with the control plane via the native <code>doktriai-cli</code> client, and security token authorization utility.</p>
+
+                    <div class="experiments-layout" style="margin-bottom: 24px;">
+                        <div class="card-sidebar">
+                            <h3>⌄ SECURE TOKEN GENERATOR</h3>
+                            <p style="font-size:11px; color:var(--muted); margin-bottom:8px;">Generate signature tokens verified by the Layer 0 authentication parser.</p>
+                            <label>Role Scope
+                                <select id="cliTokenRole" style="margin-bottom:8px;">
+                                    <option value="admin">Admin</option>
+                                    <option value="operator">Operator</option>
+                                    <option value="viewer">Viewer</option>
+                                </select>
+                            </label>
+                            <label>Actor Name
+                                <input id="cliTokenActor" value="developer-agent" placeholder="e.g. system-bot" style="margin-bottom:12px;" />
+                            </label>
+                            <button id="cliGenerateTokenBtn" class="btn-primary" style="width:100%; height:38px;">Generate Token</button>
+                        </div>
+                        <div class="card-main" style="display: flex; flex-direction: column; gap:10px;">
+                            <div class="doc-title" style="margin-bottom:4px; padding-bottom:4px;">
+                                <span>token</span><strong>X-Doktri-Token (HMAC-SHA256 Signed)</strong>
+                            </div>
+                            <textarea id="cliTokenOutput" readonly style="flex:1; background:var(--term); border:1px solid var(--line); border-radius:6px; color:var(--green); font-family:'JetBrains Mono', monospace; font-size:12px; padding:10px; resize:none; min-height:100px;" placeholder="Generated token will appear here..."></textarea>
+                        </div>
+                    </div>
+
+                    <h2 class="section-title">CLI Cheat Sheet Reference</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Command</th>
+                                    <th>Description</th>
+                                    <th>Usage Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>apply</strong></td>
+                                    <td>Deploy or update a declarative workload spec manifest file.</td>
+                                    <td><code style="color:var(--orange);">doktriai-cli apply -f app.doktri</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>delete</strong></td>
+                                    <td>Decommission and remove a running container workload.</td>
+                                    <td><code style="color:var(--orange);">doktriai-cli delete workload secure-nginx</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>status</strong></td>
+                                    <td>Inspect the overall health, sync logs, and drift of running workloads.</td>
+                                    <td><code style="color:var(--orange);">doktriai-cli status</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>logs</strong></td>
+                                    <td>Tail running container logs for a specific workload.</td>
+                                    <td><code style="color:var(--orange);">doktriai-cli logs secure-nginx --tail=50</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>mcp-tools</strong></td>
+                                    <td>Query MCP protocols and list tools available to AI agents.</td>
+                                    <td><code style="color:var(--orange);">doktriai-cli mcp-tools</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <!-- Packages Schema View -->
+                <article id="packages" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://packages</h1>
+                    </div>
+                    <p class="lede">Interactive definition reference browser for the declarative <code>WorkloadSpec</code> parameters. Used to construct valid deployment manifests.</p>
+                    
+                    <div class="search" style="max-width:100%; margin-bottom:20px; height:38px;">
+                        <span>🔍</span>
+                        <input id="schemaSearchInput" placeholder="Filter schema fields by name or type..." style="font-size:13px;" />
+                    </div>
+
+                    <h2 class="section-title">WorkloadSpec Properties Mappings</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Field Name</th>
+                                    <th>Type</th>
+                                    <th>Required</th>
+                                    <th>Description</th>
+                                    <th>Example Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schemaTableRows">
+                                <tr><td colspan="5">Loading schema parameters...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <!-- Helm Charts Generator View -->
+                <article id="charts" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://charts</h1>
+                    </div>
+                    <p class="lede">Generates Helm values configuration manifests from standard workload definitions to compile cluster packages.</p>
+                    
+                    <div class="experiments-layout">
+                        <div class="card-sidebar" style="gap: 8px;">
+                            <h3>⌄ VALUES CONFIG</h3>
+                            <label>Workload Name
+                                <input id="chartWorkloadName" value="hello-helm" placeholder="e.g. app-web" />
+                            </label>
+                            <label>Target Image
+                                <input id="chartWorkloadImage" value="nginx:alpine" placeholder="e.g. redis:latest" />
+                            </label>
+                            <label>Replicas count
+                                <input id="chartWorkloadReplicas" type="number" value="2" />
+                            </label>
+                            <label>External Port
+                                <input id="chartWorkloadPort" type="number" value="8080" />
+                            </label>
+                            <label>Container Port
+                                <input id="chartWorkloadContainerPort" type="number" value="80" />
+                            </label>
+                            <label>Security Mode
+                                <select id="chartSecurityMode">
+                                    <option value="dev">Dev</option>
+                                    <option value="staging">Staging</option>
+                                    <option value="production" selected>Production</option>
+                                </select>
+                            </label>
+                            <button id="renderChartBtn" class="btn-primary" style="width:100%; height:38px; margin-top:8px;">Render values.yaml</button>
+                        </div>
+                        <div class="card-main" style="display: flex; flex-direction: column; gap:10px;">
+                            <div class="doc-title" style="margin-bottom:4px; padding-bottom:4px;">
+                                <span>yaml</span><strong>Compiled values.yaml Helm Manifest</strong>
+                            </div>
+                            <pre class="code-output" id="helmYamlPreview" style="flex:1; font-size:11px; min-height: 280px; line-height: 1.35; padding: 12px; font-family:'JetBrains Mono', monospace;">Click Render button to generate YAML...</pre>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Live Examples View -->
+                <article id="examples" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://examples</h1>
+                    </div>
+                    <p class="lede">Code tutorials, runnable quickstarts, and client SDK integration scripts for DOKTRIAI.</p>
+                    
+                    <div class="experiments-layout">
+                        <div class="card-sidebar">
+                            <h3>⌄ LIVE EXAMPLES</h3>
+                            <button class="tree active" id="exampleTabPython" style="width:100%; margin-bottom:8px; text-align:left;">1. Python MCP Agent</button>
+                            <button class="tree" id="exampleTabCurl" style="width:100%; margin-bottom:8px; text-align:left;">2. REST API (Curl)</button>
+                            <button class="tree" id="exampleTabGo" style="width:100%; text-align:left;">3. Go Client Package</button>
+                        </div>
+                        <div class="card-main">
+                            <pre class="code-output" id="exampleCodePreview" style="min-height: 320px; line-height:1.45; font-size:11px; padding: 12px; font-family:'JetBrains Mono', monospace;">Select a tutorial on the left...</pre>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Activity View -->
+                <article id="activity" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://activity</h1>
+                    </div>
+                    <p class="lede">Real-time control plane events stream (SSE) and tenant action audit database logs.</p>
+                    <div class="activity-layout">
+                        <div class="activity-box">
+                            <h2>Events Log (SSE stream)</h2>
+                            <div class="activity-scroll" id="eventList">
+                                <div class="event-line">Awaiting system ticks...</div>
+                            </div>
+                        </div>
+                        <div class="activity-box">
+                            <h2>Security Audit Trail</h2>
+                            <div class="activity-scroll" id="auditList">
+                                <div class="audit-line">No security actions recorded.</div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Security View (All 5 Layers) -->
+                <article id="security" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://security</h1>
+                    </div>
+                    <p class="lede">DOKTRIAI 5-Layer Agentic Security Control Plane — monitoring PTE approvals, behavioral anomalies, audit trail integrity, and supply chain policies in real time.</p>
+
+                    <!-- Layer 2: PTE Gate -->
+                    <div class="security-section">
+                        <div class="security-section-header">
+                            <span class="security-layer-badge">Layer 2</span>
+                            <h2>Pending Approvals (Plan-Then-Execute Gate)</h2>
+                        </div>
+                        <p class="security-desc">High-risk agent actions (replicas &gt; 5, sensitive env keys, all deletes) are held here until a human operator approves or rejects them. Unapproved plans expire after 15 minutes. <em>Prevents ASI09 — autonomous AI damage.</em></p>
+                        <div id="pendingPlansContainer"><div class="plan-empty">Loading pending approvals...</div></div>
+                    </div>
+
+                    <!-- Layer 3: Behavioral Metrics -->
+                    <div class="security-section">
+                        <div class="security-section-header">
+                            <span class="security-layer-badge layer3">Layer 3</span>
+                            <h2>Behavioral Anomaly Detection</h2>
+                        </div>
+                        <p class="security-desc">Rolling 5-minute window tracks deploy/delete/reject rates per actor. Actors exceeding thresholds are flagged and emit anomaly events. <em>Detects ASI10 — rogue agents.</em></p>
+                        <div id="behaviorMetricsContainer"><div class="plan-empty">Loading behavioral metrics...</div></div>
+                    </div>
+
+                    <!-- Layer 3: Audit Trail -->
+                    <div class="security-section">
+                        <div class="security-section-header">
+                            <span class="security-layer-badge layer3">Layer 3</span>
+                            <h2>Security Audit Trail <small>(SHA256 State Diff Hashing)</small></h2>
+                        </div>
+                        <p class="security-desc">Every state mutation records a SHA256 hash of desired state before and after. Signed tokens show ✓ signed badge. Approved plans show ✓ approved badge. <em>Prevents ASI06/ASI10 — audit log poisoning.</em></p>
+                        <div class="activity-scroll" id="securityAuditList">
+                            <div class="audit-line">No security actions recorded.</div>
+                        </div>
+                    </div>
+
+                    <!-- Layer 0+1: Policy Status -->
+                    <div class="security-section">
+                        <div class="security-section-header">
+                            <span class="security-layer-badge layer0">Layer 0+1</span>
+                            <h2>Intent Guard &amp; Auth Status</h2>
+                        </div>
+                        <div class="security-status-grid">
+                            <div class="security-status-card">
+                                <div class="status-icon">🔐</div>
+                                <strong>Token Auth</strong>
+                                <span id="authModeDisplay">dev mode (header fallback)</span>
+                            </div>
+                            <div class="security-status-card">
+                                <div class="status-icon">🛡️</div>
+                                <strong>Intent Guard</strong>
+                                <span>Unicode norm · Registry allowlist · Base64 scan</span>
+                            </div>
+                            <div class="security-status-card">
+                                <div class="status-icon">⚡</div>
+                                <strong>Rate Limiter</strong>
+                                <span>60 req/min · token bucket · per-IP</span>
+                            </div>
+                            <div class="security-status-card">
+                                <div class="status-icon">🔄</div>
+                                <strong>Circuit Breaker</strong>
+                                <span>3 failures → pause 2 min · ASI08</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Settings View -->
+                <article id="settings" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://settings</h1>
+                    </div>
+                    <p class="lede">Configure workspace environment settings, access roles, and connection headers.</p>
+                    <div class="settings-panel">
+                        <h2>Identity & Access Management (RBAC)</h2>
+                        <label>Simulated Request Role
+                            <select id="role">
+                                <option value="admin" selected>Admin (Full Access / Create / Delete)</option>
+                                <option value="operator">Operator (Reconcile / Apply / Read)</option>
+                                <option value="viewer">Viewer (Read-only)</option>
+                            </select>
+                        </label>
+                    </div>
+                </article>
+
+                <!-- MCP View -->
+                <article id="mcp" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://mcp</h1>
+                    </div>
+                    <p class="lede">Directly query the Model Context Protocol (MCP) handlers exposing cluster automation actions via JSON-RPC 2.0.</p>
+                    <div class="mcp-layout">
+                        <div class="mcp-grid">
+                            <button data-rpc="initialize">Initialize Session</button>
+                            <button data-rpc="tools/list">List Exposed Tools</button>
+                            <button data-tool="list_workloads">Execute tool://list_workloads</button>
+                            <button data-tool="get_logs">Execute tool://get_logs</button>
+                        </div>
+                        <div class="card-main">
+                            <pre class="code-output" id="mcpOutput">Execute an MCP method to inspect exchange protocols...</pre>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <section class="terminal">
+                <div class="terminal-title"><span>&gt;_</span><strong>TERMINAL</strong><span class="terminal-session"><i></i> doktriai-sh</span><button id="closeTerminal">×</button></div>
+                <div class="terminal-body" id="terminalBody">
+                    <p>DOKTRIAI Autonomous Control Plane Loaded.</p>
+                    <p>API gateway endpoints operational, ready for agent tools execution loops.</p>
+                </div>
+                <form id="terminalForm" class="terminal-input"><span>›</span><input id="terminalCommand" autocomplete="off" placeholder="type a command..." /></form>
+            </section>
+        </main>
     </div>
     <script src="/app.js"></script>
-  </body>
+</body>
+
 </html>

@@ -1,1120 +1,3609 @@
 {
-  "workloads": {},
-  "audit": [],
-  "events": [
-    {
-      "id": 159,
-      "time": "2026-06-18T16:26:59.7488716Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 158,
-      "time": "2026-06-18T16:26:54.7441018Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 157,
-      "time": "2026-06-18T16:26:49.7531683Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 156,
-      "time": "2026-06-18T16:26:44.7510245Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 155,
-      "time": "2026-06-18T16:26:39.7452452Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 154,
-      "time": "2026-06-18T16:26:34.7874308Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 153,
-      "time": "2026-06-18T16:26:29.7556749Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 152,
-      "time": "2026-06-18T16:26:24.7503095Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 151,
-      "time": "2026-06-18T16:26:19.7418174Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 150,
-      "time": "2026-06-18T16:26:14.7465243Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 149,
-      "time": "2026-06-18T16:26:09.761886Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 148,
-      "time": "2026-06-18T16:26:05.0538829Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 147,
-      "time": "2026-06-18T16:25:59.7563868Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 146,
-      "time": "2026-06-18T16:25:54.7529135Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 145,
-      "time": "2026-06-18T16:25:49.7494227Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 144,
-      "time": "2026-06-18T16:25:44.7461336Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 143,
-      "time": "2026-06-18T16:25:39.7836235Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 142,
-      "time": "2026-06-18T16:25:34.7494349Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 141,
-      "time": "2026-06-18T16:25:29.7443411Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 140,
-      "time": "2026-06-18T16:25:24.7616144Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 139,
-      "time": "2026-06-18T16:25:20.1681753Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 138,
-      "time": "2026-06-18T16:25:14.7457049Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 137,
-      "time": "2026-06-18T16:25:09.7487535Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 136,
-      "time": "2026-06-18T16:25:04.7529524Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 135,
-      "time": "2026-06-18T16:24:59.7381859Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 134,
-      "time": "2026-06-18T16:24:54.7444019Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 133,
-      "time": "2026-06-18T16:24:49.7555868Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 132,
-      "time": "2026-06-18T16:24:44.7588446Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 131,
-      "time": "2026-06-18T16:24:39.7505736Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 130,
-      "time": "2026-06-18T16:24:34.8313035Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 129,
-      "time": "2026-06-18T16:24:29.7540226Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 128,
-      "time": "2026-06-18T16:24:24.7671517Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 127,
-      "time": "2026-06-18T16:24:19.8819458Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 126,
-      "time": "2026-06-18T16:24:14.8580109Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 125,
-      "time": "2026-06-18T16:24:09.7932305Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 124,
-      "time": "2026-06-18T16:24:04.7766175Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 123,
-      "time": "2026-06-18T16:23:59.7504643Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 122,
-      "time": "2026-06-18T16:23:54.8475573Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 121,
-      "time": "2026-06-18T16:23:49.980105Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 120,
-      "time": "2026-06-18T16:23:44.8529693Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 119,
-      "time": "2026-06-18T16:23:39.935813Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 118,
-      "time": "2026-06-18T16:23:34.8885642Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 117,
-      "time": "2026-06-18T16:23:29.8677391Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 116,
-      "time": "2026-06-18T16:23:24.9179439Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 115,
-      "time": "2026-06-18T16:23:19.7584912Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 114,
-      "time": "2026-06-18T16:23:14.7658729Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 113,
-      "time": "2026-06-18T16:23:09.818749Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 112,
-      "time": "2026-06-18T16:23:04.7630491Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 111,
-      "time": "2026-06-18T16:22:59.7521321Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 110,
-      "time": "2026-06-18T16:22:54.87401Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 109,
-      "time": "2026-06-18T16:22:49.7697464Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 108,
-      "time": "2026-06-18T16:22:44.7565661Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 107,
-      "time": "2026-06-18T16:22:39.7545387Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 106,
-      "time": "2026-06-18T16:22:34.8818399Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 105,
-      "time": "2026-06-18T16:22:29.7592022Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 104,
-      "time": "2026-06-18T16:22:24.7638008Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 103,
-      "time": "2026-06-18T16:22:19.855355Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 102,
-      "time": "2026-06-18T16:22:14.7745625Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 101,
-      "time": "2026-06-18T16:22:09.7871083Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 100,
-      "time": "2026-06-18T16:22:04.7957718Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 99,
-      "time": "2026-06-18T16:21:59.7556997Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 98,
-      "time": "2026-06-18T16:21:54.759658Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 97,
-      "time": "2026-06-18T16:21:49.7844534Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 96,
-      "time": "2026-06-18T16:21:44.7907558Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 95,
-      "time": "2026-06-18T16:21:39.838357Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 94,
-      "time": "2026-06-18T16:21:34.9829981Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 93,
-      "time": "2026-06-18T16:21:29.7900359Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 92,
-      "time": "2026-06-18T16:21:24.7726293Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 91,
-      "time": "2026-06-18T16:21:19.7489571Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 90,
-      "time": "2026-06-18T16:21:14.7499511Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 89,
-      "time": "2026-06-18T16:21:09.755064Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 88,
-      "time": "2026-06-18T16:21:04.7621296Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 87,
-      "time": "2026-06-18T16:20:59.7715952Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 86,
-      "time": "2026-06-18T16:20:54.7407822Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 85,
-      "time": "2026-06-18T16:20:49.7467668Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 84,
-      "time": "2026-06-18T16:20:44.7550772Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 83,
-      "time": "2026-06-18T16:20:39.784711Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 82,
-      "time": "2026-06-18T16:20:34.7748617Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 81,
-      "time": "2026-06-18T16:20:29.8423364Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 80,
-      "time": "2026-06-18T16:20:24.7495756Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 79,
-      "time": "2026-06-18T16:20:19.7494991Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 78,
-      "time": "2026-06-18T16:20:14.7530671Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 77,
-      "time": "2026-06-18T16:20:09.7484339Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 76,
-      "time": "2026-06-18T16:20:04.7442313Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 75,
-      "time": "2026-06-18T16:19:59.7568826Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 74,
-      "time": "2026-06-18T16:19:54.7419491Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 73,
-      "time": "2026-06-18T16:19:49.7511457Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 72,
-      "time": "2026-06-18T16:19:44.7423695Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 71,
-      "time": "2026-06-18T16:19:39.738665Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 70,
-      "time": "2026-06-18T16:19:34.7505214Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 69,
-      "time": "2026-06-18T16:19:29.8275769Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 68,
-      "time": "2026-06-18T16:19:24.7534447Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 67,
-      "time": "2026-06-18T16:19:19.9682458Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 66,
-      "time": "2026-06-18T16:19:14.7591423Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 65,
-      "time": "2026-06-18T16:19:09.7631043Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 64,
-      "time": "2026-06-18T16:19:04.7760823Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 63,
-      "time": "2026-06-18T16:18:59.7532182Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 62,
-      "time": "2026-06-18T16:18:54.7400522Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 61,
-      "time": "2026-06-18T16:18:49.7526038Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 60,
-      "time": "2026-06-18T16:18:44.7334446Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 59,
-      "time": "2026-06-18T16:18:39.7522864Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 58,
-      "time": "2026-06-18T16:18:34.7543639Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 57,
-      "time": "2026-06-18T16:18:29.7534506Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 56,
-      "time": "2026-06-18T16:18:24.7585693Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 55,
-      "time": "2026-06-18T16:18:19.7480019Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 54,
-      "time": "2026-06-18T16:18:14.7562362Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 53,
-      "time": "2026-06-18T16:18:09.7898446Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 52,
-      "time": "2026-06-18T16:18:04.7482102Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 51,
-      "time": "2026-06-18T16:17:59.748331Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 50,
-      "time": "2026-06-18T16:17:54.7673948Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 49,
-      "time": "2026-06-18T16:17:50.188704Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 48,
-      "time": "2026-06-18T16:17:45.0538034Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 47,
-      "time": "2026-06-18T16:17:39.7606763Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 46,
-      "time": "2026-06-18T16:17:34.7510638Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 45,
-      "time": "2026-06-18T16:17:29.7804887Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 44,
-      "time": "2026-06-18T16:17:24.7449928Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 43,
-      "time": "2026-06-18T16:17:19.740336Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 42,
-      "time": "2026-06-18T16:17:14.8138526Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 41,
-      "time": "2026-06-18T16:17:09.7381986Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 40,
-      "time": "2026-06-18T16:17:04.7450766Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 39,
-      "time": "2026-06-18T16:16:59.7564972Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 38,
-      "time": "2026-06-18T16:16:54.746552Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 37,
-      "time": "2026-06-18T16:16:49.753542Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 36,
-      "time": "2026-06-18T16:16:44.7492Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 35,
-      "time": "2026-06-18T16:16:39.7569094Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 34,
-      "time": "2026-06-18T16:16:34.7512199Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 33,
-      "time": "2026-06-18T16:16:29.7617371Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 32,
-      "time": "2026-06-18T16:16:24.7650348Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 31,
-      "time": "2026-06-18T16:16:19.7605956Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 30,
-      "time": "2026-06-18T16:16:14.7487879Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 29,
-      "time": "2026-06-18T16:16:09.7739982Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 28,
-      "time": "2026-06-18T16:16:04.7768686Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 27,
-      "time": "2026-06-18T16:15:59.7555299Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 26,
-      "time": "2026-06-18T16:15:54.765325Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 25,
-      "time": "2026-06-18T16:15:49.7492829Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 24,
-      "time": "2026-06-18T16:15:44.7565204Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 23,
-      "time": "2026-06-18T16:15:39.7579776Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 22,
-      "time": "2026-06-18T16:15:34.7516626Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 21,
-      "time": "2026-06-18T16:15:29.758385Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 20,
-      "time": "2026-06-18T16:15:24.760436Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 19,
-      "time": "2026-06-18T16:15:19.766936Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 18,
-      "time": "2026-06-18T16:15:17.344889Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 17,
-      "time": "2026-06-18T16:15:14.770728Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 16,
-      "time": "2026-06-18T16:15:09.7766124Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 15,
-      "time": "2026-06-18T16:15:04.7539813Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 14,
-      "time": "2026-06-18T16:14:59.7552374Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 13,
-      "time": "2026-06-18T16:14:54.7557434Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 12,
-      "time": "2026-06-18T16:14:49.7520213Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 11,
-      "time": "2026-06-18T16:14:44.8497106Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 10,
-      "time": "2026-06-18T16:14:39.798026Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 9,
-      "time": "2026-06-18T16:14:34.951523Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 8,
-      "time": "2026-06-18T16:14:30.4083638Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 7,
-      "time": "2026-06-18T16:14:24.7510461Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 6,
-      "time": "2026-06-18T16:14:19.7787286Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 5,
-      "time": "2026-06-18T16:14:14.8246551Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 4,
-      "time": "2026-06-18T16:14:09.8461526Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 3,
-      "time": "2026-06-18T16:14:04.7596687Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 2,
-      "time": "2026-06-18T16:14:00.1632811Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-    },
-    {
-      "id": 1,
-      "time": "2026-06-18T16:13:55.1091922Z",
-      "level": "error",
-      "source": "runtime",
-      "message": "docker list failed: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+  "workloads": {
+    "hello-web": {
+      "name": "hello-web",
+      "image": "nginx:alpine",
+      "replicas": 1,
+      "port": 0,
+      "containerPort": 0,
+      "runtime": "docker",
+      "securityMode": "dev"
+    }
+  },
+  "audit": [
+    {
+      "id": 2269,
+      "seqId": 6,
+      "time": "2026-06-19T16:51:20.9263474Z",
+      "actor": "web:admin",
+      "action": "apply",
+      "workload": "operator-postgres",
+      "allowed": false,
+      "reason": "runtime \"kubernetes\" is not enabled in this build",
+      "signatureVerified": false,
+      "planApproved": false
+    },
+    {
+      "id": 2207,
+      "seqId": 5,
+      "time": "2026-06-19T16:46:14.3311085Z",
+      "actor": "web:admin",
+      "action": "apply",
+      "workload": "operator-nginx",
+      "allowed": false,
+      "reason": "runtime \"kubernetes\" is not enabled in this build",
+      "signatureVerified": false,
+      "planApproved": false
+    },
+    {
+      "id": 2202,
+      "seqId": 4,
+      "time": "2026-06-19T16:45:53.6289431Z",
+      "actor": "web:admin",
+      "action": "apply",
+      "workload": "operator-nginx",
+      "allowed": false,
+      "reason": "runtime \"kubernetes\" is not enabled in this build",
+      "signatureVerified": false,
+      "planApproved": false
+    },
+    {
+      "id": 2015,
+      "seqId": 3,
+      "time": "2026-06-19T16:30:24.5366634Z",
+      "actor": "web:admin",
+      "action": "apply",
+      "workload": "operator-nginx",
+      "allowed": false,
+      "reason": "runtime \"kubernetes\" is not enabled in this build",
+      "signatureVerified": false,
+      "planApproved": false
+    },
+    {
+      "id": 2002,
+      "seqId": 2,
+      "time": "2026-06-19T16:29:23.3280525Z",
+      "actor": "web:admin",
+      "action": "apply",
+      "workload": "operator-postgres",
+      "allowed": false,
+      "reason": "runtime \"kubernetes\" is not enabled in this build",
+      "signatureVerified": false,
+      "planApproved": false
+    },
+    {
+      "id": 1980,
+      "seqId": 1,
+      "time": "2026-06-19T16:27:38.5873956Z",
+      "actor": "web:admin",
+      "action": "apply",
+      "workload": "operator-postgres",
+      "allowed": false,
+      "reason": "runtime \"kubernetes\" is not enabled in this build",
+      "signatureVerified": false,
+      "planApproved": false
+    },
+    {
+      "id": 1802,
+      "seqId": 0,
+      "time": "2026-06-19T16:13:24.745209Z",
+      "actor": "web:admin",
+      "action": "apply",
+      "workload": "hello-web",
+      "allowed": true,
+      "signatureVerified": false,
+      "planApproved": false,
+      "stateHashBefore": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "stateHashAfter": "1fd44d18e64eb00866ffadc9376c497326182f2aa56471ba38e317a2b2469d82"
     }
   ],
-  "nextId": 160
-}
+  "events": [
+    {
+      "id": 2419,
+      "time": "2026-06-19T17:21:32.276004Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2418,
+      "time": "2026-06-19T17:21:27.2756736Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2417,
+      "time": "2026-06-19T17:21:22.2758239Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2416,
+      "time": "2026-06-19T17:21:17.2755499Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2415,
+      "time": "2026-06-19T17:21:12.2756042Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2414,
+      "time": "2026-06-19T17:21:07.2759192Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2413,
+      "time": "2026-06-19T17:21:02.2754291Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2412,
+      "time": "2026-06-19T17:20:57.2756758Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2411,
+      "time": "2026-06-19T17:20:52.2765158Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2410,
+      "time": "2026-06-19T17:20:47.3333532Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2409,
+      "time": "2026-06-19T17:20:42.2759887Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2408,
+      "time": "2026-06-19T17:20:37.2756652Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2407,
+      "time": "2026-06-19T17:20:32.2756686Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2406,
+      "time": "2026-06-19T17:20:27.275856Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2405,
+      "time": "2026-06-19T17:20:22.2755965Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2404,
+      "time": "2026-06-19T17:20:17.2768763Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2403,
+      "time": "2026-06-19T17:20:12.2757719Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2402,
+      "time": "2026-06-19T17:20:07.2762429Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2401,
+      "time": "2026-06-19T17:20:02.2761406Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2400,
+      "time": "2026-06-19T17:19:57.2766769Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2399,
+      "time": "2026-06-19T17:19:52.2761103Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2398,
+      "time": "2026-06-19T17:19:47.2770393Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2397,
+      "time": "2026-06-19T17:19:42.2756421Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2396,
+      "time": "2026-06-19T17:19:37.2756797Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2395,
+      "time": "2026-06-19T17:19:34.6809252Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2394,
+      "time": "2026-06-19T17:01:42.2760603Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2393,
+      "time": "2026-06-19T17:01:37.2759848Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2392,
+      "time": "2026-06-19T17:01:32.2758321Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2391,
+      "time": "2026-06-19T17:01:27.2759043Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2390,
+      "time": "2026-06-19T17:01:22.2760946Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2389,
+      "time": "2026-06-19T17:01:17.2763784Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2388,
+      "time": "2026-06-19T17:01:12.275765Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2387,
+      "time": "2026-06-19T17:01:07.275908Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2386,
+      "time": "2026-06-19T17:01:02.2760969Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2385,
+      "time": "2026-06-19T17:00:57.2757466Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2384,
+      "time": "2026-06-19T17:00:52.2756841Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2383,
+      "time": "2026-06-19T17:00:47.2758863Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2382,
+      "time": "2026-06-19T17:00:42.275577Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2381,
+      "time": "2026-06-19T17:00:37.2757909Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2380,
+      "time": "2026-06-19T17:00:32.2758118Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2379,
+      "time": "2026-06-19T17:00:27.2762399Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2378,
+      "time": "2026-06-19T17:00:22.275964Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2377,
+      "time": "2026-06-19T17:00:17.2758189Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2376,
+      "time": "2026-06-19T17:00:12.275806Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2375,
+      "time": "2026-06-19T17:00:07.2758207Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2374,
+      "time": "2026-06-19T17:00:02.2757794Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2373,
+      "time": "2026-06-19T16:59:57.2760386Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2372,
+      "time": "2026-06-19T16:59:52.2758975Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2371,
+      "time": "2026-06-19T16:59:47.2761685Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2370,
+      "time": "2026-06-19T16:59:42.2756664Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2369,
+      "time": "2026-06-19T16:59:37.2760031Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2368,
+      "time": "2026-06-19T16:59:32.2759714Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2367,
+      "time": "2026-06-19T16:59:27.2757015Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2366,
+      "time": "2026-06-19T16:59:22.2757647Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2365,
+      "time": "2026-06-19T16:59:17.2756298Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2364,
+      "time": "2026-06-19T16:59:12.2758663Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2363,
+      "time": "2026-06-19T16:59:07.2761598Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2362,
+      "time": "2026-06-19T16:59:02.2760042Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2361,
+      "time": "2026-06-19T16:58:57.2758146Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2360,
+      "time": "2026-06-19T16:58:52.2754328Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2359,
+      "time": "2026-06-19T16:58:47.2758841Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2358,
+      "time": "2026-06-19T16:58:42.2757936Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2357,
+      "time": "2026-06-19T16:58:37.276241Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2356,
+      "time": "2026-06-19T16:58:32.2761321Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2355,
+      "time": "2026-06-19T16:58:27.2774762Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2354,
+      "time": "2026-06-19T16:58:22.2758186Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2353,
+      "time": "2026-06-19T16:58:17.2769058Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2352,
+      "time": "2026-06-19T16:58:12.2761707Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2351,
+      "time": "2026-06-19T16:58:07.2759401Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2350,
+      "time": "2026-06-19T16:58:02.2758527Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2349,
+      "time": "2026-06-19T16:57:57.2759969Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2348,
+      "time": "2026-06-19T16:57:52.2760099Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2347,
+      "time": "2026-06-19T16:57:47.2762775Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2346,
+      "time": "2026-06-19T16:57:42.2754566Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2345,
+      "time": "2026-06-19T16:57:37.2755611Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2344,
+      "time": "2026-06-19T16:57:32.275915Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2343,
+      "time": "2026-06-19T16:57:27.2755077Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2342,
+      "time": "2026-06-19T16:57:22.2759895Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2341,
+      "time": "2026-06-19T16:57:17.2759559Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2340,
+      "time": "2026-06-19T16:57:12.2759473Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2339,
+      "time": "2026-06-19T16:57:07.2759041Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2338,
+      "time": "2026-06-19T16:57:02.2759091Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2337,
+      "time": "2026-06-19T16:56:57.2757649Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2336,
+      "time": "2026-06-19T16:56:52.275607Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2335,
+      "time": "2026-06-19T16:56:47.275951Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2334,
+      "time": "2026-06-19T16:56:42.2758509Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2333,
+      "time": "2026-06-19T16:56:37.2758244Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2332,
+      "time": "2026-06-19T16:56:32.2758559Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2331,
+      "time": "2026-06-19T16:56:27.2760433Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2330,
+      "time": "2026-06-19T16:56:22.2755588Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2329,
+      "time": "2026-06-19T16:56:17.2756952Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2328,
+      "time": "2026-06-19T16:56:12.2759499Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2327,
+      "time": "2026-06-19T16:56:07.275856Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2326,
+      "time": "2026-06-19T16:56:02.2755704Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2325,
+      "time": "2026-06-19T16:55:57.2758367Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2324,
+      "time": "2026-06-19T16:55:52.2756963Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2323,
+      "time": "2026-06-19T16:55:47.2760172Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2322,
+      "time": "2026-06-19T16:55:42.2760851Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2321,
+      "time": "2026-06-19T16:55:37.2757641Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2320,
+      "time": "2026-06-19T16:55:32.2758926Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2319,
+      "time": "2026-06-19T16:55:27.2762533Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2318,
+      "time": "2026-06-19T16:55:22.2756764Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2317,
+      "time": "2026-06-19T16:55:17.2757378Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2316,
+      "time": "2026-06-19T16:55:12.276453Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2315,
+      "time": "2026-06-19T16:55:07.2761636Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2314,
+      "time": "2026-06-19T16:55:02.2758266Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2313,
+      "time": "2026-06-19T16:54:57.275739Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2312,
+      "time": "2026-06-19T16:54:52.2756969Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2311,
+      "time": "2026-06-19T16:54:47.2762248Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2310,
+      "time": "2026-06-19T16:54:42.27555Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2309,
+      "time": "2026-06-19T16:54:37.2755447Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2308,
+      "time": "2026-06-19T16:54:32.2758813Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2307,
+      "time": "2026-06-19T16:54:27.2753965Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2306,
+      "time": "2026-06-19T16:54:22.275709Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2305,
+      "time": "2026-06-19T16:54:17.2759336Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2304,
+      "time": "2026-06-19T16:54:12.2758089Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2303,
+      "time": "2026-06-19T16:54:07.2758683Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2302,
+      "time": "2026-06-19T16:54:02.2755599Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2301,
+      "time": "2026-06-19T16:53:57.2758245Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2300,
+      "time": "2026-06-19T16:53:52.2758679Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2299,
+      "time": "2026-06-19T16:53:47.2756378Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2298,
+      "time": "2026-06-19T16:53:42.2760258Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2297,
+      "time": "2026-06-19T16:53:37.2755261Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2296,
+      "time": "2026-06-19T16:53:32.2763259Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2295,
+      "time": "2026-06-19T16:53:27.2843437Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2294,
+      "time": "2026-06-19T16:53:22.2756979Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2293,
+      "time": "2026-06-19T16:53:17.2758762Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2292,
+      "time": "2026-06-19T16:53:12.2760453Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2291,
+      "time": "2026-06-19T16:53:07.2758956Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2290,
+      "time": "2026-06-19T16:53:02.275785Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2289,
+      "time": "2026-06-19T16:52:57.2759997Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2288,
+      "time": "2026-06-19T16:52:52.275941Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2287,
+      "time": "2026-06-19T16:52:47.2753718Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2286,
+      "time": "2026-06-19T16:52:42.2757989Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2285,
+      "time": "2026-06-19T16:52:37.2756872Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2284,
+      "time": "2026-06-19T16:52:32.2759376Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2283,
+      "time": "2026-06-19T16:52:27.2759388Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2282,
+      "time": "2026-06-19T16:52:22.2760558Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2281,
+      "time": "2026-06-19T16:52:17.2759173Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2280,
+      "time": "2026-06-19T16:52:12.2756714Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2279,
+      "time": "2026-06-19T16:52:07.2763967Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2278,
+      "time": "2026-06-19T16:52:02.2763184Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2277,
+      "time": "2026-06-19T16:51:57.2755554Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2276,
+      "time": "2026-06-19T16:51:52.2760572Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2275,
+      "time": "2026-06-19T16:51:47.275668Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2274,
+      "time": "2026-06-19T16:51:42.2760595Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2273,
+      "time": "2026-06-19T16:51:37.2759147Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2272,
+      "time": "2026-06-19T16:51:32.2762835Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2271,
+      "time": "2026-06-19T16:51:27.2759729Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2270,
+      "time": "2026-06-19T16:51:22.2756491Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2268,
+      "time": "2026-06-19T16:51:17.2756913Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2267,
+      "time": "2026-06-19T16:51:12.2760295Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2266,
+      "time": "2026-06-19T16:51:07.2756634Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2265,
+      "time": "2026-06-19T16:51:02.2777897Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2264,
+      "time": "2026-06-19T16:50:57.2756875Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2263,
+      "time": "2026-06-19T16:50:52.2759768Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2262,
+      "time": "2026-06-19T16:50:47.2760562Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2261,
+      "time": "2026-06-19T16:50:42.2758921Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2260,
+      "time": "2026-06-19T16:50:37.2757294Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2259,
+      "time": "2026-06-19T16:50:32.2757475Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2258,
+      "time": "2026-06-19T16:50:27.2755339Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2257,
+      "time": "2026-06-19T16:50:22.275817Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2256,
+      "time": "2026-06-19T16:50:17.2758747Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2255,
+      "time": "2026-06-19T16:50:12.2757771Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2254,
+      "time": "2026-06-19T16:50:07.2761957Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2253,
+      "time": "2026-06-19T16:50:02.2756644Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2252,
+      "time": "2026-06-19T16:49:57.2761208Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2251,
+      "time": "2026-06-19T16:49:52.2761395Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2250,
+      "time": "2026-06-19T16:49:47.2759582Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2249,
+      "time": "2026-06-19T16:49:42.2759295Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2248,
+      "time": "2026-06-19T16:49:37.2758732Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2247,
+      "time": "2026-06-19T16:49:32.276038Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2246,
+      "time": "2026-06-19T16:49:27.2762338Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2245,
+      "time": "2026-06-19T16:49:22.2754217Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2244,
+      "time": "2026-06-19T16:49:17.2755401Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2243,
+      "time": "2026-06-19T16:49:12.2759004Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2242,
+      "time": "2026-06-19T16:49:07.2763226Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2241,
+      "time": "2026-06-19T16:49:02.276022Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2240,
+      "time": "2026-06-19T16:48:57.275646Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2239,
+      "time": "2026-06-19T16:48:52.2754688Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2238,
+      "time": "2026-06-19T16:48:47.2761394Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2237,
+      "time": "2026-06-19T16:48:42.2760388Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2236,
+      "time": "2026-06-19T16:48:37.2757676Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2235,
+      "time": "2026-06-19T16:48:32.2756608Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2234,
+      "time": "2026-06-19T16:48:27.2760216Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2233,
+      "time": "2026-06-19T16:48:22.2754016Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2232,
+      "time": "2026-06-19T16:48:17.2758064Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2231,
+      "time": "2026-06-19T16:48:12.275815Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2230,
+      "time": "2026-06-19T16:48:07.2756778Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2229,
+      "time": "2026-06-19T16:48:02.2759551Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2228,
+      "time": "2026-06-19T16:47:57.2760215Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2227,
+      "time": "2026-06-19T16:47:52.276126Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2226,
+      "time": "2026-06-19T16:47:47.2756063Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2225,
+      "time": "2026-06-19T16:47:42.2758112Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2224,
+      "time": "2026-06-19T16:47:37.2761197Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2223,
+      "time": "2026-06-19T16:47:32.2759004Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2222,
+      "time": "2026-06-19T16:47:27.2756846Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2221,
+      "time": "2026-06-19T16:47:22.275837Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2220,
+      "time": "2026-06-19T16:47:17.2758751Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2219,
+      "time": "2026-06-19T16:47:12.2759867Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2218,
+      "time": "2026-06-19T16:47:07.2757641Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2217,
+      "time": "2026-06-19T16:47:02.2757502Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2216,
+      "time": "2026-06-19T16:46:57.2755996Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2215,
+      "time": "2026-06-19T16:46:52.2766716Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2214,
+      "time": "2026-06-19T16:46:47.2758716Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2213,
+      "time": "2026-06-19T16:46:42.2760167Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2212,
+      "time": "2026-06-19T16:46:37.2759269Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2211,
+      "time": "2026-06-19T16:46:32.2761603Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2210,
+      "time": "2026-06-19T16:46:27.2757426Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2209,
+      "time": "2026-06-19T16:46:22.2758117Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2208,
+      "time": "2026-06-19T16:46:17.2756245Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2206,
+      "time": "2026-06-19T16:46:12.2760929Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2205,
+      "time": "2026-06-19T16:46:07.276124Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2204,
+      "time": "2026-06-19T16:46:02.2761981Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2203,
+      "time": "2026-06-19T16:45:57.2755208Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2201,
+      "time": "2026-06-19T16:45:52.2759931Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2200,
+      "time": "2026-06-19T16:45:47.2756732Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2199,
+      "time": "2026-06-19T16:45:42.2761485Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2198,
+      "time": "2026-06-19T16:45:37.2759972Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2197,
+      "time": "2026-06-19T16:45:32.2760622Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2196,
+      "time": "2026-06-19T16:45:27.2755769Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2195,
+      "time": "2026-06-19T16:45:22.2762332Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2194,
+      "time": "2026-06-19T16:45:17.2768552Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2193,
+      "time": "2026-06-19T16:45:12.2762254Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2192,
+      "time": "2026-06-19T16:45:07.2761044Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2191,
+      "time": "2026-06-19T16:45:02.2760824Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2190,
+      "time": "2026-06-19T16:44:57.2758125Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2189,
+      "time": "2026-06-19T16:44:52.2756342Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2188,
+      "time": "2026-06-19T16:44:47.2756291Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2187,
+      "time": "2026-06-19T16:44:42.2768754Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2186,
+      "time": "2026-06-19T16:44:37.275832Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2185,
+      "time": "2026-06-19T16:44:32.2760512Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2184,
+      "time": "2026-06-19T16:44:27.2757797Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2183,
+      "time": "2026-06-19T16:44:22.275535Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2182,
+      "time": "2026-06-19T16:44:17.2761283Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2181,
+      "time": "2026-06-19T16:44:12.2759201Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2180,
+      "time": "2026-06-19T16:44:07.2758531Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2179,
+      "time": "2026-06-19T16:44:02.2756573Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2178,
+      "time": "2026-06-19T16:43:57.2758414Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2177,
+      "time": "2026-06-19T16:43:52.2756724Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2176,
+      "time": "2026-06-19T16:43:47.275905Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2175,
+      "time": "2026-06-19T16:43:42.2758474Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2174,
+      "time": "2026-06-19T16:43:37.2761504Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2173,
+      "time": "2026-06-19T16:43:32.2760287Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2172,
+      "time": "2026-06-19T16:43:27.2762031Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2171,
+      "time": "2026-06-19T16:43:22.2759325Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2170,
+      "time": "2026-06-19T16:43:17.27562Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2169,
+      "time": "2026-06-19T16:43:12.2756563Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2168,
+      "time": "2026-06-19T16:43:07.275947Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2167,
+      "time": "2026-06-19T16:43:02.2757407Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2166,
+      "time": "2026-06-19T16:42:57.2773628Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2165,
+      "time": "2026-06-19T16:42:52.2757805Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2164,
+      "time": "2026-06-19T16:42:47.2756835Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2163,
+      "time": "2026-06-19T16:42:42.2758716Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2162,
+      "time": "2026-06-19T16:42:37.2758404Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2161,
+      "time": "2026-06-19T16:42:32.2759461Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2160,
+      "time": "2026-06-19T16:42:27.276129Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2159,
+      "time": "2026-06-19T16:42:22.275705Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2158,
+      "time": "2026-06-19T16:42:17.2759641Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2157,
+      "time": "2026-06-19T16:42:12.2754343Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2156,
+      "time": "2026-06-19T16:42:07.2757897Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2155,
+      "time": "2026-06-19T16:42:02.2758864Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2154,
+      "time": "2026-06-19T16:41:57.2760806Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2153,
+      "time": "2026-06-19T16:41:52.2756898Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2152,
+      "time": "2026-06-19T16:41:47.2760766Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2151,
+      "time": "2026-06-19T16:41:42.2757992Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2150,
+      "time": "2026-06-19T16:41:37.2760344Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2149,
+      "time": "2026-06-19T16:41:32.2759036Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2148,
+      "time": "2026-06-19T16:41:27.2756524Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2147,
+      "time": "2026-06-19T16:41:22.2755006Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2146,
+      "time": "2026-06-19T16:41:17.2757524Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2145,
+      "time": "2026-06-19T16:41:12.2754955Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2144,
+      "time": "2026-06-19T16:41:07.2756587Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2143,
+      "time": "2026-06-19T16:41:02.276145Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2142,
+      "time": "2026-06-19T16:40:57.2759931Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2141,
+      "time": "2026-06-19T16:40:52.2897959Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2140,
+      "time": "2026-06-19T16:40:47.2759974Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2139,
+      "time": "2026-06-19T16:40:42.2757138Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2138,
+      "time": "2026-06-19T16:40:37.2759367Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2137,
+      "time": "2026-06-19T16:40:32.27618Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2136,
+      "time": "2026-06-19T16:40:27.2758106Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2135,
+      "time": "2026-06-19T16:40:22.2754758Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2134,
+      "time": "2026-06-19T16:40:17.2760098Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2133,
+      "time": "2026-06-19T16:40:12.2757002Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2132,
+      "time": "2026-06-19T16:40:07.2759892Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2131,
+      "time": "2026-06-19T16:40:02.279546Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2130,
+      "time": "2026-06-19T16:39:57.275877Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2129,
+      "time": "2026-06-19T16:39:52.2762143Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2128,
+      "time": "2026-06-19T16:39:47.309388Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2127,
+      "time": "2026-06-19T16:39:42.2756421Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2126,
+      "time": "2026-06-19T16:39:37.2759521Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2125,
+      "time": "2026-06-19T16:39:32.275579Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2124,
+      "time": "2026-06-19T16:39:27.2761316Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2123,
+      "time": "2026-06-19T16:39:22.2757286Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2122,
+      "time": "2026-06-19T16:39:17.2760414Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2121,
+      "time": "2026-06-19T16:39:12.2775137Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2120,
+      "time": "2026-06-19T16:39:07.2756444Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2119,
+      "time": "2026-06-19T16:39:02.2762361Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2118,
+      "time": "2026-06-19T16:38:57.2759718Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2117,
+      "time": "2026-06-19T16:38:52.2758957Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2116,
+      "time": "2026-06-19T16:38:47.2759671Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2115,
+      "time": "2026-06-19T16:38:42.2757028Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2114,
+      "time": "2026-06-19T16:38:37.2760833Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2113,
+      "time": "2026-06-19T16:38:32.2762696Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2112,
+      "time": "2026-06-19T16:38:27.2756106Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2111,
+      "time": "2026-06-19T16:38:22.2759749Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2110,
+      "time": "2026-06-19T16:38:17.2763786Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2109,
+      "time": "2026-06-19T16:38:12.2757339Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2108,
+      "time": "2026-06-19T16:38:07.2757888Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2107,
+      "time": "2026-06-19T16:38:02.2759709Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2106,
+      "time": "2026-06-19T16:37:57.2756945Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2105,
+      "time": "2026-06-19T16:37:52.2754508Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2104,
+      "time": "2026-06-19T16:37:47.2758012Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2103,
+      "time": "2026-06-19T16:37:42.2757369Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2102,
+      "time": "2026-06-19T16:37:37.2757658Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2101,
+      "time": "2026-06-19T16:37:32.2758624Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2100,
+      "time": "2026-06-19T16:37:27.2755643Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2099,
+      "time": "2026-06-19T16:37:22.2756474Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2098,
+      "time": "2026-06-19T16:37:17.2763542Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2097,
+      "time": "2026-06-19T16:37:12.2762114Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2096,
+      "time": "2026-06-19T16:37:07.2754314Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2095,
+      "time": "2026-06-19T16:37:02.2761245Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2094,
+      "time": "2026-06-19T16:36:57.275892Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2093,
+      "time": "2026-06-19T16:36:52.2758364Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2092,
+      "time": "2026-06-19T16:36:47.2755347Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2091,
+      "time": "2026-06-19T16:36:42.2756834Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2090,
+      "time": "2026-06-19T16:36:37.2762448Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2089,
+      "time": "2026-06-19T16:36:32.2759265Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2088,
+      "time": "2026-06-19T16:36:27.2759154Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2087,
+      "time": "2026-06-19T16:36:22.2763289Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2086,
+      "time": "2026-06-19T16:36:17.2758591Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2085,
+      "time": "2026-06-19T16:36:12.2756675Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2084,
+      "time": "2026-06-19T16:36:07.2758589Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2083,
+      "time": "2026-06-19T16:36:02.2758672Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2082,
+      "time": "2026-06-19T16:35:57.2762458Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2081,
+      "time": "2026-06-19T16:35:52.2757309Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2080,
+      "time": "2026-06-19T16:35:47.2833127Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2079,
+      "time": "2026-06-19T16:35:42.2762795Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2078,
+      "time": "2026-06-19T16:35:37.2759702Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2077,
+      "time": "2026-06-19T16:35:32.2755128Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2076,
+      "time": "2026-06-19T16:35:27.2755954Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2075,
+      "time": "2026-06-19T16:35:22.2757719Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2074,
+      "time": "2026-06-19T16:35:17.2759313Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2073,
+      "time": "2026-06-19T16:35:12.2757337Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2072,
+      "time": "2026-06-19T16:35:07.2759505Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2071,
+      "time": "2026-06-19T16:35:02.2759994Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2070,
+      "time": "2026-06-19T16:34:57.2757428Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2069,
+      "time": "2026-06-19T16:34:52.2755906Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2068,
+      "time": "2026-06-19T16:34:47.2757745Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2067,
+      "time": "2026-06-19T16:34:42.2761808Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2066,
+      "time": "2026-06-19T16:34:37.2756419Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2065,
+      "time": "2026-06-19T16:34:32.2756167Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2064,
+      "time": "2026-06-19T16:34:27.2758527Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2063,
+      "time": "2026-06-19T16:34:22.2755688Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2062,
+      "time": "2026-06-19T16:34:17.2758822Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2061,
+      "time": "2026-06-19T16:34:12.2756989Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2060,
+      "time": "2026-06-19T16:34:07.2758028Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2059,
+      "time": "2026-06-19T16:34:02.2757728Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2058,
+      "time": "2026-06-19T16:33:57.2760865Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2057,
+      "time": "2026-06-19T16:33:52.2761133Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2056,
+      "time": "2026-06-19T16:33:47.2757175Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2055,
+      "time": "2026-06-19T16:33:42.2789428Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2054,
+      "time": "2026-06-19T16:33:37.2758666Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2053,
+      "time": "2026-06-19T16:33:32.2761455Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2052,
+      "time": "2026-06-19T16:33:27.2756552Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2051,
+      "time": "2026-06-19T16:33:22.2756322Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2050,
+      "time": "2026-06-19T16:33:17.2757784Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2049,
+      "time": "2026-06-19T16:33:12.2758428Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2048,
+      "time": "2026-06-19T16:33:07.2860161Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2047,
+      "time": "2026-06-19T16:33:02.2756341Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2046,
+      "time": "2026-06-19T16:32:57.2758199Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2045,
+      "time": "2026-06-19T16:32:52.2760529Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2044,
+      "time": "2026-06-19T16:32:47.275782Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2043,
+      "time": "2026-06-19T16:32:42.2758386Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2042,
+      "time": "2026-06-19T16:32:37.2759794Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2041,
+      "time": "2026-06-19T16:32:32.2757941Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2040,
+      "time": "2026-06-19T16:32:27.2759562Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2039,
+      "time": "2026-06-19T16:32:22.2759065Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2038,
+      "time": "2026-06-19T16:32:17.2759221Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2037,
+      "time": "2026-06-19T16:32:12.2761497Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2036,
+      "time": "2026-06-19T16:32:07.2757371Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2035,
+      "time": "2026-06-19T16:32:02.2759883Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2034,
+      "time": "2026-06-19T16:31:57.2761728Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2033,
+      "time": "2026-06-19T16:31:52.2758553Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2032,
+      "time": "2026-06-19T16:31:47.275498Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2031,
+      "time": "2026-06-19T16:31:42.2762493Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2030,
+      "time": "2026-06-19T16:31:37.2759493Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2029,
+      "time": "2026-06-19T16:31:32.2756099Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2028,
+      "time": "2026-06-19T16:31:27.2759059Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2027,
+      "time": "2026-06-19T16:31:22.2758045Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2026,
+      "time": "2026-06-19T16:31:17.2763069Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2025,
+      "time": "2026-06-19T16:31:12.2758776Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2024,
+      "time": "2026-06-19T16:31:07.2756213Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2023,
+      "time": "2026-06-19T16:31:02.2762358Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2022,
+      "time": "2026-06-19T16:30:57.2760991Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2021,
+      "time": "2026-06-19T16:30:52.275724Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2020,
+      "time": "2026-06-19T16:30:47.2761133Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2019,
+      "time": "2026-06-19T16:30:42.2756124Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2018,
+      "time": "2026-06-19T16:30:37.276263Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2017,
+      "time": "2026-06-19T16:30:32.2755291Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2016,
+      "time": "2026-06-19T16:30:27.2755946Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2014,
+      "time": "2026-06-19T16:30:22.2759667Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2013,
+      "time": "2026-06-19T16:30:17.2758127Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2012,
+      "time": "2026-06-19T16:30:12.275631Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2011,
+      "time": "2026-06-19T16:30:07.2758927Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2010,
+      "time": "2026-06-19T16:30:02.2756859Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2009,
+      "time": "2026-06-19T16:29:57.2760133Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2008,
+      "time": "2026-06-19T16:29:52.2759723Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2007,
+      "time": "2026-06-19T16:29:47.276217Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2006,
+      "time": "2026-06-19T16:29:42.2756102Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2005,
+      "time": "2026-06-19T16:29:37.276077Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2004,
+      "time": "2026-06-19T16:29:32.2755511Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2003,
+      "time": "2026-06-19T16:29:27.2755798Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2001,
+      "time": "2026-06-19T16:29:22.275579Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 2000,
+      "time": "2026-06-19T16:29:17.2762373Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1999,
+      "time": "2026-06-19T16:29:12.2756257Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1998,
+      "time": "2026-06-19T16:29:07.2755159Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1997,
+      "time": "2026-06-19T16:29:02.2757026Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1996,
+      "time": "2026-06-19T16:28:57.2755765Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1995,
+      "time": "2026-06-19T16:28:52.2757581Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1994,
+      "time": "2026-06-19T16:28:47.2755388Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1993,
+      "time": "2026-06-19T16:28:42.2760153Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1992,
+      "time": "2026-06-19T16:28:37.2760673Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1991,
+      "time": "2026-06-19T16:28:32.2753917Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1990,
+      "time": "2026-06-19T16:28:27.27597Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1989,
+      "time": "2026-06-19T16:28:22.2757464Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1988,
+      "time": "2026-06-19T16:28:17.275567Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1987,
+      "time": "2026-06-19T16:28:12.2761798Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1986,
+      "time": "2026-06-19T16:28:07.2758436Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1985,
+      "time": "2026-06-19T16:28:02.276473Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1984,
+      "time": "2026-06-19T16:27:57.2758165Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1983,
+      "time": "2026-06-19T16:27:52.2758892Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1982,
+      "time": "2026-06-19T16:27:47.2762744Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1981,
+      "time": "2026-06-19T16:27:42.2761375Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1979,
+      "time": "2026-06-19T16:27:37.2757687Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1978,
+      "time": "2026-06-19T16:27:32.2759886Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1977,
+      "time": "2026-06-19T16:27:27.2761726Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1976,
+      "time": "2026-06-19T16:27:22.2758444Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1975,
+      "time": "2026-06-19T16:27:17.2758334Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1974,
+      "time": "2026-06-19T16:27:12.2756362Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1973,
+      "time": "2026-06-19T16:27:07.2760618Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1972,
+      "time": "2026-06-19T16:27:02.2755226Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1971,
+      "time": "2026-06-19T16:26:57.2757297Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1970,
+      "time": "2026-06-19T16:26:52.2760689Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1969,
+      "time": "2026-06-19T16:26:47.2761132Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1968,
+      "time": "2026-06-19T16:26:42.2756431Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1967,
+      "time": "2026-06-19T16:26:37.2760657Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1966,
+      "time": "2026-06-19T16:26:32.2760661Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1965,
+      "time": "2026-06-19T16:26:27.2756432Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1964,
+      "time": "2026-06-19T16:26:22.2756071Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1963,
+      "time": "2026-06-19T16:26:17.2757265Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1962,
+      "time": "2026-06-19T16:26:16.7732524Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1961,
+      "time": "2026-06-19T16:26:12.2758889Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1960,
+      "time": "2026-06-19T16:26:07.2757834Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1959,
+      "time": "2026-06-19T16:26:02.2757628Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1958,
+      "time": "2026-06-19T16:25:57.275725Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1957,
+      "time": "2026-06-19T16:25:52.2760173Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1956,
+      "time": "2026-06-19T16:25:47.2759585Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1955,
+      "time": "2026-06-19T16:25:42.2759262Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1954,
+      "time": "2026-06-19T16:25:37.2758539Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1953,
+      "time": "2026-06-19T16:25:32.2756405Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1952,
+      "time": "2026-06-19T16:25:27.2759854Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1951,
+      "time": "2026-06-19T16:25:22.2759341Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1950,
+      "time": "2026-06-19T16:25:17.2759461Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1949,
+      "time": "2026-06-19T16:25:12.275561Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1948,
+      "time": "2026-06-19T16:25:07.2758572Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1947,
+      "time": "2026-06-19T16:25:02.2755868Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1946,
+      "time": "2026-06-19T16:24:57.2762167Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1945,
+      "time": "2026-06-19T16:24:52.2760054Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1944,
+      "time": "2026-06-19T16:24:47.2762168Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1943,
+      "time": "2026-06-19T16:24:42.2760132Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1942,
+      "time": "2026-06-19T16:24:37.2759147Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1941,
+      "time": "2026-06-19T16:24:32.2757997Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1940,
+      "time": "2026-06-19T16:24:27.2755303Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1939,
+      "time": "2026-06-19T16:24:22.2757419Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1938,
+      "time": "2026-06-19T16:24:17.2758653Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1937,
+      "time": "2026-06-19T16:24:12.2756978Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1936,
+      "time": "2026-06-19T16:24:07.2757809Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1935,
+      "time": "2026-06-19T16:24:02.2761729Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1934,
+      "time": "2026-06-19T16:23:57.2758866Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1933,
+      "time": "2026-06-19T16:23:52.2755645Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1932,
+      "time": "2026-06-19T16:23:47.2760239Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1931,
+      "time": "2026-06-19T16:23:42.2761374Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1930,
+      "time": "2026-06-19T16:23:37.2757524Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1929,
+      "time": "2026-06-19T16:23:32.2758709Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1928,
+      "time": "2026-06-19T16:23:27.2756826Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1927,
+      "time": "2026-06-19T16:23:22.2760241Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1926,
+      "time": "2026-06-19T16:23:17.2758519Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1925,
+      "time": "2026-06-19T16:23:12.2758668Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1924,
+      "time": "2026-06-19T16:23:07.275919Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1923,
+      "time": "2026-06-19T16:23:02.2757725Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1922,
+      "time": "2026-06-19T16:22:57.2756682Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1921,
+      "time": "2026-06-19T16:22:52.2759873Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1920,
+      "time": "2026-06-19T16:22:47.2756421Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1919,
+      "time": "2026-06-19T16:22:42.2755245Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1918,
+      "time": "2026-06-19T16:22:37.2760203Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1917,
+      "time": "2026-06-19T16:22:32.2756754Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1916,
+      "time": "2026-06-19T16:22:27.2757612Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1915,
+      "time": "2026-06-19T16:22:22.5240165Z",
+      "level": "ok",
+      "source": "core",
+      "message": "reconcile tick complete"
+    },
+    {
+      "id": 1914,
+      "time": "2026-06-19T16:22:22.5150571Z",
+      "level": "warn",
+      "source": "core",
+      "workload": "agent-gateway",
+      "message": "removed unmanaged Doktriai replica set"
+    }
+  ],
+  "nextId": 2420,
+  "nextSeq": 7,
+  "lock": {
+    "locked": false,
+    "time": "0001-01-01T00:00:00Z"
+  }
+}                                                         
