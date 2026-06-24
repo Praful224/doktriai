@@ -134,6 +134,28 @@ func (d *DockerDriver) Apply(ctx context.Context, spec packages.WorkloadSpec, re
 	for key, value := range spec.Env {
 		args = append(args, "-e", key+"="+value)
 	}
+	// Resource limits
+	if spec.Resources.MemoryMB > 0 {
+		args = append(args, fmt.Sprintf("--memory=%dm", spec.Resources.MemoryMB))
+	}
+	if spec.Resources.CPUShares > 0 {
+		args = append(args, fmt.Sprintf("--cpu-shares=%d", spec.Resources.CPUShares))
+	}
+	if spec.Resources.CPUQuota > 0 {
+		args = append(args, fmt.Sprintf("--cpu-quota=%d", spec.Resources.CPUQuota))
+	}
+	// Volume mounts
+	for _, vol := range spec.Volumes {
+		mountStr := vol.HostPath + ":" + vol.ContainerPath
+		if vol.ReadOnly {
+			mountStr += ":ro"
+		}
+		args = append(args, "-v", mountStr)
+	}
+	// Custom labels
+	for k, v := range spec.Labels {
+		args = append(args, "--label", k+"="+v)
+	}
 	args = append(args, spec.Image)
 	_, err := exec.CommandContext(ctx, d.binary, args...).CombinedOutput()
 	if err != nil {
@@ -144,6 +166,7 @@ func (d *DockerDriver) Apply(ctx context.Context, spec packages.WorkloadSpec, re
 		return d.Apply(ctx, spec, replica)
 	}
 	return nil
+
 }
 
 func (d *DockerDriver) Delete(ctx context.Context, workload string, replica int) error {
@@ -237,5 +260,11 @@ func (d *DockerDriver) IsSimulated() bool {
 	d.mu.RLock()
 	defer d.mu.RUnlock()
 	return d.simulated
+}
+
+func (d *DockerDriver) SetSimulated(sim bool) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.simulated = sim
 }
 

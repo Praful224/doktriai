@@ -25,11 +25,11 @@ type ProtocolHandler struct {
 	plans  *core.PlanStore
 }
 
-func NewProtocolHandler(store *core.Store, engine *core.Engine) *ProtocolHandler {
+func NewProtocolHandler(store *core.Store, engine *core.Engine, plans *core.PlanStore) *ProtocolHandler {
 	return &ProtocolHandler{
 		store:  store,
 		engine: engine,
-		plans:  core.NewPlanStore(),
+		plans:  plans,
 	}
 }
 
@@ -56,9 +56,12 @@ func (h *ProtocolHandler) HandleRPC(ctx context.Context, actor string, payload [
 		return []map[string]any{
 			{"name": "deploy_workload", "description": "Declare and reconcile a container workload (high-risk: may require PTE approval)", "requiresApproval": true},
 			{"name": "list_workloads", "description": "List desired and actual workload states", "requiresApproval": false},
+			{"name": "get_workload", "description": "Get a single workload by name with live actual state", "requiresApproval": false},
 			{"name": "delete_workload", "description": "Delete desired state and stop containers (ALWAYS requires PTE approval)", "requiresApproval": true},
 			{"name": "get_logs", "description": "Read container logs for a workload", "requiresApproval": false},
 			{"name": "list_pending_plans", "description": "List plans awaiting human approval", "requiresApproval": false},
+			{"name": "approve_plan", "description": "Approve a pending PTE plan by ID (executes the workload change)", "requiresApproval": false},
+			{"name": "reject_plan", "description": "Reject a pending PTE plan by ID with an optional comment", "requiresApproval": false},
 			{"name": "get_behavior_metrics", "description": "Retrieve per-actor behavioral anomaly metrics", "requiresApproval": false},
 		}, nil
 
@@ -175,8 +178,54 @@ func (h *ProtocolHandler) callTool(
 	case "list_pending_plans":
 		return h.plans.List(), nil
 
+	case "approve_plan":
+		var payload struct {
+			ID string `json:"id"`
+		}
+		if err := json.Unmarshal(args, &payload); err != nil {
+			return nil, err
+		}
+		plan, err := h.plans.Approve(payload.ID, actor)
+		if err != nil {
+			return nil, err
+		}
+		if err := h.engine.Apply(ctx, actor, plan.Spec); err != nil {
+			return nil, fmt.Errorf("plan approved but apply failed: %w", err)
+		}
+		return map[string]string{"status": "approved_and_applied", "planId": payload.ID}, nil
+
+	case "reject_plan":
+		var payload struct {
+			ID      string `json:"id"`
+			Comment string `json:"comment"`
+		}
+		if err := json.Unmarshal(args, &payload); err != nil {
+			return nil, err
+		}
+		if err := h.plans.Reject(payload.ID, actor, payload.Comment); err != nil {
+			return nil, err
+		}
+		return map[string]string{"status": "rejected", "planId": payload.ID}, nil
+
+	case "get_workload":
+		var payload struct {
+			Name string `json:"name"`
+		}
+		if err := json.Unmarshal(args, &payload); err != nil {
+			return nil, err
+		}
+		status, err := h.engine.Status(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, ws := range status {
+			if ws.Spec.Name == payload.Name {
+				return ws, nil
+			}
+		}
+		return nil, fmt.Errorf("workload %q not found", payload.Name)
+
 	case "get_behavior_metrics":
-		// Returns empty — behavior tracker lives in the API server layer
 		return map[string]string{"note": "use GET /api/behavior for real-time metrics"}, nil
 
 	default:

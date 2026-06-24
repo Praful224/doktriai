@@ -1,0 +1,15 @@
+# State and Database files
+data/*.json
+data/*.db
+data/*.db-journal
+
+# Compiled binaries and distributions
+.dist/
+bin/
+*.exe
+*.test
+*.prof
+
+# OS specific files
+.DS_Store
+Thumbs.db

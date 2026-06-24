@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -16,6 +17,7 @@ import (
 	"github.com/praful224/doktriai/doktriai-packages"
 	doktriruntime "github.com/praful224/doktriai/doktriai-runtime"
 )
+
 
 // Server is the HTTP API surface for the DOKTRIAI control plane.
 type Server struct {
@@ -29,13 +31,14 @@ type Server struct {
 }
 
 func NewServer(store *core.Store, engine *core.Engine, bus *core.EventBus, webDir string) *Server {
+	plans := core.NewPlanStore()
 	return &Server{
 		store:    store,
 		engine:   engine,
 		bus:      bus,
-		plans:    core.NewPlanStore(),
+		plans:    plans,
 		behavior: core.NewBehaviorTracker(),
-		mcp:      mcp.NewProtocolHandler(store, engine),
+		mcp:      mcp.NewProtocolHandler(store, engine, plans),
 		webDir:   webDir,
 	}
 }
@@ -48,7 +51,9 @@ func (s *Server) Routes() http.Handler {
 
 	// Workload management
 	mux.HandleFunc("GET /api/workloads", s.workloads)
+	mux.HandleFunc("GET /api/workloads/{name}", s.getWorkload)
 	mux.HandleFunc("POST /api/workloads", s.applyWorkload)
+	mux.HandleFunc("PATCH /api/workloads/{name}", s.patchWorkload)
 	mux.HandleFunc("DELETE /api/workloads/{name}", s.deleteWorkload)
 	mux.HandleFunc("POST /api/reconcile", s.reconcile)
 	mux.HandleFunc("POST /api/validate", s.validateWorkload)
@@ -80,6 +85,9 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("GET /api/runtime/status", s.runtimeStatus)
 	mux.HandleFunc("POST /api/charts/render", s.renderChart)
 
+	// Prometheus-compatible metrics
+	mux.HandleFunc("GET /api/metrics", s.metrics)
+
 	// Static web dashboard
 	mux.Handle("/", http.FileServer(http.Dir(filepath.Clean(s.webDir))))
 
@@ -108,6 +116,78 @@ func (s *Server) workloads(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, status)
+}
+
+func (s *Server) getWorkload(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("name")
+	spec, ok := s.store.GetWorkload(name)
+	if !ok {
+		writeError(w, http.StatusNotFound, fmt.Errorf("workload %q not found", name))
+		return
+	}
+	// Return spec + live actual state
+	status, err := s.engine.Status(r.Context())
+	if err != nil {
+		writeJSON(w, http.StatusOK, map[string]any{"spec": spec})
+		return
+	}
+	for _, ws := range status {
+		if ws.Spec.Name == name {
+			writeJSON(w, http.StatusOK, ws)
+			return
+		}
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"spec": spec, "actual": []any{}, "healthy": false})
+}
+
+func (s *Server) patchWorkload(w http.ResponseWriter, r *http.Request) {
+	claims := s.authenticate(w, r)
+	if claims == nil {
+		return
+	}
+	if !authorizeRole(w, r, claims.Role, "apply") {
+		return
+	}
+	name := r.PathValue("name")
+	existing, ok := s.store.GetWorkload(name)
+	if !ok {
+		writeError(w, http.StatusNotFound, fmt.Errorf("workload %q not found", name))
+		return
+	}
+	// Decode partial patch — only provided fields override existing
+	var patch map[string]any
+	if err := json.NewDecoder(r.Body).Decode(&patch); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	// Merge patch into existing spec via JSON round-trip
+	raw, _ := json.Marshal(existing)
+	var merged map[string]any
+	_ = json.Unmarshal(raw, &merged)
+	for k, v := range patch {
+		merged[k] = v
+	}
+	mergedRaw, _ := json.Marshal(merged)
+	var spec packages.WorkloadSpec
+	if err := json.Unmarshal(mergedRaw, &spec); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	s.behavior.Record(claims.ActorName, "apply")
+	if needsApproval, reason := core.RequiresHumanApproval(spec); needsApproval {
+		plan, err := s.plans.Submit(claims.ActorName, claims.AgentID, claims.Goal, reason, spec)
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, err)
+			return
+		}
+		writeJSON(w, http.StatusAccepted, map[string]any{"status": "pending_approval", "planId": plan.ID, "approvalReason": reason})
+		return
+	}
+	if err := s.engine.Apply(r.Context(), claims.ActorName, spec); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"status": "updated", "workload": name})
 }
 
 func (s *Server) applyWorkload(w http.ResponseWriter, r *http.Request) {
@@ -524,6 +604,48 @@ func authorizeRole(w http.ResponseWriter, r *http.Request, role, action string) 
 	return false
 }
 
+// --- Metrics (Prometheus-compatible) ---
+
+func (s *Server) metrics(w http.ResponseWriter, r *http.Request) {
+	status, _ := s.engine.Status(r.Context())
+	totalDesired := 0
+	totalActual := 0
+	for _, ws := range status {
+		totalDesired += ws.Spec.Replicas
+		totalActual += len(ws.Actual)
+	}
+	audit := s.store.ListAudit()
+	allowedOps := 0
+	deniedOps := 0
+	for _, a := range audit {
+		if a.Allowed {
+			allowedOps++
+		} else {
+			deniedOps++
+		}
+	}
+	w.Header().Set("Content-Type", "text/plain; version=0.0.4")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "# HELP doktriai_workloads_desired Total desired replica count across all workloads\n")
+	fmt.Fprintf(w, "# TYPE doktriai_workloads_desired gauge\n")
+	fmt.Fprintf(w, "doktriai_workloads_desired %d\n", totalDesired)
+	fmt.Fprintf(w, "# HELP doktriai_workloads_actual Total actual running replica count\n")
+	fmt.Fprintf(w, "# TYPE doktriai_workloads_actual gauge\n")
+	fmt.Fprintf(w, "doktriai_workloads_actual %d\n", totalActual)
+	fmt.Fprintf(w, "# HELP doktriai_workloads_total Total number of tracked workloads\n")
+	fmt.Fprintf(w, "# TYPE doktriai_workloads_total gauge\n")
+	fmt.Fprintf(w, "doktriai_workloads_total %d\n", len(status))
+	fmt.Fprintf(w, "# HELP doktriai_audit_allowed_total Cumulative allowed operations\n")
+	fmt.Fprintf(w, "# TYPE doktriai_audit_allowed_total counter\n")
+	fmt.Fprintf(w, "doktriai_audit_allowed_total %d\n", allowedOps)
+	fmt.Fprintf(w, "# HELP doktriai_audit_denied_total Cumulative denied operations\n")
+	fmt.Fprintf(w, "# TYPE doktriai_audit_denied_total counter\n")
+	fmt.Fprintf(w, "doktriai_audit_denied_total %d\n", deniedOps)
+	fmt.Fprintf(w, "# HELP doktriai_pending_plans Pending PTE approval plans\n")
+	fmt.Fprintf(w, "# TYPE doktriai_pending_plans gauge\n")
+	fmt.Fprintf(w, "doktriai_pending_plans %d\n", len(s.plans.List()))
+}
+
 // --- Rate limiter (Layer 5 — per-IP token bucket, 60 req/min) ---
 
 type rateLimiter struct {
@@ -592,6 +714,15 @@ func withCORS(next http.Handler) http.Handler {
 	allowedOrigins := map[string]bool{
 		"http://localhost:18082": true,
 		"http://127.0.0.1:18082": true,
+		"http://localhost:18080": true,
+		"http://127.0.0.1:18080": true,
+	}
+	if extra := os.Getenv("DOKTRIAI_CORS_ORIGINS"); extra != "" {
+		for _, o := range strings.Split(extra, ",") {
+			if trimmed := strings.TrimSpace(o); trimmed != "" {
+				allowedOrigins[trimmed] = true
+			}
+		}
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
@@ -599,7 +730,7 @@ func withCORS(next http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 		}
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Doktri-Role, X-Doktri-Actor, X-Doktri-Token")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
 		w.Header().Set("Vary", "Origin")
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)

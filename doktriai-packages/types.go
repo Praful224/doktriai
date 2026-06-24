@@ -24,6 +24,31 @@ const (
 	PlanStatusExpired  PlanStatus = "expired"
 )
 
+// ResourceLimits controls CPU and memory constraints for a workload container.
+type ResourceLimits struct {
+	CPUShares int64  `json:"cpuShares,omitempty"` // relative CPU weight (e.g. 512, 1024)
+	MemoryMB  int64  `json:"memoryMb,omitempty"`  // memory limit in megabytes
+	CPUPeriod int64  `json:"cpuPeriod,omitempty"` // CPU period in microseconds (default 100000)
+	CPUQuota  int64  `json:"cpuQuota,omitempty"`  // CPU quota in microseconds
+}
+
+// HealthCheck defines a container readiness/liveness probe.
+type HealthCheck struct {
+	Command     []string `json:"command,omitempty"`     // exec probe command
+	HTTPPath    string   `json:"httpPath,omitempty"`    // HTTP GET path for HTTP probe
+	HTTPPort    int      `json:"httpPort,omitempty"`    // port for HTTP probe
+	IntervalSec int      `json:"intervalSec,omitempty"` // seconds between checks (default 30)
+	TimeoutSec  int      `json:"timeoutSec,omitempty"`  // seconds before timeout (default 5)
+	Retries     int      `json:"retries,omitempty"`     // failure threshold before unhealthy (default 3)
+}
+
+// VolumeMount defines a host→container bind mount.
+type VolumeMount struct {
+	HostPath      string `json:"hostPath"`
+	ContainerPath string `json:"containerPath"`
+	ReadOnly      bool   `json:"readOnly,omitempty"`
+}
+
 // WorkloadSpec is the desired state declaration for a container workload.
 type WorkloadSpec struct {
 	Name          string            `json:"name"`
@@ -34,15 +59,23 @@ type WorkloadSpec struct {
 	Runtime       string            `json:"runtime"`
 	Env           map[string]string `json:"env,omitempty"`
 	SecurityMode  SecurityMode      `json:"securityMode,omitempty"`
+	Resources     ResourceLimits    `json:"resources,omitempty"`
+	HealthCheck   *HealthCheck      `json:"healthCheck,omitempty"`
+	Volumes       []VolumeMount     `json:"volumes,omitempty"`
+	Labels        map[string]string `json:"labels,omitempty"`
 }
 
 // ActualWorkload is the observed container state from the runtime driver.
 type ActualWorkload struct {
-	Name    string `json:"name"`
-	Replica int    `json:"replica"`
-	Runtime string `json:"runtime"`
-	ID      string `json:"id"`
-	Status  string `json:"status"`
+	Name      string `json:"name"`
+	Replica   int    `json:"replica"`
+	Runtime   string `json:"runtime"`
+	ID        string `json:"id"`
+	Status    string `json:"status"`
+	StartedAt string `json:"startedAt,omitempty"`
+	CPUUsage  string `json:"cpuUsage,omitempty"`
+	MemUsage  string `json:"memUsage,omitempty"`
+	Image     string `json:"image,omitempty"`
 }
 
 // WorkloadStatus combines desired spec with observed actual state.
@@ -52,6 +85,7 @@ type WorkloadStatus struct {
 	Healthy bool             `json:"healthy"`
 	Drift   string           `json:"drift,omitempty"`
 }
+
 
 // Event is a real-time notification emitted to the SSE event bus.
 type Event struct {

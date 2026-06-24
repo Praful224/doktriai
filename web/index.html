@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data:;">
     <title>DOKTRIAI / control-plane</title>
     <link rel="stylesheet" href="/styles.css" />
 </head>
@@ -29,7 +29,15 @@
                     </svg>
                 </button>
             </div>
-            <div class="brand"><strong>DOKTRIAI</strong><span>/</span><span>control-plane</span></div>
+            <div class="brand">
+                <strong>DOKTRIAI</strong>
+                <span>/</span>
+                <span class="project-name-container" id="projectNameContainer" title="Click to rename project" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                    <span id="projectNameText">control-plane</span>
+                    <input id="projectNameInput" style="display: none; background: var(--bg); border: 1px solid var(--line); color: #fff; font-size: 13px; height: 20px; padding: 0 4px; border-radius: 4px; width: 120px;" value="control-plane" autocomplete="off" />
+                    <span class="edit-icon" style="font-size: 10px; opacity: 0.5;">✏️</span>
+                </span>
+            </div>
             <label class="search">
                 <span>⌘</span>
                 <input id="commandSearch" placeholder="Search or press ⌘K..." autocomplete="off" />
@@ -39,8 +47,7 @@
             <div class="system-tray">
                 <span class="wifi">◒</span>
                 <span>4G</span>
-                <span>⚡</span>
-                <span>▰ 99%</span>
+                <span id="batteryIndicator">▰ 99%</span>
                 <span id="clock">Thu, Jun 18 22:14:25</span>
                 <div class="theme-menu-container">
                     <button id="themeDropdownBtn" title="Workspace Theme" class="icon-btn">🎨</button>
@@ -135,31 +142,24 @@
         </header>
 
         <aside class="explorer">
-            <h2>EXPLORER</h2>
-            <section>
-                <h3>⌄ WORKSPACE</h3>
-                <button class="tree active" data-view="overview">⌂ Overview</button>
+            <section style="margin-top: 12px;">
+                <h3>Workspace</h3>
+                <button class="tree active" data-view="overview">Overview</button>
+                <button class="tree" data-view="workloads">Workloads</button>
             </section>
             <section>
-                <h3>⌄ COMPUTE</h3>
-                <button class="tree" data-view="workloads">▦ Workloads</button>
-                <button class="tree" data-view="core">⟳ Reconciler</button>
-                <button class="tree" data-view="operator">☸ Operator/GitOps</button>
-                <button class="tree" data-view="runtime">⬡ Runtime Drivers</button>
+                <h3>Content</h3>
+                <button class="tree" data-view="projects">Projects</button>
+                <button class="tree" data-view="experiments">Experiments</button>
+                <button class="tree" data-view="writing">Documentation</button>
+                <button class="tree" data-view="notes">Notes</button>
+                <button class="tree" data-view="gallery">Gallery</button>
             </section>
             <section>
-                <h3>⌄ INTEGRATIONS</h3>
-                <button class="tree" data-view="mcp">✦ AI Agent Hub</button>
-                <button class="tree" data-view="cli">🐚 CLI Reference</button>
-                <button class="tree" data-view="packages">{ } Schema Browser</button>
-                <button class="tree" data-view="charts">⛵ Helm Charts</button>
-                <button class="tree" data-view="examples">⚡ Examples</button>
-            </section>
-            <section>
-                <h3>⌄ SYSTEM</h3>
-                <button class="tree" data-view="security">🔒 Security</button>
-                <button class="tree" data-view="activity">⌁ Activity</button>
-                <button class="tree" data-view="settings">⚙ Settings</button>
+                <h3>System</h3>
+                <button class="tree" data-view="activity">Activity</button>
+                <button class="tree" data-view="contact">Contact</button>
+                <button class="tree" data-view="settings">Settings</button>
             </section>
             <div class="explorer-status">
                 <p><span class="dot" id="connectionDot"></span> <span id="statusText">connecting...</span></p>
@@ -169,11 +169,8 @@
         </aside>
 
         <main class="main">
-            <nav class="tabs">
-                <button class="tab active" data-view="overview">Overview <span>×</span></button>
-                <button class="tab" data-view="workloads">Workloads</button>
-                <button class="tab" data-view="security">Security <span id="planBadge" class="plan-badge" style="display:none">0</span></button>
-                <button class="tab" data-view="mcp">doktriai-mcp</button>
+            <nav class="tabs" id="tabsContainer">
+                <!-- Dynamically generated by app.js -->
                 <button class="tab spacer">···</button>
             </nav>
 
@@ -182,6 +179,9 @@
                 <article id="overview" class="view active-view">
                     <div class="doc-title"><span>&gt;_</span>
                         <h1>workspace://overview</h1>
+                    </div>
+                    <div style="font-size: 14px; margin-bottom: 16px; color: var(--orange); font-weight: 500;">
+                        Active Project: <span id="overviewProjectName" style="text-decoration: underline;">control-plane</span>
                     </div>
                     <p class="lede">Autonomous control plane for declarative container clusters. Doktriai-api coordinates multi-tenant workload requests, and doktriai-core reconciles desired state against local and remote Docker runtimes.</p>
                     <div class="hero-panel">
@@ -218,18 +218,82 @@
                         </div>
                     </div>
 
-                    <div class="repo-grid">
-                        <button class="repo-card" data-view="workloads"><strong>doktriai-api</strong><span>REST/gRPC front door, mTLS auth, audit logs, SSE event streaming</span></button>
-                        <button class="repo-card" data-view="core"><strong>doktriai-core</strong><span>Declarative reconciler compliance loop preventing environment drift</span></button>
-                        <button class="repo-card" data-view="mcp"><strong>doktriai-mcp</strong><span>Model Context Protocol server exposing tools to AI agents</span></button>
-                        <button class="repo-card" data-view="cli"><strong>doktriai-cli</strong><span>Native developer CLI binary interface for local scaling & logs</span></button>
-                        <button class="repo-card" data-view="operator"><strong>doktriai-operator</strong><span>Kubernetes GitOps operator syncing custom manifests (CRDs)</span></button>
-                        <button class="repo-card" data-view="runtime"><strong>doktriai-runtime</strong><span>Universal adapter driver engine virtualizing container platforms</span></button>
-                        <button class="repo-card" data-view="packages"><strong>doktriai-packages</strong><span>Shared common schemas, configuration maps, and specifications</span></button>
-                        <button class="repo-card" data-view="charts"><strong>doktriai-charts</strong><span>Official Helm 3 packages for secure cluster deployment distributions</span></button>
-                        <button class="repo-card" data-view="examples"><strong>doktriai-examples</strong><span>Reference tutorials, quickstart scripts, and sample agent clients</span></button>
-                        <button class="repo-card" data-view="settings"><strong>doktriai-web</strong><span>Static workspace interface served natively by the Go API engine</span></button>
+                    <!-- Platform Modules / Projects -->
+                    <h2 class="section-title" style="margin-top: 28px;">Platform Modules</h2>
+                    <p style="font-size:12px; color:var(--muted); margin-bottom: 14px;">Click any module card to connect and navigate directly to its console.</p>
+                    <div class="repo-grid" id="overviewProjectsGrid">
+                        <div class="repo-card clickable-project-card" data-project-view="workloads" data-status="active" style="cursor:pointer; display:flex; flex-direction:column; justify-content:space-between; gap:6px;">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                    <strong style="color:#fff; font-size:13px;">doktriai-api</strong>
+                                    <span style="background:rgba(48,209,88,0.1); color:var(--green); border-radius:4px; padding:2px 6px; font-size:10px;">ACTIVE</span>
+                                </div>
+                                <span style="font-size:11px; color:var(--muted);">REST &amp; gRPC gateway — auth, audit, SSE streaming.</span>
+                            </div>
+                            <span style="font-size:11px; color:var(--orange); font-weight:500;">Connect ➜</span>
+                        </div>
+                        <div class="repo-card clickable-project-card" data-project-view="core" data-status="active" style="cursor:pointer; display:flex; flex-direction:column; justify-content:space-between; gap:6px;">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                    <strong style="color:#fff; font-size:13px;">doktriai-core</strong>
+                                    <span style="background:rgba(48,209,88,0.1); color:var(--green); border-radius:4px; padding:2px 6px; font-size:10px;">ACTIVE</span>
+                                </div>
+                                <span style="font-size:11px; color:var(--muted);">Reconciler engine — drift detection, scheduling, events.</span>
+                            </div>
+                            <span style="font-size:11px; color:var(--orange); font-weight:500;">Connect ➜</span>
+                        </div>
+                        <div class="repo-card clickable-project-card" data-project-view="mcp" data-status="active" style="cursor:pointer; display:flex; flex-direction:column; justify-content:space-between; gap:6px;">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                    <strong style="color:#fff; font-size:13px;">doktriai-mcp</strong>
+                                    <span style="background:rgba(48,209,88,0.1); color:var(--green); border-radius:4px; padding:2px 6px; font-size:10px;">ACTIVE</span>
+                                </div>
+                                <span style="font-size:11px; color:var(--muted);">AI agent gateway — Claude, GPT, multi-agent automation.</span>
+                            </div>
+                            <span style="font-size:11px; color:var(--orange); font-weight:500;">Connect ➜</span>
+                        </div>
+                        <div class="repo-card clickable-project-card" data-project-view="cli" data-status="active" style="cursor:pointer; display:flex; flex-direction:column; justify-content:space-between; gap:6px;">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                    <strong style="color:#fff; font-size:13px;">doktriai-cli</strong>
+                                    <span style="background:rgba(48,209,88,0.1); color:var(--green); border-radius:4px; padding:2px 6px; font-size:10px;">ACTIVE</span>
+                                </div>
+                                <span style="font-size:11px; color:var(--muted);">Terminal UX — deploy, logs, diagnose from shell.</span>
+                            </div>
+                            <span style="font-size:11px; color:var(--orange); font-weight:500;">Connect ➜</span>
+                        </div>
+                        <div class="repo-card clickable-project-card" data-project-view="operator" data-status="active" style="cursor:pointer; display:flex; flex-direction:column; justify-content:space-between; gap:6px;">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                    <strong style="color:#fff; font-size:13px;">doktriai-operator</strong>
+                                    <span style="background:rgba(48,209,88,0.1); color:var(--green); border-radius:4px; padding:2px 6px; font-size:10px;">ACTIVE</span>
+                                </div>
+                                <span style="font-size:11px; color:var(--muted);">GitOps Kubernetes bridge — CRDs, canary, drift alerts.</span>
+                            </div>
+                            <span style="font-size:11px; color:var(--orange); font-weight:500;">Connect ➜</span>
+                        </div>
+                        <div class="repo-card clickable-project-card" data-project-view="runtime" data-status="active" style="cursor:pointer; display:flex; flex-direction:column; justify-content:space-between; gap:6px;">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                    <strong style="color:#fff; font-size:13px;">doktriai-runtime</strong>
+                                    <span style="background:rgba(48,209,88,0.1); color:var(--green); border-radius:4px; padding:2px 6px; font-size:10px;">ACTIVE</span>
+                                </div>
+                                <span style="font-size:11px; color:var(--muted);">Universal driver — Docker, Kubernetes, Podman, bare-metal.</span>
+                            </div>
+                            <span style="font-size:11px; color:var(--orange); font-weight:500;">Connect ➜</span>
+                        </div>
                     </div>
+
+                    <!-- Quick Start Links -->
+                    <h2 class="section-title" style="margin-top: 28px;">Quick Start</h2>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px;">
+                        <button onclick="switchView('workloads')" style="font-size:12px; padding:8px 16px; background:var(--orange); color:#fff; border-radius:6px; border:0; cursor:pointer;">🚀 Deploy Workload</button>
+                        <button onclick="switchView('writing')" style="font-size:12px; padding:8px 16px; background:var(--panel-hover); color:var(--text); border-radius:6px; border:1px solid var(--line); cursor:pointer;">📖 Documentation</button>
+                        <button onclick="switchView('security')" style="font-size:12px; padding:8px 16px; background:var(--panel-hover); color:var(--text); border-radius:6px; border:1px solid var(--line); cursor:pointer;">🛡️ Security Gate</button>
+                        <button onclick="switchView('activity')" style="font-size:12px; padding:8px 16px; background:var(--panel-hover); color:var(--text); border-radius:6px; border:1px solid var(--line); cursor:pointer;">⚡ Live Activity</button>
+                    </div>
+
+                    <!-- End of Overview components -->
                 </article>
 
                 <!-- Workloads View -->
@@ -291,7 +355,7 @@
                         <h1>workspace://core</h1>
                     </div>
                     <p class="lede">Declarative compliance loop of the DOKTRIAI core engine. Compares target workload specs against actual environment state, reconciling any detected drift.</p>
-                    
+
                     <div class="experiments-layout" style="margin-bottom: 24px;">
                         <div class="card-sidebar">
                             <h3>⌄ DIAGNOSTICS</h3>
@@ -337,7 +401,9 @@
                                 </tr>
                             </thead>
                             <tbody id="coreDriftRows">
-                                <tr><td colspan="5">Loading reconciler state...</td></tr>
+                                <tr>
+                                    <td colspan="5">Loading reconciler state...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -349,7 +415,7 @@
                         <h1>workspace://operator</h1>
                     </div>
                     <p class="lede">Synchronizes Custom Resource Definitions (CRDs) and custom declarative resources into Kubernetes target runtimes.</p>
-                    
+
                     <div class="experiments-layout" style="margin-bottom: 24px;">
                         <div class="card-sidebar">
                             <h3>⌄ CRD TEMPLATE</h3>
@@ -443,15 +509,14 @@
                                 </tr>
                             </thead>
                             <tbody id="runtimeContainerRows">
-                                <tr><td colspan="6">Querying driver processes...</td></tr>
+                                <tr>
+                                    <td colspan="6">Querying driver processes...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <h2 class="section-title">System Architecture Connections Mapping</h2>
-                    <div class="gallery-layout">
-                        <canvas id="architectureCanvas" width="1100" height="420"></canvas>
-                    </div>
+                    <!-- Runtime Driver Metrics Only -->
                 </article>
 
                 <!-- CLI View -->
@@ -532,7 +597,7 @@
                         <h1>workspace://packages</h1>
                     </div>
                     <p class="lede">Interactive definition reference browser for the declarative <code>WorkloadSpec</code> parameters. Used to construct valid deployment manifests.</p>
-                    
+
                     <div class="search" style="max-width:100%; margin-bottom:20px; height:38px;">
                         <span>🔍</span>
                         <input id="schemaSearchInput" placeholder="Filter schema fields by name or type..." style="font-size:13px;" />
@@ -551,7 +616,9 @@
                                 </tr>
                             </thead>
                             <tbody id="schemaTableRows">
-                                <tr><td colspan="5">Loading schema parameters...</td></tr>
+                                <tr>
+                                    <td colspan="5">Loading schema parameters...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -563,7 +630,7 @@
                         <h1>workspace://charts</h1>
                     </div>
                     <p class="lede">Generates Helm values configuration manifests from standard workload definitions to compile cluster packages.</p>
-                    
+
                     <div class="experiments-layout">
                         <div class="card-sidebar" style="gap: 8px;">
                             <h3>⌄ VALUES CONFIG</h3>
@@ -606,7 +673,7 @@
                         <h1>workspace://examples</h1>
                     </div>
                     <p class="lede">Code tutorials, runnable quickstarts, and client SDK integration scripts for DOKTRIAI.</p>
-                    
+
                     <div class="experiments-layout">
                         <div class="card-sidebar">
                             <h3>⌄ LIVE EXAMPLES</h3>
@@ -656,7 +723,9 @@
                             <h2>Pending Approvals (Plan-Then-Execute Gate)</h2>
                         </div>
                         <p class="security-desc">High-risk agent actions (replicas &gt; 5, sensitive env keys, all deletes) are held here until a human operator approves or rejects them. Unapproved plans expire after 15 minutes. <em>Prevents ASI09 — autonomous AI damage.</em></p>
-                        <div id="pendingPlansContainer"><div class="plan-empty">Loading pending approvals...</div></div>
+                        <div id="pendingPlansContainer">
+                            <div class="plan-empty">Loading pending approvals...</div>
+                        </div>
                     </div>
 
                     <!-- Layer 3: Behavioral Metrics -->
@@ -666,7 +735,9 @@
                             <h2>Behavioral Anomaly Detection</h2>
                         </div>
                         <p class="security-desc">Rolling 5-minute window tracks deploy/delete/reject rates per actor. Actors exceeding thresholds are flagged and emit anomaly events. <em>Detects ASI10 — rogue agents.</em></p>
-                        <div id="behaviorMetricsContainer"><div class="plan-empty">Loading behavioral metrics...</div></div>
+                        <div id="behaviorMetricsContainer">
+                            <div class="plan-empty">Loading behavioral metrics...</div>
+                        </div>
                     </div>
 
                     <!-- Layer 3: Audit Trail -->
@@ -710,6 +781,437 @@
                             </div>
                         </div>
                     </div>
+                </article>
+
+                </article>
+
+                <!-- Projects View -->
+                <article id="projects" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://projects</h1>
+                    </div>
+                    <p class="lede">10 platform modules registered. Click a project card to switch to its technical logs, console, or deployment settings.</p>
+                    
+                    <div class="project-filters" style="display: flex; gap: 8px; margin-bottom: 20px;">
+                        <button class="filter-btn active" data-filter="all" style="font-size: 11px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--panel-hover);">All</button>
+                        <button class="filter-btn" data-filter="active" style="font-size: 11px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px; background: transparent;">Active</button>
+                        <button class="filter-btn" data-filter="in-progress" style="font-size: 11px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px; background: transparent;">In-Progress</button>
+                        <button class="filter-btn" data-filter="shipped" style="font-size: 11px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px; background: transparent;">Shipped</button>
+                    </div>
+
+                    <div class="repo-grid" id="projectsGrid">
+                        <div class="repo-card clickable-project-card" data-project-view="workloads" data-status="active" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <strong style="color: #fff; font-size: 13px;">doktriai-api</strong>
+                                    <span class="badge-verified" style="background: rgba(48, 209, 88, 0.1); color: var(--green); border-radius: 4px; padding: 2px 6px; font-size: 10px;">ACTIVE</span>
+                                </div>
+                                <span style="font-size: 12px; color: var(--muted); line-height: 1.4;">REST and gRPC front door for CLI, MCP, and integrations. Authentication (API keys, JWT, OIDC), validation, SSE log streaming, audit logs, dry-run, bulk ops, cursor pagination, and rate limiting. Delegates all business logic to core.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">REST</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">gRPC</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">auth</span>
+                                </div>
+                                <span style="font-size: 11px; color: var(--orange); font-weight: 500;">Connect ➜</span>
+                            </div>
+                        </div>
+
+                        <div class="repo-card clickable-project-card" data-project-view="core" data-status="active" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <strong style="color: #fff; font-size: 13px;">doktriai-core</strong>
+                                    <span class="badge-verified" style="background: rgba(48, 209, 88, 0.1); color: var(--green); border-radius: 4px; padding: 2px 6px; font-size: 10px;">ACTIVE</span>
+                                </div>
+                                <span style="font-size: 12px; color: var(--muted); line-height: 1.4;">The orchestration engine — reconciliation loops, workload scheduling, state management, event routing, and policy enforcement. Merges Git, API, and AI intent into runtime actions. Never exposes HTTP; drives runtime and operator.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">reconciler</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">state</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">events</span>
+                                </div>
+                                <span style="font-size: 11px; color: var(--orange); font-weight: 500;">Connect ➜</span>
+                            </div>
+                        </div>
+
+                        <div class="repo-card clickable-project-card" data-project-view="mcp" data-status="active" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <strong style="color: #fff; font-size: 13px;">doktriai-mcp</strong>
+                                    <span class="badge-verified" style="background: rgba(48, 209, 88, 0.1); color: var(--green); border-radius: 4px; padding: 2px 6px; font-size: 10px;">ACTIVE</span>
+                                </div>
+                                <span style="font-size: 12px; color: var(--muted); line-height: 1.4;">MCP server for Claude, GPT, and custom agents. Tools for deploy, logs, analyze, natural-language deploy, dry-run, autonomous healing, runbooks, multi-agent tasks, and per-agent audit. Safety boundaries block namespace/RBAC/secret abuse.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">MCP</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">AI agents</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">automation</span>
+                                </div>
+                                <span style="font-size: 11px; color: var(--orange); font-weight: 500;">Connect ➜</span>
+                            </div>
+                        </div>
+
+                        <div class="repo-card clickable-project-card" data-project-view="cli" data-status="active" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <strong style="color: #fff; font-size: 13px;">doktriai-cli</strong>
+                                    <span class="badge-verified" style="background: rgba(48, 209, 88, 0.1); color: var(--green); border-radius: 4px; padding: 2px 6px; font-size: 10px;">ACTIVE</span>
+                                </div>
+                                <span style="font-size: 12px; color: var(--muted); line-height: 1.4;">Primary human interface — deploy, logs, analyze, restart, namespaces, manifest generation, context profiles (dev/staging/prod), doctor, port-forward. Pure API client; config in ~/.doktriai/config.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">CLI</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">terminal</span>
+                                </div>
+                                <span style="font-size: 11px; color: var(--orange); font-weight: 500;">Connect ➜</span>
+                            </div>
+                        </div>
+
+                        <div class="repo-card clickable-project-card" data-project-view="operator" data-status="active" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <strong style="color: #fff; font-size: 13px;">doktriai-operator</strong>
+                                    <span class="badge-verified" style="background: rgba(48, 209, 88, 0.1); color: var(--green); border-radius: 4px; padding: 2px 6px; font-size: 10px;">ACTIVE</span>
+                                </div>
+                                <span style="font-size: 12px; color: var(--muted); line-height: 1.4;">In-cluster GitOps bridge — watches DoktriApp, DoktriPolicy, DoktriPipeline, DoktriSecret, DoktriDriftAlert CRDs. Canary/blue-green, federation, secret sync (Vault/AWS/Azure), drift alerts, admission webhooks.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">GitOps</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">CRD</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">controller</span>
+                                </div>
+                                <span style="font-size: 11px; color: var(--orange); font-weight: 500;">Connect ➜</span>
+                            </div>
+                        </div>
+
+                        <div class="repo-card clickable-project-card" data-project-view="runtime" data-status="active" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <strong style="color: #fff; font-size: 13px;">doktriai-runtime</strong>
+                                    <span class="badge-verified" style="background: rgba(48, 209, 88, 0.1); color: var(--green); border-radius: 4px; padding: 2px 6px; font-size: 10px;">ACTIVE</span>
+                                </div>
+                                <span style="font-size: 12px; color: var(--muted); line-height: 1.4;">Runtime drivers invoked by core — Docker, Kubernetes, Podman, and remote bare-metal. Maps workload priority, spot tolerations, and cross-namespace NetworkPolicy to each backend.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">Docker</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">Kubernetes</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">drivers</span>
+                                </div>
+                                <span style="font-size: 11px; color: var(--orange); font-weight: 500;">Connect ➜</span>
+                            </div>
+                        </div>
+
+                        <div class="repo-card clickable-project-card" data-project-view="packages" data-status="shipped" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <strong style="color: #fff; font-size: 13px;">doktriai-packages</strong>
+                                    <span class="badge-approved" style="background: rgba(255, 157, 0, 0.1); color: var(--amber); border-radius: 4px; padding: 2px 6px; font-size: 10px;">SHIPPED</span>
+                                </div>
+                                <span style="font-size: 12px; color: var(--muted); line-height: 1.4;">Shared domain types, RuntimeDriver interface, errors, auth, config. Public SDKs for Go, TypeScript, Python, and Rust. doktriai-mock-api for tests without core.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">shared</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">types</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">sdk</span>
+                                </div>
+                                <span style="font-size: 11px; color: var(--orange); font-weight: 500;">Connect ➜</span>
+                            </div>
+                        </div>
+
+                        <div class="repo-card clickable-project-card" data-project-view="charts" data-status="shipped" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <strong style="color: #fff; font-size: 13px;">doktriai-charts</strong>
+                                    <span class="badge-approved" style="background: rgba(255, 157, 0, 0.1); color: var(--amber); border-radius: 4px; padding: 2px 6px; font-size: 10px;">SHIPPED</span>
+                                </div>
+                                <span style="font-size: 12px; color: var(--muted); line-height: 1.4;">Official Helm charts — umbrella install for core, api, operator, optional MCP. CRDs, RBAC, NetworkPolicies, HA profile, OpenTelemetry, ArgoCD app-of-apps template.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">Helm</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">Kubernetes</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">install</span>
+                                </div>
+                                <span style="font-size: 11px; color: var(--orange); font-weight: 500;">Connect ➜</span>
+                            </div>
+                        </div>
+
+                        <div class="repo-card clickable-project-card" data-project-view="examples" data-status="shipped" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <strong style="color: #fff; font-size: 13px;">doktriai-examples</strong>
+                                    <span class="badge-approved" style="background: rgba(255, 157, 0, 0.1); color: var(--amber); border-radius: 4px; padding: 2px 6px; font-size: 10px;">SHIPPED</span>
+                                </div>
+                                <span style="font-size: 12px; color: var(--muted); line-height: 1.4;">Runnable quickstarts and reference architectures — Docker hello-world, Claude MCP agents, GitOps loops, IDP patterns, observability, ML inference, multi-cloud failover.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">examples</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">quickstart</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">reference</span>
+                                </div>
+                                <span style="font-size: 11px; color: var(--orange); font-weight: 500;">Connect ➜</span>
+                            </div>
+                        </div>
+
+                        <div class="repo-card clickable-project-card" data-project-view="settings" data-status="in-progress" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <strong style="color: #fff; font-size: 13px;">doktriai-web</strong>
+                                    <span class="badge-dev" style="background: rgba(255,255,255,0.06); color: var(--muted); border-radius: 4px; padding: 2px 6px; font-size: 10px;">IN PROGRESS</span>
+                                </div>
+                                <span style="font-size: 12px; color: var(--muted); line-height: 1.4;">This site — the DOKTRIAI control plane workspace. Documentation hub, platform overview, and developer portal built with the workspace UI template.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">web</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">docs</span>
+                                    <span style="font-size: 10px; background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--orange);">portal</span>
+                                </div>
+                                <span style="font-size: 11px; color: var(--orange); font-weight: 500;">Connect ➜</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                </article>
+
+                <!-- Experiments View -->
+                <article id="experiments" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://experiments</h1>
+                    </div>
+                    <p class="lede">Simulate chaos engineering experiments, control plane node drain rates, and network failure tolerance test cases.</p>
+                    
+                    <div class="experiments-layout" style="margin-bottom: 24px;">
+                        <div class="card-sidebar">
+                            <h3>⌄ CHAOS UTILS</h3>
+                            <button id="btnChaosDrain" style="width:100%; margin-bottom:8px;" class="btn-primary">Drain Target Node</button>
+                            <button id="btnChaosLatency" style="width:100%; margin-bottom:8px;">Inject Network Latency</button>
+                            <button id="btnChaosKill" style="width:100%; margin-bottom:16px;">Kill Random Process</button>
+                            
+                            <h3>⌄ SIMULATION STATE</h3>
+                            <p style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">Monitor injection vectors and safety margins.</p>
+                            <div class="security-status-card" style="padding: 10px; gap:2px; background: var(--bg);">
+                                <strong>Active Injections:</strong>
+                                <span id="chaosActiveCount">0 running</span>
+                            </div>
+                        </div>
+                        <div class="card-main" style="display: flex; flex-direction: column; gap: 10px;">
+                            <h3>Chaos Output Console</h3>
+                            <pre class="code-output" id="chaosOutputConsole" style="min-height: 240px; font-family:'JetBrains Mono', monospace; font-size:12px;">Select a chaos engineering experiment to execute output streams...</pre>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Writing View -->
+                <article id="writing" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://documentation</h1>
+                    </div>
+                    <p class="lede">Step-by-step guides, API references, CLI usage, and platform integration documentation for DOKTRIAI.</p>
+
+                    <!-- Section 1: Getting Started -->
+                    <h2 class="section-title" style="margin-top:0;">Getting Started</h2>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:12px; margin-bottom:24px;">
+                        <div class="repo-card" style="cursor:default;">
+                            <strong style="color:#fff; font-size:13px;">① Start the Control Plane</strong>
+                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Setup · Server</span>
+                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
+                                Run the API server from the project root:<br/>
+                                <code style="display:block; background:var(--term); color:var(--green); padding:6px 8px; border-radius:4px; margin-top:6px; font-size:11px;">go run ./cmd/doktriai-api -addr :18080</code>
+                                Then open <code style="color:var(--orange);">http://localhost:18080</code> in your browser.
+                            </span>
+                        </div>
+                        <div class="repo-card" style="cursor:default;">
+                            <strong style="color:#fff; font-size:13px;">② Navigate the Workspace</strong>
+                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Setup · UI</span>
+                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
+                                • Use the <strong>left sidebar</strong> to switch between sections.<br/>
+                                • Click <strong>tabs</strong> in the top bar to jump between open views.<br/>
+                                • Press <kbd style="background:var(--panel); border:1px solid var(--line); border-radius:3px; padding:1px 5px; font-size:10px;">Ctrl+K</kbd> to open the command palette.
+                            </span>
+                        </div>
+                        <div class="repo-card" style="cursor:default;">
+                            <strong style="color:#fff; font-size:13px;">③ Deploy Your First Workload</strong>
+                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Setup · Workloads</span>
+                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
+                                Navigate to <strong>Workloads</strong> → fill in the form:<br/>
+                                • Name: <code style="color:var(--orange);">hello-web</code><br/>
+                                • Image: <code style="color:var(--orange);">nginx:alpine</code><br/>
+                                • Replicas: <code style="color:var(--orange);">1</code><br/>
+                                Click <strong>Deploy App</strong> to submit.
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: CLI Reference -->
+                    <h2 class="section-title">CLI Reference</h2>
+                    <div class="repo-card" style="cursor:default; margin-bottom:20px;">
+                        <strong style="color:#fff; font-size:13px;">doktriai-cli Commands</strong>
+                        <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Reference · CLI</span>
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:10px; margin-top:10px;">
+                            <div style="background:var(--term); border-radius:6px; padding:10px;">
+                                <div style="font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">Deploy</div>
+                                <code style="font-size:11px; color:var(--green); line-height:1.6; display:block;">go run ./cmd/doktriai-api -addr :18080</code>
+                                <code style="font-size:11px; color:var(--green); line-height:1.6; display:block;">doktriai-cli apply -f app.doktri</code>
+                            </div>
+                            <div style="background:var(--term); border-radius:6px; padding:10px;">
+                                <div style="font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">Inspect</div>
+                                <code style="font-size:11px; color:var(--green); line-height:1.6; display:block;">doktriai-cli status</code>
+                                <code style="font-size:11px; color:var(--green); line-height:1.6; display:block;">doktriai-cli logs hello-web --tail=50</code>
+                            </div>
+                            <div style="background:var(--term); border-radius:6px; padding:10px;">
+                                <div style="font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">Manage</div>
+                                <code style="font-size:11px; color:var(--green); line-height:1.6; display:block;">doktriai-cli delete workload hello-web</code>
+                                <code style="font-size:11px; color:var(--green); line-height:1.6; display:block;">doktriai-cli mcp-tools</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: REST API -->
+                    <h2 class="section-title">REST API Reference</h2>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:12px; margin-bottom:24px;">
+                        <div class="repo-card" style="cursor:default;">
+                            <strong style="color:#fff; font-size:13px;">Health &amp; Status</strong>
+                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">API · GET</span>
+                            <code style="display:block; background:var(--term); color:var(--green); padding:8px; border-radius:4px; margin-top:8px; font-size:11px; line-height:1.6;">GET /api/health<br/>GET /api/workloads<br/>GET /api/audit</code>
+                        </div>
+                        <div class="repo-card" style="cursor:default;">
+                            <strong style="color:#fff; font-size:13px;">Deploy &amp; Reconcile</strong>
+                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">API · POST</span>
+                            <code style="display:block; background:var(--term); color:var(--green); padding:8px; border-radius:4px; margin-top:8px; font-size:11px; line-height:1.6;">POST /api/workloads<br/>POST /api/reconcile<br/>POST /api/lock</code>
+                        </div>
+                        <div class="repo-card" style="cursor:default;">
+                            <strong style="color:#fff; font-size:13px;">Delete &amp; Stream</strong>
+                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">API · DELETE / SSE</span>
+                            <code style="display:block; background:var(--term); color:var(--green); padding:8px; border-radius:4px; margin-top:8px; font-size:11px; line-height:1.6;">DELETE /api/workloads/:name<br/>GET /api/events (SSE)<br/>GET /api/logs/:name</code>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Connecting Projects -->
+                    <h2 class="section-title">Connecting Projects &amp; Modules</h2>
+                    <div class="repo-card" style="cursor:default; margin-bottom:20px;">
+                        <strong style="color:#fff; font-size:13px;">How Projects Connect</strong>
+                        <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Architecture · Modules</span>
+                        <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:8px;">
+                            • Navigate to <strong>Projects</strong> or <strong>Overview</strong> to see all platform modules.<br/>
+                            • <strong>Click any module card</strong> — the workspace auto-connects to it, renames the active project, and opens its console view.<br/>
+                            • Module connections flow: <code style="color:var(--orange);">Developer / Agent → CLI / MCP → API → Core → Runtime / Operator</code><br/>
+                            • Use the <strong>Gallery</strong> view to see a live architecture diagram of how modules link together.
+                        </span>
+                    </div>
+
+                    <!-- Section 5: Security Gate -->
+                    <h2 class="section-title">Security &amp; PTE Approval Gate</h2>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:12px; margin-bottom:24px;">
+                        <div class="repo-card" style="cursor:default; border-color: rgba(255,157,0,0.3);">
+                            <strong style="color:#fff; font-size:13px;">Layer 2 — PTE Approval Gate</strong>
+                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Security · Required</span>
+                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
+                                High-risk deploys (replicas &gt; 5, sensitive keys, all deletes) require <strong>human approval</strong>. Navigate to <strong>Security → Pending Approvals</strong> to approve or reject them before they execute.
+                            </span>
+                        </div>
+                        <div class="repo-card" style="cursor:default; border-color: rgba(255,157,0,0.3);">
+                            <strong style="color:#fff; font-size:13px;">Layer 3 — Behavioral Anomaly</strong>
+                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Security · Detection</span>
+                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
+                                Rolling 5-minute windows track deploy/delete/reject rates per actor. Actors exceeding thresholds are <strong>flagged</strong> and emit anomaly events visible in the Security panel.
+                            </span>
+                        </div>
+                        <div class="repo-card" style="cursor:default;">
+                            <strong style="color:#fff; font-size:13px;">Control Plane Lock</strong>
+                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Security · Lock</span>
+                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
+                                Use <strong>Reconciler → Control Plane Lock</strong> to freeze all automated deployment changes. Enter a reason and click <strong>Acquire Lock</strong>. Release when safe to resume operations.
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Section 6: MCP Agent -->
+                    <h2 class="section-title">MCP Agent Integration</h2>
+                    <div class="repo-card" style="cursor:default; margin-bottom:20px;">
+                        <strong style="color:#fff; font-size:13px;">Connecting an AI Agent via MCP</strong>
+                        <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Integration · AI Agents</span>
+                        <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:8px;">
+                            The MCP server exposes tools over JSON-RPC 2.0 at <code style="color:var(--orange);">POST /api/mcp</code>. Available tools:
+                        </span>
+                        <div style="background:var(--term); border-radius:6px; padding:10px; margin-top:10px;">
+                            <code style="font-size:11px; color:var(--green); line-height:1.7; display:block;">
+                                tools/list — list all agent-callable tools<br/>
+                                deploy_workload — deploy a container via agent<br/>
+                                list_workloads — fetch current workload state<br/>
+                                delete_workload — decommission a workload<br/>
+                                get_logs — stream container logs
+                            </code>
+                        </div>
+                        <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:8px;">
+                            Generate a signed HMAC token in <strong>CLI Reference → Secure Token Generator</strong> and attach it as <code style="color:var(--orange);">X-Doktri-Token</code> header in agent calls.
+                        </span>
+                    </div>
+
+                </article>
+
+
+                <!-- Notes View -->
+                <article id="notes" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://notes</h1>
+                    </div>
+                    <p class="lede">Interactive workspace notebook. Save design details, code snippets, or configuration notes locally.</p>
+                    <div class="notes-container">
+                        <div class="notes-list" id="notesList" style="display: flex; flex-direction: column; gap: 4px; padding: 6px;">
+                            <!-- Dynamically generated note items -->
+                        </div>
+                        <div class="note-editor">
+                            <label>Note Title
+                                <input id="noteTitleInput" placeholder="e.g. Scaling Plan" style="background:var(--panel); border:1px solid var(--line); border-radius:6px; color:#fff; padding:0 8px; font-size:12px; height:32px;" autocomplete="off" />
+                            </label>
+                            <label>Note Content
+                                <textarea id="noteContentTextarea" placeholder="Write note content here..." style="min-height: 200px; padding: 8px; background:var(--panel); border:1px solid var(--line); border-radius:6px; color:#fff; font-family:'JetBrains Mono', monospace; font-size:12px; resize:none;"></textarea>
+                            </label>
+                            <div class="note-actions" style="margin-top: 8px;">
+                                <button id="btnNewNote" class="btn-secondary">New Note</button>
+                                <button id="btnDeleteNote" class="btn-secondary" style="color: var(--danger); border-color: var(--danger);">Delete</button>
+                                <button id="btnSaveNote" class="btn-primary">Save Note</button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Gallery View -->
+                <article id="gallery" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://gallery</h1>
+                    </div>
+                    <p class="lede">System Architecture Connections Mapping diagram and system layout visualization.</p>
+                    <div class="gallery-layout">
+                        <canvas id="architectureCanvas" width="1100" height="420" style="width: 100%; max-width: 1100px; height: auto; background: var(--term); border: 1px solid var(--line); border-radius: 8px;"></canvas>
+                    </div>
+                </article>
+
+                <!-- Contact View -->
+                <article id="contact" class="view">
+                    <div class="doc-title"><span>&gt;_</span>
+                        <h1>workspace://contact</h1>
+                      </div>
+                      <p class="lede">Reach out to the cluster administrator or support engineers for system access and assistance.</p>
+                      <form id="contactForm" class="contact-panel">
+                          <h2>Submit Support Request</h2>
+                          <label>Subject
+                              <input name="subject" id="contactSubject" required placeholder="e.g. Deploy issue" autocomplete="off" style="background: var(--bg); border: 1px solid var(--line); border-radius: 6px; color: #fff; padding: 0 8px; height: 32px; font-size: 12px;" />
+                          </label>
+                          <label>Message
+                              <textarea name="message" id="contactMessage" required placeholder="Describe the request..." style="height: 100px; padding: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; color: #fff; font-size: 12px; font-family: inherit; resize: none;"></textarea>
+                          </label>
+                          <button type="submit" style="background: var(--orange); color: #fff; height: 32px; border-radius: 6px;">Submit Request</button>
+                      </form>
                 </article>
 
                 <!-- Settings View -->
@@ -759,6 +1261,22 @@
                 <form id="terminalForm" class="terminal-input"><span>›</span><input id="terminalCommand" autocomplete="off" placeholder="type a command..." /></form>
             </section>
         </main>
+        <footer class="statusbar">
+            <div class="statusbar-left" style="display: flex; align-items: center; gap: 6px;">
+                <span class="dot" id="sbConnectionDot" style="width: 6px; height: 6px; border-radius: 50%; display: inline-block; background: var(--green);"></span>
+                <span id="sbStatusText">connecting...</span>
+                <span class="separator" style="color: var(--line); margin: 0 4px;">|</span>
+                <span class="dot" id="sbLockDot" style="width: 6px; height: 6px; border-radius: 50%; display: inline-block; background: var(--green);"></span>
+                <span id="sbLockStatusText">system unlocked</span>
+                <span class="separator" style="color: var(--line); margin: 0 4px;">|</span>
+                <span id="sbMcpStatus" style="color: var(--muted);">MCP pending · alpha-v1</span>
+            </div>
+            <div class="statusbar-right" style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                <span id="sbActiveProjectName">control-plane</span>
+                <span class="separator" style="color: var(--line); margin: 0 4px;">|</span>
+                <span id="sbActiveThemeLabel">Linen Theme</span>
+            </div>
+        </footer>
     </div>
     <script src="/app.js"></script>
 </body>

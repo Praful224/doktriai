@@ -151,11 +151,11 @@ func IsDevMode() bool {
 // DevClaimsFromHeaders builds an AgentClaims from legacy X-Doktri-Role / X-Doktri-Actor headers.
 // Only used in dev mode to preserve backward compatibility.
 func DevClaimsFromHeaders(role, actor string) AgentClaims {
-	if actor == "" {
-		actor = role
-	}
 	if role == "" {
 		role = "admin"
+	}
+	if actor == "" {
+		actor = role
 	}
 	return AgentClaims{
 		ActorName: actor,

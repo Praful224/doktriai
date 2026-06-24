@@ -1,36 +1,46 @@
-replicaCount: 1
+## DOKTRIAI Helm Chart — values.yaml
+## Override any value with: helm install doktriai ./doktriai-charts -f my-values.yaml
 
-image:
-  repository: doktriai/control-plane
-  pullPolicy: IfNotPresent
-  tag: "latest"
+nameOverride: ""
+fullnameOverride: ""
 
-service:
-  type: ClusterIP
+global:
+  # Auth mode: "dev" uses header fallback; "production" requires HMAC tokens
+  authMode: "dev"
+  # HMAC signing secret — override with a strong random value in production
+  signingSecret: "doktriai-dev-secret-do-not-use-in-production"
+  # Comma-separated additional allowed CORS origins
+  corsOrigins: ""
+
+# ── doktriai-api ─────────────────────────────────────────────────────────────
+api:
+  replicas: 1
   port: 18080
+  image:
+    repository: doktriai/api
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 18080
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
 
+# ── Persistence ──────────────────────────────────────────────────────────────
+persistence:
+  enabled: false
+  size: 1Gi
+  storageClass: ""
+
+# ── Ingress (optional) ───────────────────────────────────────────────────────
 ingress:
   enabled: false
   className: ""
-  hosts:
-    - host: doktriai.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 5
-
-nodeSelector: {}
-tolerations: []
-affinity: {}
+  annotations: {}
+  host: doktriai.local
+  tls: []

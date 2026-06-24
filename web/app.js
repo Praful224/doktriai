@@ -11,9 +11,147 @@ const api = {
   }
 };
 
-const state = { workloads: [], events: [], audit: [], plans: [], behaviorMetrics: [] };
+const state = {
+  workloads: [],
+  events: [],
+  audit: [],
+  plans: [],
+  behaviorMetrics: [],
+  openTabs: ["overview", "workloads", "writing", "security", "mcp"],
+  activeView: "overview"
+};
 const qs = (selector) => document.querySelector(selector);
 const qsa = (selector) => [...document.querySelectorAll(selector)];
+
+const tabLabels = {
+  overview: "Overview",
+  projects: "Projects",
+  experiments: "Experiments",
+  writing: "Documentation",
+  notes: "Notes",
+  gallery: "Gallery",
+  contact: "Contact",
+  workloads: "Workloads",
+  core: "Reconciler",
+  operator: "Operator/GitOps",
+  runtime: "Runtime Drivers",
+  mcp: "doktriai-mcp",
+  cli: "CLI Reference",
+  packages: "Schema Browser",
+  charts: "Helm Charts",
+  examples: "Examples",
+  security: "Security",
+  activity: "Activity",
+  settings: "Settings"
+};
+
+let notes = JSON.parse(localStorage.getItem("doktriai_notes")) || [
+  { id: "1", title: "Scale Workload Spec", content: "To scale hello-web app:\nreplicas: 3\nimage: nginx:alpine" },
+  { id: "2", title: "GitOps Config", content: "Syncing CRD specs via operator module:\nkind: DoktriApp\nmetadata:\n  name: secure-nginx" }
+];
+let activeNoteId = "1";
+
+function renderNotes() {
+  const list = qs("#notesList");
+  if (!list) return;
+  list.innerHTML = "";
+  
+  if (notes.length === 0) {
+    list.innerHTML = `<div class="note-item" style="color:var(--muted); font-size:11px; text-align:center; padding:12px;">No notes yet.</div>`;
+    qs("#noteTitleInput").value = "";
+    qs("#noteContentTextarea").value = "";
+    return;
+  }
+  
+  notes.forEach(note => {
+    const item = document.createElement("div");
+    item.className = `note-item${note.id === activeNoteId ? " active" : ""}`;
+    item.style.padding = "8px";
+    item.style.borderBottom = "1px solid var(--line)";
+    item.style.cursor = "pointer";
+    item.style.borderRadius = "4px";
+    if (note.id === activeNoteId) {
+      item.style.background = "var(--panel-hover)";
+    }
+    
+    item.innerHTML = `
+      <div style="font-weight:600; font-size:12px; color:#fff;">${escapeHtml(note.title || "Untitled")}</div>
+      <div style="font-size:10px; color:var(--muted); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(note.content || "")}</div>
+    `;
+    item.addEventListener("click", () => {
+      activeNoteId = note.id;
+      renderNotes();
+      loadActiveNote();
+    });
+    list.appendChild(item);
+  });
+}
+
+function loadActiveNote() {
+  const note = notes.find(n => n.id === activeNoteId);
+  const tInput = qs("#noteTitleInput");
+  const cText = qs("#noteContentTextarea");
+  if (note && tInput && cText) {
+    tInput.value = note.title;
+    cText.value = note.content;
+  }
+}
+
+function renderTabs() {
+  const container = qs("#tabsContainer");
+  if (!container) return;
+  container.innerHTML = "";
+  
+  state.openTabs.forEach(view => {
+    const btn = document.createElement("button");
+    btn.className = `tab${state.activeView === view ? " active" : ""}`;
+    btn.dataset.view = view;
+    
+    const label = tabLabels[view] || view;
+    btn.appendChild(document.createTextNode(label + " "));
+    
+    if (view === "security") {
+      const badge = document.createElement("span");
+      badge.id = "planBadge";
+      badge.className = "plan-badge";
+      const pendingCount = (state.plans || []).filter(p => p.status === "pending").length;
+      badge.textContent = pendingCount;
+      badge.style.display = pendingCount > 0 ? "inline-flex" : "none";
+      btn.appendChild(badge);
+    }
+    
+    const closeSpan = document.createElement("span");
+    closeSpan.className = "tab-close";
+    closeSpan.dataset.close = view;
+    closeSpan.innerHTML = "×";
+    closeSpan.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeTab(view);
+    });
+    btn.appendChild(closeSpan);
+    
+    btn.addEventListener("click", () => switchView(view));
+    container.appendChild(btn);
+  });
+  
+  const spacer = document.createElement("button");
+  spacer.className = "tab spacer";
+  spacer.textContent = "···";
+  container.appendChild(spacer);
+}
+
+function closeTab(view) {
+  state.openTabs = state.openTabs.filter(t => t !== view);
+  if (state.activeView === view) {
+    const nextActive = state.openTabs[state.openTabs.length - 1] || "overview";
+    if (!state.openTabs.includes("overview") && nextActive === "overview") {
+      state.openTabs.push("overview");
+    }
+    switchView(nextActive);
+  } else {
+    renderTabs();
+  }
+}
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -25,12 +163,20 @@ function escapeHtml(value) {
 }
 
 function switchView(view, updateHash = true) {
+  state.activeView = view;
+  if (!state.openTabs.includes(view)) {
+    state.openTabs.push(view);
+  }
+
   qsa(".view").forEach((item) => item.classList.remove("active-view"));
-  qsa(".tree,.tab").forEach((item) => item.classList.toggle("active", item.dataset.view === view));
+  qsa(".tree").forEach((item) => item.classList.toggle("active", item.dataset.view === view));
+  
   const target = qs(`#${view}`);
   if (target) target.classList.add("active-view");
+  if (view === "gallery") {
+    setTimeout(drawArchitecture, 50);
+  }
   if (view === "runtime") {
-    drawArchitecture();
     renderRuntimeView();
   }
   if (view === "core") renderCoreView();
@@ -39,6 +185,7 @@ function switchView(view, updateHash = true) {
   if (updateHash) {
     window.location.hash = "/" + view;
   }
+  renderTabs();
 }
 
 function handleRouting() {
@@ -93,6 +240,14 @@ async function refreshAll() {
     qs("#statusText").textContent = "reconciler online";
     const dot = qs("#connectionDot");
     if (dot) dot.classList.remove("offline");
+
+    const sbStatus = qs("#sbStatusText");
+    if (sbStatus) sbStatus.textContent = "reconciler online";
+    const sbDot = qs("#sbConnectionDot");
+    if (sbDot) {
+      sbDot.style.background = "var(--green)";
+      sbDot.style.boxShadow = "var(--glow-emerald)";
+    }
     
     // Update pending plan badge
     const pendingCount = (state.plans || []).filter(p => p.status === "pending").length;
@@ -105,23 +260,38 @@ async function refreshAll() {
     // Update Lock UI
     const lockDot = qs("#lockDot");
     const lockStatusText = qs("#lockStatusText");
+    const sbLockDot = qs("#sbLockDot");
+    const sbLockStatusText = qs("#sbLockStatusText");
     if (lockDot && lockStatusText) {
       if (lockState.locked) {
         lockDot.style.background = "var(--amber)";
         lockDot.style.boxShadow = "0 0 10px rgba(255, 157, 0, 0.4)";
         lockStatusText.textContent = `locked (${lockState.acquiredBy})`;
+        if (sbLockDot) sbLockDot.style.background = "var(--amber)";
+        if (sbLockStatusText) sbLockStatusText.textContent = `locked (${lockState.acquiredBy})`;
       } else {
         lockDot.style.background = "var(--green)";
         lockDot.style.boxShadow = "var(--glow-emerald)";
         lockStatusText.textContent = "system unlocked";
+        if (sbLockDot) sbLockDot.style.background = "var(--green)";
+        if (sbLockStatusText) sbLockStatusText.textContent = "system unlocked";
       }
     }
     
     qs("#mcpStatus").textContent = "MCP ready · alpha-v1";
+    const sbMcp = qs("#sbMcpStatus");
+    if (sbMcp) sbMcp.textContent = "MCP ready · alpha-v1";
   } catch (error) {
     qs("#statusText").textContent = "api offline";
     const dot = qs("#connectionDot");
     if (dot) dot.classList.add("offline");
+
+    const sbStatus = qs("#sbStatusText");
+    if (sbStatus) sbStatus.textContent = "api offline";
+    const sbDot = qs("#sbConnectionDot");
+    if (sbDot) {
+      sbDot.style.background = "var(--danger)";
+    }
     writeTerminal(`error: ${error.message}`);
   }
 }
@@ -800,8 +970,239 @@ async function generateToken(actor, role, agentId, scope, goal) {
   return payload + "|" + signature;
 }
 
+let projectName = localStorage.getItem("doktriai_project_name") || "control-plane";
+
+function updateProjectName(name) {
+  projectName = name;
+  localStorage.setItem("doktriai_project_name", name);
+  
+  const textEl = qs("#projectNameText");
+  if (textEl) textEl.textContent = name;
+  
+  const inputEl = qs("#projectNameInput");
+  if (inputEl) inputEl.value = name;
+  
+  const sbEl = qs("#sbActiveProjectName");
+  if (sbEl) sbEl.textContent = `Project: ${name}`;
+
+  const overviewProjEl = qs("#overviewProjectName");
+  if (overviewProjEl) overviewProjEl.textContent = name;
+  
+  const brandSpans = qsa(".brand span");
+  if (brandSpans.length > 0) {
+    const lastSpan = brandSpans[brandSpans.length - 1];
+    if (lastSpan && !lastSpan.closest("#projectNameContainer")) {
+      lastSpan.textContent = name;
+    }
+  }
+}
+
+function updateBattery() {
+  const indicator = qs("#batteryIndicator");
+  if (!indicator) return;
+
+  if (navigator.getBattery) {
+    navigator.getBattery().then(battery => {
+      const updateInfo = () => {
+        const pct = Math.round(battery.level * 100);
+        const icon = battery.charging ? "⚡" : "▰";
+        indicator.textContent = `${icon} ${pct}%`;
+      };
+      updateInfo();
+      battery.addEventListener("levelchange", updateInfo);
+      battery.addEventListener("chargingchange", updateInfo);
+    });
+  } else {
+    indicator.textContent = "▰ 99%";
+  }
+}
+
+function updateShipDates() {
+  const today = new Date();
+  const formatOptions = { month: "short", day: "numeric", year: "numeric" };
+  const formattedDate = today.toLocaleDateString("en-US", formatOptions);
+  
+  qsa(".ship-date").forEach(el => {
+    const content = el.textContent || "";
+    const parts = content.split(" · ");
+    const category = parts.length > 1 ? parts[1] : "Guide";
+    el.textContent = `${formattedDate} · ${category}`;
+  });
+}
+
 function bind() {
-  qsa("[data-view]").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
+  qsa(".tree").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
+
+  // Project Name Inline Editing
+  const nameContainer = qs("#projectNameContainer");
+  const nameText = qs("#projectNameText");
+  const nameInput = qs("#projectNameInput");
+  const editIcon = qs("#projectNameContainer .edit-icon");
+  
+  if (nameContainer && nameText && nameInput) {
+    nameContainer.addEventListener("click", () => {
+      if (nameInput.style.display === "inline-block") return;
+      nameText.style.display = "none";
+      if (editIcon) editIcon.style.display = "none";
+      nameInput.style.display = "inline-block";
+      nameInput.focus();
+      nameInput.select();
+    });
+    
+    const saveName = () => {
+      const val = nameInput.value.trim();
+      if (val) {
+        updateProjectName(val);
+        writeTerminal(`Project renamed to "${val}".`);
+      }
+      nameText.style.display = "inline";
+      if (editIcon) editIcon.style.display = "inline";
+      nameInput.style.display = "none";
+    };
+    
+    nameInput.addEventListener("blur", saveName);
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        saveName();
+      }
+      if (e.key === "Escape") {
+        nameInput.value = projectName;
+        nameText.style.display = "inline";
+        if (editIcon) editIcon.style.display = "inline";
+        nameInput.style.display = "none";
+      }
+    });
+  }
+  
+  // Initialize project name
+  updateProjectName(projectName);
+
+  // Clickable Project Cards
+  qsa(".clickable-project-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const targetView = card.dataset.projectView;
+      const strongEl = card.querySelector("strong");
+      const projName = strongEl ? strongEl.textContent.trim() : "";
+      if (projName) {
+        updateProjectName(projName);
+        writeTerminal(`Connected to project: ${projName}`);
+      }
+      if (targetView) {
+        switchView(targetView);
+      }
+    });
+  });
+
+  // Project filtering
+  qsa(".project-filters button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      qsa(".project-filters button").forEach(b => {
+        b.classList.remove("active");
+        b.style.background = "transparent";
+      });
+      btn.classList.add("active");
+      btn.style.background = "var(--panel-hover)";
+      
+      const filter = btn.dataset.filter;
+      qsa(".clickable-project-card").forEach(card => {
+        if (filter === "all" || card.dataset.status === filter) {
+          card.style.display = "flex";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    });
+  });
+
+  // Notes App bindings
+  const btnNew = qs("#btnNewNote");
+  const btnSave = qs("#btnSaveNote");
+  const btnDelete = qs("#btnDeleteNote");
+  
+  if (btnNew) {
+    btnNew.addEventListener("click", () => {
+      const newId = Date.now().toString();
+      notes.push({ id: newId, title: "New Note", content: "" });
+      activeNoteId = newId;
+      localStorage.setItem("doktriai_notes", JSON.stringify(notes));
+      renderNotes();
+      loadActiveNote();
+      qs("#noteTitleInput").focus();
+    });
+  }
+  
+  if (btnSave) {
+    btnSave.addEventListener("click", () => {
+      const note = notes.find(n => n.id === activeNoteId);
+      if (note) {
+        note.title = qs("#noteTitleInput").value.trim() || "Untitled";
+        note.content = qs("#noteContentTextarea").value;
+        localStorage.setItem("doktriai_notes", JSON.stringify(notes));
+        renderNotes();
+        writeTerminal(`Note "${note.title}" saved successfully.`);
+      }
+    });
+  }
+  
+  if (btnDelete) {
+    btnDelete.addEventListener("click", () => {
+      notes = notes.filter(n => n.id !== activeNoteId);
+      activeNoteId = notes[0]?.id || "";
+      localStorage.setItem("doktriai_notes", JSON.stringify(notes));
+      renderNotes();
+      loadActiveNote();
+      writeTerminal("Note deleted.");
+    });
+  }
+  
+  // Render notes initial load
+  renderNotes();
+  loadActiveNote();
+
+  // Contact support form
+  const contactForm = qs("#contactForm");
+  if (contactForm) {
+    contactForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const subject = qs("#contactSubject").value;
+      writeTerminal(`Support request submitted: Subject="${subject}"`);
+      contactForm.reset();
+      alert("Support request submitted to DOKTRIAI core panel.");
+    });
+  }
+
+  // Chaos simulations
+  const btnDrain = qs("#btnChaosDrain");
+  const btnLatency = qs("#btnChaosLatency");
+  const btnChaosKill = qs("#btnChaosKill");
+  const chaosConsole = qs("#chaosOutputConsole");
+  const chaosActive = qs("#chaosActiveCount");
+  let chaosCount = 0;
+  
+  if (btnDrain && chaosConsole) {
+    btnDrain.addEventListener("click", () => {
+      chaosCount++;
+      if (chaosActive) chaosActive.textContent = `${chaosCount} running`;
+      chaosConsole.textContent += `\n[${new Date().toLocaleTimeString()}] INJECTION: Draining node 'worker-node-1'...\n[${new Date().toLocaleTimeString()}] STATUS: Evicting container replicas safely.`;
+      writeTerminal("Chaos event: Node drain simulation started.");
+    });
+  }
+  
+  if (btnLatency && chaosConsole) {
+    btnLatency.addEventListener("click", () => {
+      chaosCount++;
+      if (chaosActive) chaosActive.textContent = `${chaosCount} running`;
+      chaosConsole.textContent += `\n[${new Date().toLocaleTimeString()}] INJECTION: Injecting +250ms egress latency on docker0 bridge...\n[${new Date().toLocaleTimeString()}] STATUS: Observing reconciliation ticks lag.`;
+      writeTerminal("Chaos event: Egress latency injected.");
+    });
+  }
+  
+  if (btnChaosKill && chaosConsole) {
+    btnChaosKill.addEventListener("click", () => {
+      chaosConsole.textContent += `\n[${new Date().toLocaleTimeString()}] INJECTION: Sending SIGKILL to replica hello-web-1...\n[${new Date().toLocaleTimeString()}] STATUS: Core reconciler triggered auto-heal loop successfully.`;
+      writeTerminal("Chaos event: SIGKILL chaos test run.");
+    });
+  }
   
   const deployForm = qs("#deployForm");
   if (deployForm) {
@@ -1150,6 +1551,9 @@ spec:
     const nameEl = qs("#activeThemeName");
     if (nameEl) nameEl.textContent = label;
 
+    const sbTheme = qs("#sbActiveThemeLabel");
+    if (sbTheme) sbTheme.textContent = `${label} Theme`;
+
     writeTerminal(`Theme changed to ${label} Mode.`);
   }
 
@@ -1196,6 +1600,8 @@ bind();
 connectEvents();
 refreshAll();
 handleRouting();
+updateBattery();
+updateShipDates();
 
 // Sync dropdown menu UI with the saved preference after scripts bind
 document.addEventListener("DOMContentLoaded", () => {
@@ -1207,4 +1613,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const label = savedTheme.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
   const nameEl = qs("#activeThemeName");
   if (nameEl) nameEl.textContent = label;
+
+  const sbTheme = qs("#sbActiveThemeLabel");
+  if (sbTheme) sbTheme.textContent = `${label} Theme`;
+  updateBattery();
+  updateShipDates();
 });

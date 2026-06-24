@@ -1,9 +1,19 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: doktriapps.doktri.io
+  name: doktriaiapps.doktriai.io
+  labels:
+    app.kubernetes.io/managed-by: doktriai-operator
+    io.doktri.managed: "true"
 spec:
-  group: doktri.io
+  group: doktriai.io
+  scope: Namespaced
+  names:
+    plural: doktriaiapps
+    singular: doktriaiapp
+    kind: DoktriaiApp
+    shortNames:
+      - dapp
   versions:
     - name: v1alpha1
       served: true
@@ -11,24 +21,84 @@ spec:
       schema:
         openAPIV3Schema:
           type: object
+          required:
+            - spec
           properties:
             spec:
               type: object
+              required:
+                - image
               properties:
                 image:
                   type: string
+                  description: "Container image reference (e.g. nginx:alpine)"
                 replicas:
                   type: integer
                   minimum: 1
-                  maximum: 10
+                  maximum: 50
+                  default: 1
+                  description: "Desired number of container replicas"
                 port:
                   type: integer
+                  minimum: 0
+                  maximum: 65535
+                  description: "Host port to expose"
                 containerPort:
                   type: integer
-  names:
-    kind: DoktriApp
-    plural: doktriapps
-    singular: doktriapp
-    shortNames:
-      - dapp
-  scope: Namespaced
+                  minimum: 0
+                  maximum: 65535
+                  description: "Container port"
+                runtime:
+                  type: string
+                  enum: ["docker", "kubernetes"]
+                  default: "kubernetes"
+                  description: "Target runtime driver"
+                securityMode:
+                  type: string
+                  enum: ["dev", "staging", "production"]
+                  default: "dev"
+                env:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: "Environment variables for the container"
+                resources:
+                  type: object
+                  properties:
+                    memoryMb:
+                      type: integer
+                      description: "Memory limit in megabytes"
+                    cpuShares:
+                      type: integer
+                      description: "Relative CPU weight"
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  enum: ["Pending", "Running", "Failed", "Converged"]
+                readyReplicas:
+                  type: integer
+                lastReconciled:
+                  type: string
+                  format: date-time
+                drift:
+                  type: string
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Image
+          type: string
+          jsonPath: .spec.image
+        - name: Replicas
+          type: integer
+          jsonPath: .spec.replicas
+        - name: Runtime
+          type: string
+          jsonPath: .spec.runtime
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp

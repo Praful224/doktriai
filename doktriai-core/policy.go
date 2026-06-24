@@ -74,8 +74,8 @@ func ValidateSpec(spec packages.WorkloadSpec) error {
 	if spec.ContainerPort < 0 || spec.ContainerPort > 65535 {
 		return fmt.Errorf("container port must be between 0 and 65535")
 	}
-	if spec.Runtime != "docker" {
-		return fmt.Errorf("runtime %q is not enabled in this build", spec.Runtime)
+	if spec.Runtime != "docker" && spec.Runtime != "kubernetes" && spec.Runtime != "k8s" {
+		return fmt.Errorf("runtime %q is not supported — choose 'docker' or 'kubernetes'", spec.Runtime)
 	}
 	for key, value := range spec.Env {
 		if !safeEnvKey.MatchString(key) {
@@ -83,6 +83,22 @@ func ValidateSpec(spec packages.WorkloadSpec) error {
 		}
 		if strings.ContainsAny(value, "\x00\r\n") {
 			return fmt.Errorf("env value for %q contains unsupported characters", key)
+		}
+	}
+	// Resource limits validation
+	if spec.Resources.MemoryMB < 0 {
+		return fmt.Errorf("resources.memoryMb must be non-negative")
+	}
+	if spec.Resources.CPUShares < 0 {
+		return fmt.Errorf("resources.cpuShares must be non-negative")
+	}
+	// Volume mount validation
+	for i, vol := range spec.Volumes {
+		if vol.HostPath == "" || vol.ContainerPath == "" {
+			return fmt.Errorf("volume[%d]: hostPath and containerPath are required", i)
+		}
+		if strings.ContainsAny(vol.HostPath+vol.ContainerPath, shellMetachars) {
+			return fmt.Errorf("volume[%d]: path contains forbidden characters", i)
 		}
 	}
 	return nil
