@@ -712,6 +712,44 @@ function renderExamplesView(tab = "python") {
   container.textContent = examplesData[tab] || "Select an example.";
 }
 
+function showToast(message, type = "info") {
+  const container = qs("#toastContainer") || (() => {
+    const el = document.createElement("div");
+    el.id = "toastContainer";
+    el.className = "toast-container";
+    document.body.appendChild(el);
+    return el;
+  })();
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <span class="toast-icon">${type === "warning" ? "⏳" : type === "error" ? "❌" : "✓"}</span>
+    <div class="toast-content">
+      <div class="toast-title">${type === "warning" ? "PTE Approval Pending" : type === "error" ? "Action Blocked" : "Success"}</div>
+      <div class="toast-message">${escapeHtml(message)}</div>
+    </div>
+    <span class="toast-close">&times;</span>
+  `;
+
+  toast.querySelector(".toast-close").addEventListener("click", () => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+    setTimeout(() => toast.remove(), 200);
+  });
+
+  container.appendChild(toast);
+
+  // Auto remove toast after 6 seconds
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(-10px)";
+      setTimeout(() => toast.remove(), 300);
+    }
+  }, 6000);
+}
+
 function writeTerminal(message) {
   const body = qs("#terminalBody");
   if (!body) return;
@@ -731,13 +769,21 @@ async function deployFromForm(form) {
     containerPort: Number(data.containerPort || 0),
     runtime: "docker"
   };
-  const result = await api.json("/api/workloads", { method: "POST", body: JSON.stringify(payload) });
-  if (result.status === "pending_approval") {
-    writeTerminal(`⏳ PTE Gate: workload requires approval. Plan ID: ${result.planId}`);
-    writeTerminal(`   Reason: ${result.approvalReason}`);
-    writeTerminal(`   Go to Security → Pending Approvals to approve or reject.`);
-  } else {
-    writeTerminal(`deploy accepted: ${payload.name}`);
+  try {
+    const result = await api.json("/api/workloads", { method: "POST", body: JSON.stringify(payload) });
+    if (result.status === "pending_approval") {
+      writeTerminal(`⏳ PTE Gate: workload requires approval. Plan ID: ${result.planId}`);
+      writeTerminal(`   Reason: ${result.approvalReason}`);
+      writeTerminal(`   Go to Security → Pending Approvals to approve or reject.`);
+      showToast(`Workload "${payload.name}" requires human approval: ${result.approvalReason}`, "warning");
+    } else {
+      writeTerminal(`deploy accepted: ${payload.name}`);
+      showToast(`Workload "${payload.name}" successfully deployed!`, "success");
+    }
+  } catch (err) {
+    writeTerminal(`error: ${err.message}`);
+    showToast(`Failed to deploy workload: ${err.message}`, "error");
+    throw err;
   }
   form.reset();
   await refreshAll();
