@@ -317,7 +317,10 @@ function renderWorkloads() {
       <td>${item.actual ? item.actual.length : 0}</td>
       <td>${escapeHtml(item.spec.runtime)}</td>
       <td class="${item.healthy ? "ok" : "danger"}">${escapeHtml(item.drift || "healthy")}</td>
-      <td><button class="row-action" data-delete="${escapeHtml(item.spec.name)}">delete</button></td>
+      <td>
+        <button class="row-action" style="margin-right: 6px;" data-edit="${escapeHtml(item.spec.name)}">edit</button>
+        <button class="row-action" data-delete="${escapeHtml(item.spec.name)}">delete</button>
+      </td>
     `;
     rows.appendChild(tr);
   }
@@ -1219,13 +1222,34 @@ function bind() {
   const rows = qs("#workloadRows");
   if (rows) {
     rows.addEventListener("click", async (event) => {
-      const button = event.target.closest("[data-delete]");
-      if (!button) return;
-      try {
-        await api.json(`/api/workloads/${encodeURIComponent(button.dataset.delete)}`, { method: "DELETE" });
-        await refreshAll();
-      } catch (error) {
-        writeTerminal(`error: ${error.message}`);
+      const deleteButton = event.target.closest("[data-delete]");
+      if (deleteButton) {
+        try {
+          await api.json(`/api/workloads/${encodeURIComponent(deleteButton.dataset.delete)}`, { method: "DELETE" });
+          await refreshAll();
+        } catch (error) {
+          writeTerminal(`error: ${error.message}`);
+        }
+        return;
+      }
+
+      const editButton = event.target.closest("[data-edit]");
+      if (editButton) {
+        const name = editButton.dataset.edit;
+        const wl = state.workloads.find(w => w.spec.name === name);
+        if (wl) {
+          const form = qs("#deployForm");
+          if (form) {
+            form.querySelector('[name="name"]').value = wl.spec.name;
+            form.querySelector('[name="image"]').value = wl.spec.image;
+            form.querySelector('[name="replicas"]').value = wl.spec.replicas;
+            form.querySelector('[name="port"]').value = wl.spec.port || "";
+            form.querySelector('[name="containerPort"]').value = wl.spec.containerPort || "";
+            
+            form.scrollIntoView({ behavior: "smooth" });
+            writeTerminal(`Loaded workload "${name}" into the deploy form for editing.`);
+          }
+        }
       }
     });
   }
