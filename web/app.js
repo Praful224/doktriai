@@ -407,9 +407,11 @@ function renderPendingPlans() {
       try {
         const res = await api.json(`/api/plan/${encodeURIComponent(btn.dataset.planId)}/approve`, { method: "POST", body: "{}" });
         writeTerminal(`Plan ${btn.dataset.planId} approved and applied: ${res.status}`);
+        showToast(`Plan ${btn.dataset.planId} approved and applied successfully!`, "success");
         await refreshAll();
       } catch (err) {
         writeTerminal(`Approve error: ${err.message}`);
+        showToast(`Approval failed: ${err.message}`, "error");
       }
     });
   });
@@ -419,9 +421,11 @@ function renderPendingPlans() {
       try {
         await api.json(`/api/plan/${encodeURIComponent(btn.dataset.planId)}/reject`, { method: "POST", body: JSON.stringify({ comment }) });
         writeTerminal(`Plan ${btn.dataset.planId} rejected.`);
+        showToast(`Plan ${btn.dataset.planId} has been rejected.`, "success");
         await refreshAll();
       } catch (err) {
         writeTerminal(`Reject error: ${err.message}`);
+        showToast(`Rejection failed: ${err.message}`, "error");
       }
     });
   });
