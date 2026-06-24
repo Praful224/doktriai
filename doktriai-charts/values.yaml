@@ -17,7 +17,7 @@ api:
   replicas: 1
   port: 18080
   image:
-    repository: doktriai/api
+    repository: ghcr.io/praful224/doktriai-api
     tag: latest
     pullPolicy: IfNotPresent
   service:
