@@ -23,6 +23,9 @@ func main() {
 	}
 
 	client := cli.NewClient(*apiURL, *role, *actor)
+	if tokenVal := os.Getenv("DOKTRIAI_TOKEN"); tokenVal != "" {
+		client = client.WithToken(tokenVal)
+	}
 	command := flag.Arg(0)
 	var err error
 
@@ -152,6 +155,8 @@ func main() {
 	// ── MCP tools ─────────────────────────────────────────────────────────
 	case "mcp-tools":
 		err = client.CallMCP("tools/list", nil)
+	case "mcp", "mcp-serve":
+		err = client.StdioBridge()
 
 	default:
 		usage()
@@ -231,5 +236,6 @@ Token Management:
                                     Generate a signed HMAC auth token
 
 MCP Tools:
-  mcp-tools                         List MCP agent tools`)
+  mcp-tools                         List MCP agent tools
+  mcp | mcp-serve                   Run as a stdio MCP bridge server`)
 }

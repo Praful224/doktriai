@@ -1,11 +1,13 @@
 package cli
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -159,3 +161,58 @@ func colourJSONLine(line string) string {
 	}
 	return line
 }
+
+// StdioBridge reads JSON-RPC payloads from stdin, forwards them to the /api/mcp endpoint, and writes the response to stdout.
+func (c *Client) StdioBridge() error {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		line, err := reader.ReadBytes('\n')
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
+		line = bytes.TrimSpace(line)
+		if len(line) == 0 {
+			continue
+		}
+
+		req, err := http.NewRequest("POST", c.BaseURL+"/api/mcp", bytes.NewReader(line))
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "error creating request:", err)
+			continue
+		}
+		req.Header.Set("Content-Type", "application/json")
+		if c.Token != "" {
+			req.Header.Set("X-Doktri-Token", c.Token)
+		} else {
+			req.Header.Set("X-Doktri-Role", c.Role)
+			req.Header.Set("X-Doktri-Actor", c.Actor)
+		}
+
+		res, err := c.HTTP.Do(req)
+		if err != nil {
+			errResp := map[string]any{
+				"jsonrpc": "2.0",
+				"error": map[string]any{
+					"code":    -32000,
+					"message": "API connection failed: " + err.Error(),
+				},
+			}
+			_ = json.NewEncoder(os.Stdout).Encode(errResp)
+			continue
+		}
+
+		data, err := io.ReadAll(res.Body)
+		res.Body.Close()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "error reading body:", err)
+			continue
+		}
+
+		os.Stdout.Write(data)
+		os.Stdout.Write([]byte("\n"))
+	}
+}
+

@@ -97,13 +97,15 @@ func (s *Server) Routes() http.Handler {
 // --- Health ---
 
 func (s *Server) health(w http.ResponseWriter, r *http.Request) {
+	wd, _ := os.Getwd()
 	writeJSON(w, http.StatusOK, map[string]any{
-		"ok":        true,
-		"service":   "doktriai-api",
-		"runtime":   "docker",
-		"timestamp": time.Now().UTC(),
-		"authMode":  map[bool]string{true: "dev", false: "production"}[core.IsDevMode()],
-		"circuits":  s.engine.ListCircuitBreakers(),
+		"ok":           true,
+		"service":      "doktriai-api",
+		"runtime":      "docker",
+		"timestamp":    time.Now().UTC(),
+		"authMode":     map[bool]string{true: "dev", false: "production"}[core.IsDevMode()],
+		"circuits":     s.engine.ListCircuitBreakers(),
+		"workspaceDir": filepath.ToSlash(wd),
 	})
 }
 

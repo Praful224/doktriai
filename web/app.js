@@ -1548,13 +1548,308 @@ spec:
     });
   }
 
-  qsa("[data-rpc]").forEach((button) => button.addEventListener("click", async () => {
-    qs("#mcpOutput").textContent = JSON.stringify(await callRPC(button.dataset.rpc), null, 2);
-  }));
+  // Modern MCP Panel handlers
+  const mcpTokenRole = qs("#mcpTokenRole");
+  const mcpToolSelect = qs("#mcpToolSelect");
+  const mcpParamsForm = qs("#mcpParamsForm");
 
-  qsa("[data-tool]").forEach((button) => button.addEventListener("click", async () => {
-    qs("#mcpOutput").textContent = JSON.stringify(await callTool(button.dataset.tool), null, 2);
-  }));
+  // Switch client tabs
+  qsa("#mcpTabHeader .tab-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      qsa("#mcpTabHeader .tab-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      updateMcpClientConfigs();
+    });
+  });
+
+  if (mcpTokenRole) {
+    mcpTokenRole.addEventListener("change", () => {
+      updateMcpClientConfigs();
+    });
+  }
+
+  if (mcpToolSelect) {
+    mcpToolSelect.addEventListener("change", () => {
+      renderMcpParamsForm();
+    });
+  }
+
+  // Copy config button
+  const copyConfigBtn = qs("#copyMcpConfigBtn");
+  if (copyConfigBtn) {
+    copyConfigBtn.addEventListener("click", () => {
+      const blockEl = qs("#mcpConfigBlock");
+      if (blockEl) {
+        navigator.clipboard.writeText(blockEl.textContent);
+        showToast("Copied MCP Config to Clipboard", "ok");
+      }
+    });
+  }
+
+  // Copy token button
+  const copyTokenBtn = qs("#copyMcpTokenBtn");
+  if (copyTokenBtn) {
+    copyTokenBtn.addEventListener("click", async () => {
+      const role = mcpTokenRole ? mcpTokenRole.value : "admin";
+      try {
+        const token = await generateToken("developer", role, "mcp-agent", "cluster:deploy", "Local Scaling");
+        navigator.clipboard.writeText(token);
+        showToast(`Copied ${role.toUpperCase()} test token to clipboard`, "ok");
+      } catch (e) {
+        showToast("Error generating token", "error");
+      }
+    });
+  }
+
+  // Parameter rendering and execution
+  function renderMcpParamsForm() {
+    if (!mcpParamsForm || !mcpToolSelect) return;
+    const tool = mcpToolSelect.value;
+    mcpParamsForm.innerHTML = "";
+    
+    if (tool === "deploy_workload") {
+      mcpParamsForm.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div>
+            <label style="font-size: 11px; color: var(--muted); display: block; margin-bottom: 2px;">Workload Name</label>
+            <input id="paramName" class="select-field" type="text" value="mcp-test-app" placeholder="e.g. hello-web" style="height: 28px; padding: 4px 8px; font-size: 12px;" />
+          </div>
+          <div>
+            <label style="font-size: 11px; color: var(--muted); display: block; margin-bottom: 2px;">Container Image</label>
+            <input id="paramImage" class="select-field" type="text" value="nginx:alpine" placeholder="e.g. nginx:alpine" style="height: 28px; padding: 4px 8px; font-size: 12px;" />
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px;">
+          <div>
+            <label style="font-size: 11px; color: var(--muted); display: block; margin-bottom: 2px;">Replicas</label>
+            <input id="paramReplicas" class="select-field" type="number" value="2" min="1" style="height: 28px; padding: 4px 8px; font-size: 12px;" />
+          </div>
+          <div>
+            <label style="font-size: 11px; color: var(--muted); display: block; margin-bottom: 2px;">Host Port</label>
+            <input id="paramPort" class="select-field" type="number" value="8085" style="height: 28px; padding: 4px 8px; font-size: 12px;" />
+          </div>
+          <div>
+            <label style="font-size: 11px; color: var(--muted); display: block; margin-bottom: 2px;">Container Port</label>
+            <input id="paramContainerPort" class="select-field" type="number" value="80" style="height: 28px; padding: 4px 8px; font-size: 12px;" />
+          </div>
+        </div>
+      `;
+    } else if (tool === "delete_workload") {
+      mcpParamsForm.innerHTML = `
+        <div>
+          <label style="font-size: 11px; color: var(--muted); display: block; margin-bottom: 2px;">Workload Name to Delete</label>
+          <input id="paramDeleteName" class="select-field" type="text" value="mcp-test-app" placeholder="e.g. hello-web" style="height: 28px; padding: 4px 8px; font-size: 12px;" />
+        </div>
+      `;
+    } else if (tool === "get_logs") {
+      mcpParamsForm.innerHTML = `
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px;">
+          <div>
+            <label style="font-size: 11px; color: var(--muted); display: block; margin-bottom: 2px;">Workload Name</label>
+            <input id="paramLogName" class="select-field" type="text" value="mcp-test-app" placeholder="e.g. hello-web" style="height: 28px; padding: 4px 8px; font-size: 12px;" />
+          </div>
+          <div>
+            <label style="font-size: 11px; color: var(--muted); display: block; margin-bottom: 2px;">Tail Lines</label>
+            <input id="paramLogTail" class="select-field" type="number" value="50" min="1" style="height: 28px; padding: 4px 8px; font-size: 12px;" />
+          </div>
+        </div>
+      `;
+    } else {
+      mcpParamsForm.innerHTML = `<p style="font-size: 12px; color: var(--muted); margin: 0;">This method does not require any parameters.</p>`;
+    }
+  }
+
+  async function updateMcpClientConfigs() {
+    const role = mcpTokenRole ? mcpTokenRole.value : "admin";
+    const pathEl = qs("#mcpWorkspacePath");
+    const workspaceDir = (pathEl && pathEl.textContent !== "Detecting...") ? pathEl.textContent : "c:/Users/prafu/OneDrive/Documents/Placement/DevOps/doktriai-control-plane";
+    
+    let token = "";
+    try {
+      token = await generateToken("developer", role, "mcp-agent", "cluster:deploy", "Local Scaling");
+    } catch (e) {
+      token = "error-generating-token";
+    }
+    
+    const activeTab = qs("#mcpTabHeader .tab-btn.active");
+    const client = activeTab ? activeTab.dataset.client : "cursor";
+    
+    let configObj = {};
+    let filename = "project.json";
+    
+    const binaryPath = `${workspaceDir}/doktriai-cli.exe`;
+    
+    if (client === "cursor") {
+      filename = "project.json";
+      configObj = {
+        "mcpServers": {
+          "doktriai": {
+            "command": binaryPath,
+            "args": ["mcp"],
+            "env": {
+              "DOKTRIAI_API": "http://localhost:18080",
+              "DOKTRIAI_TOKEN": token
+            }
+          }
+        }
+      };
+    } else if (client === "windsurf") {
+      filename = "mcp_config.json";
+      configObj = {
+        "mcpServers": {
+          "doktriai": {
+            "command": binaryPath,
+            "args": ["mcp"],
+            "env": {
+              "DOKTRIAI_API": "http://localhost:18080",
+              "DOKTRIAI_TOKEN": token
+            }
+          }
+        }
+      };
+    } else {
+      filename = "claude_desktop_config.json";
+      configObj = {
+        "mcpServers": {
+          "doktriai": {
+            "command": binaryPath,
+            "args": ["mcp"],
+            "env": {
+              "DOKTRIAI_API": "http://localhost:18080",
+              "DOKTRIAI_TOKEN": token
+            }
+          }
+        }
+      };
+    }
+    
+    const filenameEl = qs("#mcpConfigFilename");
+    if (filenameEl) filenameEl.textContent = filename;
+    
+    const blockEl = qs("#mcpConfigBlock");
+    if (blockEl) blockEl.textContent = JSON.stringify(configObj, null, 2);
+  }
+
+  // Load workspace path and initialize configs
+  async function initMcpPanel() {
+    try {
+      const health = await api.json("/api/health");
+      if (health.workspaceDir) {
+        const pathEl = qs("#mcpWorkspacePath");
+        if (pathEl) pathEl.textContent = health.workspaceDir;
+      }
+    } catch(e) {}
+    renderMcpParamsForm();
+    updateMcpClientConfigs();
+  }
+
+  // Execute initialization
+  initMcpPanel();
+
+  const runMcpToolBtn = qs("#runMcpToolBtn");
+  if (runMcpToolBtn) {
+    runMcpToolBtn.addEventListener("click", async () => {
+      if (!mcpToolSelect) return;
+      const tool = mcpToolSelect.value;
+      const role = mcpTokenRole ? mcpTokenRole.value : "admin";
+      const outputEl = qs("#mcpOutput");
+      outputEl.textContent = "Executing JSON-RPC request...";
+      
+      let token = "";
+      try {
+        token = await generateToken("developer", role, "mcp-agent", "cluster:deploy", "Local Scaling");
+      } catch (e) {
+        showToast("Failed to generate authorization token", "error");
+        outputEl.textContent = "Token generation error";
+        return;
+      }
+      
+      let rpcMethod = "";
+      let rpcParams = null;
+      
+      if (tool === "initialize" || tool === "tools/list") {
+        rpcMethod = tool;
+      } else if (tool === "list_workloads" || tool === "list_pending_plans") {
+        rpcMethod = "tools/call";
+        rpcParams = {
+          name: tool,
+          arguments: {}
+        };
+      } else if (tool === "deploy_workload") {
+        const nameVal = qs("#paramName") ? qs("#paramName").value.trim() : "mcp-test-app";
+        const imgVal = qs("#paramImage") ? qs("#paramImage").value.trim() : "nginx:alpine";
+        const repVal = qs("#paramReplicas") ? Number(qs("#paramReplicas").value) : 2;
+        const portVal = qs("#paramPort") ? Number(qs("#paramPort").value) : 8085;
+        const cportVal = qs("#paramContainerPort") ? Number(qs("#paramContainerPort").value) : 80;
+        
+        rpcMethod = "tools/call";
+        rpcParams = {
+          name: "deploy_workload",
+          arguments: {
+            name: nameVal,
+            image: imgVal,
+            replicas: repVal,
+            port: portVal,
+            containerPort: cportVal,
+            runtime: "docker"
+          }
+        };
+      } else if (tool === "delete_workload") {
+        const delVal = qs("#paramDeleteName") ? qs("#paramDeleteName").value.trim() : "mcp-test-app";
+        rpcMethod = "tools/call";
+        rpcParams = {
+          name: "delete_workload",
+          arguments: {
+            name: delVal
+          }
+        };
+      } else if (tool === "get_logs") {
+        const logNameVal = qs("#paramLogName") ? qs("#paramLogName").value.trim() : "mcp-test-app";
+        const tailVal = qs("#paramLogTail") ? Number(qs("#paramLogTail").value) : 50;
+        rpcMethod = "tools/call";
+        rpcParams = {
+          name: "get_logs",
+          arguments: {
+            name: logNameVal,
+            tail: tailVal
+          }
+        };
+      }
+      
+      if (rpcMethod === "tools/call" && rpcParams) {
+        rpcParams.agentId = "mcp-web-playground";
+        rpcParams.scope = "cluster:deploy";
+        rpcParams.goal = "Interactive playground testing";
+      }
+      
+      try {
+        const res = await fetch("/api/mcp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Doktri-Token": token
+          },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: Date.now(),
+            method: rpcMethod,
+            params: rpcParams
+          })
+        });
+        const data = await res.json();
+        outputEl.textContent = JSON.stringify(data, null, 2);
+        if (data.error) {
+          showToast(data.error.message || "MCP Execution Error", "error");
+        } else {
+          showToast("MCP Method Call Succeeded", "ok");
+          refreshAll();
+        }
+      } catch (err) {
+        outputEl.textContent = `Network Error: ${err.message}`;
+        showToast("Connection failed", "error");
+      }
+    });
+  }
 
   // Command search input listeners
   if (searchInput) {

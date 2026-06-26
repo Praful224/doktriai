@@ -1238,15 +1238,71 @@
                         <h1>workspace://mcp</h1>
                     </div>
                     <p class="lede">Directly query the Model Context Protocol (MCP) handlers exposing cluster automation actions via JSON-RPC 2.0.</p>
-                    <div class="mcp-layout">
-                        <div class="mcp-grid">
-                            <button data-rpc="initialize">Initialize Session</button>
-                            <button data-rpc="tools/list">List Exposed Tools</button>
-                            <button data-tool="list_workloads">Execute tool://list_workloads</button>
-                            <button data-tool="get_logs">Execute tool://get_logs</button>
+
+                    <!-- Row 1: Credentials & Global Config -->
+                    <div class="mcp-setup-bar">
+                        <div class="mcp-bar-section">
+                            <span class="mcp-label">Workspace Path:</span>
+                            <span class="mcp-value" id="mcpWorkspacePath">Detecting...</span>
                         </div>
-                        <div class="card-main">
-                            <pre class="code-output" id="mcpOutput">Execute an MCP method to inspect exchange protocols...</pre>
+                        <div class="mcp-bar-section">
+                            <label for="mcpTokenRole" style="margin-right: 8px;">Token Role:</label>
+                            <select id="mcpTokenRole" class="select-field" style="width: auto; padding: 4px 8px; height: 28px;">
+                                <option value="admin">Admin</option>
+                                <option value="operator">Operator</option>
+                                <option value="viewer">Viewer</option>
+                            </select>
+                        </div>
+                        <div class="mcp-bar-actions">
+                            <button id="copyMcpTokenBtn" class="btn" style="height: 28px; line-height: 26px; padding: 0 12px; font-size: 12px;">Copy Test Token</button>
+                        </div>
+                    </div>
+
+                    <div class="mcp-layout-new">
+                        <!-- Client Connection configuration tabs -->
+                        <div class="mcp-docs-panel">
+                            <h3 style="margin-top: 0; font-size: 15px; color: var(--text);">Agent Client Integration</h3>
+                            <p class="panel-desc">Configure your preferred AI editor or client using the standard stdio bridge:</p>
+                            <div class="tab-header" id="mcpTabHeader">
+                                <button class="tab-btn active" data-client="cursor">Cursor</button>
+                                <button class="tab-btn" data-client="windsurf">Windsurf</button>
+                                <button class="tab-btn" data-client="claude">Claude Desktop</button>
+                            </div>
+                            <div class="tab-content">
+                                <div class="code-header">
+                                    <span id="mcpConfigFilename">config.json</span>
+                                    <button class="btn-copy" id="copyMcpConfigBtn">Copy Config</button>
+                                </div>
+                                <pre class="code-output" id="mcpConfigBlock" style="margin-top: 0; border-radius: 0 0 4px 4px; max-height: 250px;">...</pre>
+                            </div>
+                        </div>
+
+                        <!-- Tool Calling Form / Interactive Playground -->
+                        <div class="mcp-playground-panel">
+                            <h3 style="margin-top: 0; font-size: 15px; color: var(--text);">Interactive Tool Tester</h3>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label for="mcpToolSelect" style="display: block; margin-bottom: 6px; font-size: 12px; color: var(--muted);">Select MCP Tool / Method:</label>
+                                <select id="mcpToolSelect" class="select-field">
+                                    <option value="initialize">initialize (RPC)</option>
+                                    <option value="tools/list">tools/list (RPC)</option>
+                                    <option value="list_workloads">list_workloads</option>
+                                    <option value="deploy_workload">deploy_workload</option>
+                                    <option value="delete_workload">delete_workload</option>
+                                    <option value="get_logs">get_logs</option>
+                                    <option value="list_pending_plans">list_pending_plans</option>
+                                </select>
+                            </div>
+
+                            <div id="mcpParamsForm" class="params-form">
+                                <!-- Dynamic Parameters Go Here -->
+                            </div>
+
+                            <button id="runMcpToolBtn" class="btn" style="height: 32px; font-size: 12px; margin-top: 8px;">Run Tool / Method</button>
+
+                            <div class="output-container" style="margin-top: 16px;">
+                                <div class="code-header">Response (JSON-RPC)</div>
+                                <pre class="code-output mcp-green-box" id="mcpOutput" style="margin-top: 0; border-radius: 0 0 4px 4px; max-height: 250px; overflow-y: auto;">Execute an MCP method to inspect exchange protocols...</pre>
+                            </div>
                         </div>
                     </div>
                 </article>
