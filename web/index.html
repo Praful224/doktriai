@@ -141,30 +141,121 @@
             </div>
         </header>
 
-        <aside class="explorer">
-            <section style="margin-top: 12px;">
-                <h3>Workspace</h3>
-                <button class="tree active" data-view="overview">Overview</button>
-                <button class="tree" data-view="workloads">Workloads</button>
-            </section>
-            <section>
-                <h3>Content</h3>
-                <button class="tree" data-view="projects">Projects</button>
-                <button class="tree" data-view="experiments">Experiments</button>
-                <button class="tree" data-view="writing">Documentation</button>
-                <button class="tree" data-view="notes">Notes</button>
-                <button class="tree" data-view="gallery">Gallery</button>
-            </section>
-            <section>
-                <h3>System</h3>
-                <button class="tree" data-view="activity">Activity</button>
-                <button class="tree" data-view="contact">Contact</button>
-                <button class="tree" data-view="settings">Settings</button>
-            </section>
-            <div class="explorer-status">
-                <p><span class="dot" id="connectionDot"></span> <span id="statusText">connecting...</span></p>
-                <p><span class="dot" id="lockDot"></span> <span id="lockStatusText">system unlocked</span></p>
-                <small id="mcpStatus">MCP pending · alpha-v1</small>
+        <aside class="sidebar-container" id="sidebarContainer">
+            <!-- Sidebar Header / Logo -->
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--orange);">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    <span class="brand-text">DOKTRIAI</span>
+                </div>
+                <button id="sidebarToggleArrowBtn" class="sidebar-toggle-btn" title="Toggle Sidebar">
+                    <svg class="toggle-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="10,3 5,8 10,13"></polyline>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Inline Search -->
+            <div class="sidebar-search-container">
+                <div class="sidebar-search">
+                    <span class="search-icon">🔍</span>
+                    <input id="sidebarSearchInput" placeholder="Search..." autocomplete="off" />
+                    <span class="search-kbd">⌘K</span>
+                </div>
+            </div>
+
+            <!-- Sidebar Navigation -->
+            <div class="sidebar-menu">
+                <div class="menu-category">MAIN</div>
+                
+                <!-- Navigation Items -->
+                <div class="menu-item-group">
+                    <button class="menu-item active" data-view="overview" title="Overview">
+                        <span class="menu-icon">🎛️</span>
+                        <span class="menu-text">Overview</span>
+                    </button>
+                    <!-- Sub tree items -->
+                    <div class="sub-tree">
+                        <button class="sub-item" onclick="switchView('overview')">Dashboard</button>
+                        <button class="sub-item" onclick="switchView('projects')">Platform Modules</button>
+                        <button class="sub-item" onclick="switchView('activity')">Live Activity</button>
+                    </div>
+                </div>
+
+                <div class="menu-item-group">
+                    <button class="menu-item" data-view="workloads" title="Workloads">
+                        <span class="menu-icon">📦</span>
+                        <span class="menu-text">Workloads</span>
+                    </button>
+                    <div class="sub-tree">
+                        <button class="sub-item" onclick="switchView('workloads')">Active Workloads</button>
+                        <button class="sub-item" onclick="switchView('core')">Reconciler Core</button>
+                        <button class="sub-item" onclick="switchView('runtime')">Runtime Drivers</button>
+                    </div>
+                </div>
+
+                <div class="menu-item-group">
+                    <button class="menu-item" data-view="security" title="Security">
+                        <span class="menu-icon">🛡️</span>
+                        <span class="menu-text">Security Gate</span>
+                    </button>
+                    <div class="sub-tree">
+                        <button class="sub-item" onclick="switchView('security')">PTE Approvals</button>
+                        <button class="sub-item" onclick="switchView('security')">Anomaly Metrics</button>
+                    </div>
+                </div>
+
+                <div class="menu-item-group">
+                    <button class="menu-item" data-view="mcp" title="AI Agent Gateway">
+                        <span class="menu-icon">🤖</span>
+                        <span class="menu-text">AI Agent Gateway</span>
+                    </button>
+                </div>
+
+                <div class="menu-item-group">
+                    <button class="menu-item" data-view="cli" title="CLI &amp; Reference">
+                        <span class="menu-icon">💻</span>
+                        <span class="menu-text">CLI &amp; SDKs</span>
+                    </button>
+                </div>
+
+                <div class="menu-category">SYSTEM</div>
+
+                <div class="menu-item-group">
+                    <button class="menu-item" data-view="settings" title="Settings">
+                        <span class="menu-icon">⚙️</span>
+                        <span class="menu-text">Settings</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Actors / Messages Category -->
+            <div class="sidebar-actors-section">
+                <div class="menu-category" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>ACTIVE ACTORS</span>
+                    <span class="plus-icon" style="cursor: pointer; opacity: 0.7;">+</span>
+                </div>
+                <div class="actors-list" id="sidebarActorsList">
+                    <!-- Dynamically populated by app.js based on behavior.go tracked actors -->
+                </div>
+            </div>
+
+            <!-- Connection Status (minimal) -->
+            <div class="sidebar-status-minimal">
+                <span class="dot" id="connectionDot" style="width: 6px; height: 6px; background: var(--green); border-radius: 50%;"></span>
+                <span class="status-label" id="statusText">reconciler online</span>
+            </div>
+
+            <!-- Profile Block at Bottom -->
+            <div class="sidebar-profile">
+                <div class="profile-avatar" style="background-image: url('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&q=80');"></div>
+                <div class="profile-meta">
+                    <span class="profile-name">John Doe</span>
+                    <span class="profile-role">DevOps Lead</span>
+                </div>
+                <span class="profile-action-icon">⚙️</span>
             </div>
         </aside>
 
