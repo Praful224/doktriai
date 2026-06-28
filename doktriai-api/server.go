@@ -1021,6 +1021,14 @@ func (s *Server) runtimeStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) discover(w http.ResponseWriter, r *http.Request) {
+	claims := s.authenticate(w, r)
+	if claims == nil {
+		return
+	}
+	if !authorizeRole(w, r, claims.Role, "apply") {
+		return
+	}
+
 	driver := s.engine.Runtime()
 	d, ok := driver.(*doktriruntime.DockerDriver)
 	if !ok {
@@ -1036,9 +1044,9 @@ func (s *Server) discover(w http.ResponseWriter, r *http.Request) {
 
 	var imported []packages.WorkloadSpec
 	for _, spec := range discovered {
-		if _, err := s.store.Get(r.Context(), spec.Name); err != nil {
-			if err := s.store.Put(r.Context(), spec); err == nil {
-				s.bus.Publish(core.Event{
+		if _, ok := s.store.GetWorkload(spec.Name); !ok {
+			if err := s.store.PutWorkload(spec, claims.ActorName); err == nil {
+				s.bus.Publish(packages.Event{
 					Time:     time.Now(),
 					Level:    "info",
 					Source:   "api",
