@@ -48,7 +48,7 @@ func (d *DockerDriver) List(ctx context.Context) ([]packages.ActualWorkload, err
 	args := []string{
 		"ps", "-a",
 		"--filter", "label=io.doktri.managed=true",
-		"--format", "{{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Label \"io.doktri.workload\"}}\t{{.Label \"io.doktri.replica\"}}",
+		"--format", "{{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Label \"io.doktri.workload\"}}\t{{.Label \"io.doktri.replica\"}}\t{{.Image}}",
 	}
 	out, err := exec.CommandContext(ctx, d.binary, args...).CombinedOutput()
 	if err != nil {
@@ -62,7 +62,7 @@ func (d *DockerDriver) List(ctx context.Context) ([]packages.ActualWorkload, err
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
 		parts := strings.Split(scanner.Text(), "\t")
-		if len(parts) < 5 || parts[3] == "" {
+		if len(parts) < 6 || parts[3] == "" {
 			continue
 		}
 		replica, _ := strconv.Atoi(parts[4])
@@ -72,6 +72,7 @@ func (d *DockerDriver) List(ctx context.Context) ([]packages.ActualWorkload, err
 			Replica: replica,
 			Runtime: "docker",
 			Status:  parts[2],
+			Image:   parts[5],
 		})
 	}
 	return actual, scanner.Err()
@@ -98,6 +99,7 @@ func (d *DockerDriver) Apply(ctx context.Context, spec packages.WorkloadSpec, re
 		for i, w := range d.simulatedActual {
 			if w.ID == name {
 				d.simulatedActual[i].Status = "Up 5 seconds"
+				d.simulatedActual[i].Image = spec.Image
 				found = true
 				break
 			}
@@ -109,6 +111,7 @@ func (d *DockerDriver) Apply(ctx context.Context, spec packages.WorkloadSpec, re
 				Replica: replica,
 				Runtime: "docker",
 				Status:  "Up 2 seconds",
+				Image:   spec.Image,
 			})
 		}
 		return nil

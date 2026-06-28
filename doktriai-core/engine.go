@@ -36,6 +36,11 @@ type Engine struct {
 	// circuit: per-workload failure tracking (Layer 3 — ASI08 cascading failure prevention)
 	circuitMu sync.Mutex
 	circuit   map[string]*circuitState
+
+	// Reconcile timing for Prometheus observability
+	reconcileMu      sync.RWMutex
+	lastReconcileAt  time.Time
+	lastReconcileDur time.Duration
 }
 
 func NewEngine(store *Store, runtime packages.RuntimeDriver, bus *EventBus, interval time.Duration) *Engine {
@@ -76,7 +81,7 @@ func (e *Engine) Apply(ctx context.Context, actor string, spec packages.Workload
 	}
 
 	hashBefore := e.store.SnapshotHash()
-	if err := e.store.PutWorkload(spec); err != nil {
+	if err := e.store.PutWorkload(spec, actor); err != nil {
 		return err
 	}
 	hashAfter := e.store.SnapshotHash()
@@ -93,6 +98,21 @@ func (e *Engine) Apply(ctx context.Context, actor string, spec packages.Workload
 	// Reset circuit for this workload on a fresh apply
 	e.circuitReset(spec.Name)
 	return e.Reconcile(ctx)
+}
+
+// Rollback restores a workload to a previous specification version in history.
+func (e *Engine) Rollback(ctx context.Context, actor, name string, version int64) error {
+	spec, err := e.store.RollbackWorkload(name, version)
+	if err != nil {
+		return fmt.Errorf("rollback: failed to find version %d: %w", version, err)
+	}
+	e.emit(packages.Event{
+		Level:    "warn",
+		Source:   "api",
+		Workload: name,
+		Message:  fmt.Sprintf("rolling back workload state to version %d (initiated by %s)", version, actor),
+	})
+	return e.Apply(ctx, actor, spec)
 }
 
 // Delete removes the desired workload state and stops running containers.
@@ -125,6 +145,13 @@ func (e *Engine) Reconcile(ctx context.Context) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
+	start := time.Now()
+	defer func() {
+		e.reconcileMu.Lock()
+		e.lastReconcileAt = time.Now()
+		e.lastReconcileDur = time.Since(start)
+		e.reconcileMu.Unlock()
+	}()
 	desired := e.store.ListWorkloads()
 	actual, err := e.runtime.List(ctx)
 	if err != nil {
@@ -151,17 +178,18 @@ func (e *Engine) Reconcile(ctx context.Context) error {
 		}
 
 		replicas := actualByName[spec.Name]
-		hadError := false
-		for replica := 0; replica < spec.Replicas; replica++ {
-			if _, ok := replicas[replica]; !ok {
-				if err := e.runtime.Apply(ctx, spec, replica); err != nil {
-					e.emit(packages.Event{Level: "error", Source: "runtime", Workload: spec.Name, Message: err.Error()})
-					hadError = true
-					continue
-				}
-				e.emit(packages.Event{Level: "ok", Source: "core", Workload: spec.Name, Message: fmt.Sprintf("started replica %d", replica)})
-			}
+		if len(replicas) != spec.Replicas {
+			NotifyDrift(spec.Name, spec.Replicas, len(replicas))
 		}
+		
+		hadError := false
+		if spec.DeployStrategy == "rolling" {
+			hadError = e.applyRolling(ctx, spec, replicas)
+		} else {
+			hadError = e.applyRecreate(ctx, spec, replicas)
+		}
+
+		// Cleanup extra replicas
 		for replica := range replicas {
 			if replica >= spec.Replicas {
 				if err := e.runtime.Delete(ctx, spec.Name, replica); err != nil {
@@ -308,3 +336,83 @@ func (e *Engine) ListCircuitBreakers() map[string]any {
 	return res
 }
 
+// LastReconcileAt returns the timestamp of the last completed reconcile tick.
+func (e *Engine) LastReconcileAt() time.Time {
+	e.reconcileMu.RLock()
+	defer e.reconcileMu.RUnlock()
+	return e.lastReconcileAt
+}
+
+// LastReconcileDur returns the wall-clock duration of the last reconcile tick.
+func (e *Engine) LastReconcileDur() time.Duration {
+	e.reconcileMu.RLock()
+	defer e.reconcileMu.RUnlock()
+	return e.lastReconcileDur
+}
+
+func (e *Engine) applyRecreate(ctx context.Context, spec packages.WorkloadSpec, replicas map[int]packages.ActualWorkload) bool {
+	hadError := false
+	// First delete all replicas that don't match the new spec config (e.g. image changed)
+	for replica := 0; replica < spec.Replicas; replica++ {
+		if act, ok := replicas[replica]; ok {
+			if act.Image != "" && act.Image != spec.Image {
+				e.emit(packages.Event{Level: "warn", Source: "core", Workload: spec.Name, Message: fmt.Sprintf("recreating replica %d due to image change", replica)})
+				if err := e.runtime.Delete(ctx, spec.Name, replica); err != nil {
+					e.emit(packages.Event{Level: "error", Source: "runtime", Workload: spec.Name, Message: err.Error()})
+					hadError = true
+					continue
+				}
+				delete(replicas, replica)
+			}
+		}
+	}
+	
+	// Now apply the rest
+	for replica := 0; replica < spec.Replicas; replica++ {
+		if _, ok := replicas[replica]; !ok {
+			if err := e.runtime.Apply(ctx, spec, replica); err != nil {
+				e.emit(packages.Event{Level: "error", Source: "runtime", Workload: spec.Name, Message: err.Error()})
+				hadError = true
+				continue
+			}
+			e.emit(packages.Event{Level: "ok", Source: "core", Workload: spec.Name, Message: fmt.Sprintf("started replica %d", replica)})
+		}
+	}
+	return hadError
+}
+
+func (e *Engine) applyRolling(ctx context.Context, spec packages.WorkloadSpec, replicas map[int]packages.ActualWorkload) bool {
+	hadError := false
+	// Update one replica at a time
+	for replica := 0; replica < spec.Replicas; replica++ {
+		act, exists := replicas[replica]
+		if exists {
+			if act.Image != "" && act.Image != spec.Image {
+				e.emit(packages.Event{Level: "info", Source: "core", Workload: spec.Name, Message: fmt.Sprintf("rolling upgrade replica %d from %s to %s", replica, act.Image, spec.Image)})
+				// Delete old replica
+				if err := e.runtime.Delete(ctx, spec.Name, replica); err != nil {
+					e.emit(packages.Event{Level: "error", Source: "runtime", Workload: spec.Name, Message: err.Error()})
+					hadError = true
+					continue
+				}
+				// Start new replica
+				if err := e.runtime.Apply(ctx, spec, replica); err != nil {
+					e.emit(packages.Event{Level: "error", Source: "runtime", Workload: spec.Name, Message: err.Error()})
+					hadError = true
+					continue
+				}
+				e.emit(packages.Event{Level: "ok", Source: "core", Workload: spec.Name, Message: fmt.Sprintf("rolled replica %d successfully", replica)})
+				// Delay briefly for rollout simulation / checks
+				time.Sleep(500 * time.Millisecond)
+			}
+		} else {
+			if err := e.runtime.Apply(ctx, spec, replica); err != nil {
+				e.emit(packages.Event{Level: "error", Source: "runtime", Workload: spec.Name, Message: err.Error()})
+				hadError = true
+				continue
+			}
+			e.emit(packages.Event{Level: "ok", Source: "core", Workload: spec.Name, Message: fmt.Sprintf("started replica %d", replica)})
+		}
+	}
+	return hadError
+}

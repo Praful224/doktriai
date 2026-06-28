@@ -10,6 +10,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // authMode controls whether strict token auth or dev-mode header fallback is used.
@@ -170,4 +172,49 @@ func randomHex(n int) (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(b), nil
+}
+
+// IssueAgentJWT mints a signed JWT for a specific agent identity.
+func IssueAgentJWT(agentID, actorName, role, scope string, ttl time.Duration) (string, error) {
+	claims := jwt.MapClaims{
+		"sub":   agentID,
+		"actor": actorName,
+		"role":  role,
+		"scope": scope,
+		"iat":   time.Now().Unix(),
+		"exp":   time.Now().Add(ttl).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(signingSecret))
+}
+
+// VerifyAgentJWT validates and parses an agent JWT.
+func VerifyAgentJWT(tokenStr string) (AgentClaims, error) {
+	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (any, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+		}
+		return []byte(signingSecret), nil
+	})
+	if err != nil {
+		return AgentClaims{}, err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return AgentClaims{}, fmt.Errorf("invalid jwt token")
+	}
+	
+	// Safely extract claims
+	actor, _ := claims["actor"].(string)
+	role, _ := claims["role"].(string)
+	agentID, _ := claims["sub"].(string)
+	scope, _ := claims["scope"].(string)
+
+	return AgentClaims{
+		ActorName: actor,
+		Role:      role,
+		AgentID:   agentID,
+		Scope:     scope,
+		Dev:       false,
+	}, nil
 }

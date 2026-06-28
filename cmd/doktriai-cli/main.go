@@ -9,6 +9,7 @@ import (
 
 	"github.com/praful224/doktriai/doktriai-cli"
 	"github.com/praful224/doktriai/doktriai-core"
+	packages "github.com/praful224/doktriai/doktriai-packages"
 )
 
 func main() {
@@ -71,6 +72,23 @@ func main() {
 			tail = flag.Arg(2)
 		}
 		err = client.Call("GET", "/api/logs/"+flag.Arg(1)+"?tail="+tail, nil)
+	case "history":
+		if flag.NArg() < 2 {
+			err = fmt.Errorf("history requires workload name")
+			break
+		}
+		err = client.Call("GET", "/api/workloads/"+flag.Arg(1)+"/history", nil)
+	case "rollback":
+		if flag.NArg() < 3 {
+			err = fmt.Errorf("rollback requires: <name> <versionId>")
+			break
+		}
+		version, parseErr := strconv.ParseInt(flag.Arg(2), 10, 64)
+		if parseErr != nil {
+			err = fmt.Errorf("invalid version ID: %w", parseErr)
+			break
+		}
+		err = client.Call("POST", "/api/workloads/"+flag.Arg(1)+"/rollback", map[string]int64{"version": version})
 
 	// ── PTE Plan Gate ──────────────────────────────────────────────────────
 	case "plans":
@@ -170,8 +188,29 @@ func main() {
 }
 
 func deploy(client *cli.Client, args []string, path, method string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("deploy requires: <name> <image> [replicas] [port] [containerPort] [runtime] OR -f <manifest.yaml>")
+	}
+	
+	// Support -f <manifest.yaml>
+	if args[0] == "-f" {
+		if len(args) < 2 {
+			return fmt.Errorf("deploy -f requires a manifest file path")
+		}
+		filePath := args[1]
+		data, err := os.ReadFile(filePath)
+		if err != nil {
+			return fmt.Errorf("failed to read manifest file: %w", err)
+		}
+		spec, err := packages.ParseManifest(data)
+		if err != nil {
+			return fmt.Errorf("failed to parse manifest: %w", err)
+		}
+		return client.Call(method, path, spec)
+	}
+
 	if len(args) < 2 {
-		return fmt.Errorf("deploy requires: <name> <image> [replicas] [port] [containerPort] [runtime]")
+		return fmt.Errorf("deploy requires: <name> <image> [replicas] [port] [containerPort] [runtime] OR -f <manifest.yaml>")
 	}
 	replicas := 1
 	port := 0
@@ -213,6 +252,8 @@ Workload Commands:
   delete | rm <name>                Delete a workload (requires PTE approval)
   logs <name> [tail]                Stream container logs
   reconcile                         Trigger manual reconciliation
+  history <name>                    Show version history for a workload
+  rollback <name> <versionId>       Rollback a workload to a specific history version
 
 PTE Approval Gate:
   plans                             List all pending/approved/rejected plans

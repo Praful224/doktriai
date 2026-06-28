@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -52,6 +53,20 @@ func (ps *PlanStore) Submit(
 	ps.mu.Lock()
 	ps.plans[id] = plan
 	ps.mu.Unlock()
+
+	// Fire notifications
+	NotifyPTEWebhook(PlanEvent{
+		Event:     "plan_created",
+		PlanID:    plan.ID,
+		Workload:  plan.Spec.Name,
+		Actor:     requestedBy,
+		Reason:    approvalReason,
+		ExpiresAt: &plan.ExpiresAt,
+		Spec:      plan.Spec,
+		Timestamp: time.Now().UTC(),
+	})
+	NotifySlack(plan, os.Getenv("DOKTRIAI_API_BASE_URL"))
+
 	return plan, nil
 }
 
@@ -99,6 +114,17 @@ func (ps *PlanStore) Approve(id, approver string) (*packages.PendingPlan, error)
 	p.Status = packages.PlanStatusApproved
 	p.ApprovedBy = approver
 	p.ApprovedAt = &now
+
+	NotifyPTEWebhook(PlanEvent{
+		Event:     "plan_approved",
+		PlanID:    p.ID,
+		Workload:  p.Spec.Name,
+		Actor:     approver,
+		Reason:    p.ApprovalReason,
+		Spec:      p.Spec,
+		Timestamp: now,
+	})
+
 	return p, nil
 }
 
@@ -116,6 +142,17 @@ func (ps *PlanStore) Reject(id, rejector, comment string) error {
 	p.Status = packages.PlanStatusRejected
 	p.RejectedBy = rejector
 	p.RejectionComment = comment
+
+	NotifyPTEWebhook(PlanEvent{
+		Event:     "plan_rejected",
+		PlanID:    p.ID,
+		Workload:  p.Spec.Name,
+		Actor:     rejector,
+		Reason:    fmt.Sprintf("Rejected: %s", comment),
+		Spec:      p.Spec,
+		Timestamp: time.Now().UTC(),
+	})
+
 	return nil
 }
 
@@ -127,6 +164,15 @@ func (ps *PlanStore) pruneExpired() {
 	for id, p := range ps.plans {
 		if p.Status == packages.PlanStatusPending && now.After(p.ExpiresAt) {
 			ps.plans[id].Status = packages.PlanStatusExpired
+			NotifyPTEWebhook(PlanEvent{
+				Event:     "plan_expired",
+				PlanID:    p.ID,
+				Workload:  p.Spec.Name,
+				Actor:     p.RequestedBy,
+				Reason:    "PTE plan expired (15-min TTL exceeded)",
+				Spec:      p.Spec,
+				Timestamp: now,
+			})
 		}
 	}
 }

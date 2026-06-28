@@ -21,6 +21,9 @@ func testServer(t *testing.T) (*Server, http.Handler) {
 	if err != nil {
 		t.Fatalf("OpenStore failed: %v", err)
 	}
+	t.Cleanup(func() {
+		_ = store.Close()
+	})
 	bus := core.NewEventBus(20)
 	driver := doktriruntime.NewDockerDriver("docker")
 	// Set driver simulated to true explicitly to ensure we don't attempt calling a real docker binary

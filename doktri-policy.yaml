@@ -1,0 +1,38 @@
+# DoktriAI Policy Configuration — edit without recompiling
+# Loaded at startup.
+
+security:
+  # PTE gate: deployments exceeding this replica count require human approval
+  pteReplicaThreshold: 5
+  
+  # Image registry allowlist — prefixes permitted without extra scrutiny
+  approvedImagePrefixes:
+    - "nginx"
+    - "redis"
+    - "node"
+    - "mysql"
+    - "postgres"
+    - "doktri/"
+    - "doktriai/"
+
+  # Env key substrings that trigger PTE gate (case-insensitive)
+  sensitiveEnvKeyPatterns:
+    - "SECRET"
+    - "KEY"
+    - "TOKEN"
+    - "PASSWORD"
+    - "PASSWD"
+    - "CREDENTIAL"
+    - "PRIVATE"
+    - "CERT"
+    - "APIKEY"
+
+  # Require sha256 digest pin in production security mode
+  requireDigestPinInProduction: true
+
+# Notification webhooks (leave empty to disable)
+notifications:
+  pteWebhookURL: ""
+  pteWebhookTimeoutSec: 5
+  driftWebhookURL: ""
+  slackWebhookURL: ""

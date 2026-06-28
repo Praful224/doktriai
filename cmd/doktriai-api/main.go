@@ -22,7 +22,15 @@ func main() {
 	dataDir := flag.String("data-dir", "data", "state and audit storage directory")
 	webDir := flag.String("web-dir", "web", "static web workspace directory")
 	reconcileEvery := flag.Duration("reconcile-every", 5*time.Second, "reconciliation interval")
+	policyPath := flag.String("policy", "doktri-policy.yaml", "Path to security policy YAML configuration file")
 	flag.Parse()
+
+	// Load security policy config
+	if err := core.LoadPolicy(*policyPath); err != nil {
+		log.Printf("Warning: Failed to load policy file %q: %v. Using defaults.", *policyPath, err)
+	} else {
+		log.Printf("Loaded security policy from %q successfully", *policyPath)
+	}
 
 	if err := os.MkdirAll(*dataDir, 0o755); err != nil {
 		log.Fatalf("create data dir: %v", err)

@@ -36,6 +36,9 @@ func (s *SQLiteStorage) Migrate(ctx context.Context) error {
 			volumes TEXT NOT NULL DEFAULT '[]',
 			labels TEXT NOT NULL DEFAULT '{}',
 			security_mode TEXT NOT NULL DEFAULT 'dev',
+			deploy_strategy TEXT NOT NULL DEFAULT 'recreate',
+			max_surge INTEGER NOT NULL DEFAULT 1,
+			max_unavailable INTEGER NOT NULL DEFAULT 0,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
@@ -88,6 +91,13 @@ func (s *SQLiteStorage) Migrate(ctx context.Context) error {
 			workload TEXT,
 			message TEXT NOT NULL
 		);`,
+		`CREATE TABLE IF NOT EXISTS workload_history (
+			id          INTEGER PRIMARY KEY AUTOINCREMENT,
+			name        TEXT NOT NULL,
+			spec_json   TEXT NOT NULL,
+			applied_by  TEXT NOT NULL DEFAULT '',
+			applied_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+		);`,
 	}
 
 	for _, q := range queries {
@@ -95,13 +105,19 @@ func (s *SQLiteStorage) Migrate(ctx context.Context) error {
 			return fmt.Errorf("sqlite migration query failed: %w", err)
 		}
 	}
+	
+	// Upgrade existing database columns if they don't exist
+	_, _ = s.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN deploy_strategy TEXT DEFAULT 'recreate'")
+	_, _ = s.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN max_surge INTEGER DEFAULT 1")
+	_, _ = s.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN max_unavailable INTEGER DEFAULT 0")
+
 	return nil
 }
 
 // --- Workloads ---
 
 func (s *SQLiteStorage) ListWorkloads(ctx context.Context) ([]packages.WorkloadSpec, error) {
-	rows, err := s.db.QueryContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode FROM workloads ORDER BY name ASC")
+	rows, err := s.db.QueryContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable FROM workloads ORDER BY name ASC")
 	if err != nil {
 		return nil, err
 	}
@@ -114,6 +130,7 @@ func (s *SQLiteStorage) ListWorkloads(ctx context.Context) ([]packages.WorkloadS
 		err := rows.Scan(
 			&spec.Name, &spec.Image, &spec.Replicas, &spec.Port, &spec.ContainerPort, &spec.Runtime,
 			&envJSON, &resJSON, &volJSON, &lblJSON, &spec.SecurityMode,
+			&spec.DeployStrategy, &spec.MaxSurge, &spec.MaxUnavailable,
 		)
 		if err != nil {
 			return nil, err
@@ -130,9 +147,10 @@ func (s *SQLiteStorage) ListWorkloads(ctx context.Context) ([]packages.WorkloadS
 func (s *SQLiteStorage) GetWorkload(ctx context.Context, name string) (packages.WorkloadSpec, bool, error) {
 	var spec packages.WorkloadSpec
 	var envJSON, resJSON, volJSON, lblJSON string
-	err := s.db.QueryRowContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode FROM workloads WHERE name = ?", name).Scan(
+	err := s.db.QueryRowContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable FROM workloads WHERE name = ?", name).Scan(
 		&spec.Name, &spec.Image, &spec.Replicas, &spec.Port, &spec.ContainerPort, &spec.Runtime,
 		&envJSON, &resJSON, &volJSON, &lblJSON, &spec.SecurityMode,
+		&spec.DeployStrategy, &spec.MaxSurge, &spec.MaxUnavailable,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		return spec, false, nil
@@ -153,9 +171,16 @@ func (s *SQLiteStorage) PutWorkload(ctx context.Context, spec packages.WorkloadS
 	volJSON, _ := json.Marshal(spec.Volumes)
 	lblJSON, _ := json.Marshal(spec.Labels)
 
+	if spec.DeployStrategy == "" {
+		spec.DeployStrategy = "recreate"
+	}
+	if spec.MaxSurge == 0 && spec.DeployStrategy == "rolling" {
+		spec.MaxSurge = 1
+	}
+
 	query := `
-		INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+		INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
 		ON CONFLICT (name) DO UPDATE SET
 			image = EXCLUDED.image,
 			replicas = EXCLUDED.replicas,
@@ -167,11 +192,15 @@ func (s *SQLiteStorage) PutWorkload(ctx context.Context, spec packages.WorkloadS
 			volumes = EXCLUDED.volumes,
 			labels = EXCLUDED.labels,
 			security_mode = EXCLUDED.security_mode,
+			deploy_strategy = EXCLUDED.deploy_strategy,
+			max_surge = EXCLUDED.max_surge,
+			max_unavailable = EXCLUDED.max_unavailable,
 			updated_at = CURRENT_TIMESTAMP
 	`
 	_, err := s.db.ExecContext(ctx, query,
 		spec.Name, spec.Image, spec.Replicas, spec.Port, spec.ContainerPort, spec.Runtime,
 		string(envJSON), string(resJSON), string(volJSON), string(lblJSON), spec.SecurityMode,
+		spec.DeployStrategy, spec.MaxSurge, spec.MaxUnavailable,
 	)
 	return err
 }
@@ -493,4 +522,56 @@ func (s *SQLiteStorage) ListEvents(ctx context.Context) ([]packages.Event, error
 		events = append(events, e)
 	}
 	return events, nil
+}
+
+// --- Workload History ---
+
+func (s *SQLiteStorage) InsertHistory(ctx context.Context, name, specJSON, actor string) error {
+	_, err := s.db.ExecContext(ctx, `
+		INSERT INTO workload_history (name, spec_json, applied_by, applied_at)
+		VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+	`, name, specJSON, actor)
+	return err
+}
+
+func (s *SQLiteStorage) GetHistory(ctx context.Context, name string, limit int) ([]packages.WorkloadHistoryEntry, error) {
+	rows, err := s.db.QueryContext(ctx, `
+		SELECT id, spec_json, applied_by, applied_at 
+		FROM workload_history 
+		WHERE name = ? 
+		ORDER BY id DESC 
+		LIMIT ?
+	`, name, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var history []packages.WorkloadHistoryEntry
+	for rows.Next() {
+		var entry packages.WorkloadHistoryEntry
+		var specJSON string
+		err := rows.Scan(&entry.ID, &specJSON, &entry.AppliedBy, &entry.AppliedAt)
+		if err != nil {
+			return nil, err
+		}
+		_ = json.Unmarshal([]byte(specJSON), &entry.Spec)
+		history = append(history, entry)
+	}
+	return history, nil
+}
+
+func (s *SQLiteStorage) GetHistoryVersion(ctx context.Context, name string, version int64) (packages.WorkloadSpec, error) {
+	var spec packages.WorkloadSpec
+	var specJSON string
+	err := s.db.QueryRowContext(ctx, `
+		SELECT spec_json 
+		FROM workload_history 
+		WHERE name = ? AND id = ?
+	`, name, version).Scan(&specJSON)
+	if err != nil {
+		return spec, err
+	}
+	err = json.Unmarshal([]byte(specJSON), &spec)
+	return spec, err
 }

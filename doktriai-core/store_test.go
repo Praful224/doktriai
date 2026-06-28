@@ -67,7 +67,7 @@ func TestOpenStore_Reopen(t *testing.T) {
 	})
 
 	// Add a custom workload
-	store1.PutWorkload(packages.WorkloadSpec{Name: "custom-app", Image: "redis:7", Replicas: 2, Runtime: "docker"})
+	store1.PutWorkload(packages.WorkloadSpec{Name: "custom-app", Image: "redis:7", Replicas: 2, Runtime: "docker"}, "admin")
 
 	// Reopen — should restore state
 	store2, err := OpenStore(path)
@@ -93,7 +93,7 @@ func TestStore_PutAndGetWorkload(t *testing.T) {
 	store, _ := tempStore(t)
 
 	spec := packages.WorkloadSpec{Name: "my-app", Image: "nginx:alpine", Replicas: 3, Runtime: "docker"}
-	if err := store.PutWorkload(spec); err != nil {
+	if err := store.PutWorkload(spec, "admin"); err != nil {
 		t.Fatalf("PutWorkload failed: %v", err)
 	}
 
@@ -117,7 +117,7 @@ func TestStore_GetWorkload_NotFound(t *testing.T) {
 func TestStore_DeleteWorkload(t *testing.T) {
 	store, _ := tempStore(t)
 
-	store.PutWorkload(packages.WorkloadSpec{Name: "to-delete", Image: "nginx:alpine", Replicas: 1, Runtime: "docker"})
+	store.PutWorkload(packages.WorkloadSpec{Name: "to-delete", Image: "nginx:alpine", Replicas: 1, Runtime: "docker"}, "admin")
 
 	if err := store.DeleteWorkload("to-delete"); err != nil {
 		t.Fatalf("DeleteWorkload failed: %v", err)
@@ -140,8 +140,8 @@ func TestStore_DeleteWorkload_Nonexistent(t *testing.T) {
 func TestStore_UpdateWorkload(t *testing.T) {
 	store, _ := tempStore(t)
 
-	store.PutWorkload(packages.WorkloadSpec{Name: "update-me", Image: "nginx:alpine", Replicas: 1, Runtime: "docker"})
-	store.PutWorkload(packages.WorkloadSpec{Name: "update-me", Image: "nginx:latest", Replicas: 5, Runtime: "docker"})
+	store.PutWorkload(packages.WorkloadSpec{Name: "update-me", Image: "nginx:alpine", Replicas: 1, Runtime: "docker"}, "admin")
+	store.PutWorkload(packages.WorkloadSpec{Name: "update-me", Image: "nginx:latest", Replicas: 5, Runtime: "docker"}, "admin")
 
 	got, _ := store.GetWorkload("update-me")
 	if got.Image != "nginx:latest" {
@@ -159,9 +159,9 @@ func TestStore_ListWorkloads_Sorted(t *testing.T) {
 	store.DeleteWorkload("reconciler-daemon")
 	store.DeleteWorkload("agent-gateway")
 
-	store.PutWorkload(packages.WorkloadSpec{Name: "zzz-last", Image: "nginx:alpine", Replicas: 1, Runtime: "docker"})
-	store.PutWorkload(packages.WorkloadSpec{Name: "aaa-first", Image: "nginx:alpine", Replicas: 1, Runtime: "docker"})
-	store.PutWorkload(packages.WorkloadSpec{Name: "mmm-middle", Image: "nginx:alpine", Replicas: 1, Runtime: "docker"})
+	store.PutWorkload(packages.WorkloadSpec{Name: "zzz-last", Image: "nginx:alpine", Replicas: 1, Runtime: "docker"}, "admin")
+	store.PutWorkload(packages.WorkloadSpec{Name: "aaa-first", Image: "nginx:alpine", Replicas: 1, Runtime: "docker"}, "admin")
+	store.PutWorkload(packages.WorkloadSpec{Name: "mmm-middle", Image: "nginx:alpine", Replicas: 1, Runtime: "docker"}, "admin")
 
 	list := store.ListWorkloads()
 	if len(list) != 3 {
@@ -312,7 +312,7 @@ func TestStore_SnapshotHash_ChangesOnMutation(t *testing.T) {
 	store, _ := tempStore(t)
 
 	hash1 := store.SnapshotHash()
-	store.PutWorkload(packages.WorkloadSpec{Name: "new-app", Image: "redis:7", Replicas: 1, Runtime: "docker"})
+	store.PutWorkload(packages.WorkloadSpec{Name: "new-app", Image: "redis:7", Replicas: 1, Runtime: "docker"}, "admin")
 	hash2 := store.SnapshotHash()
 
 	if hash1 == hash2 {
@@ -335,7 +335,7 @@ func TestStore_AtomicSave(t *testing.T) {
 	store, path := tempStore(t)
 
 	// Write and verify no .tmp file left behind
-	store.PutWorkload(packages.WorkloadSpec{Name: "atomic-test", Image: "nginx:alpine", Replicas: 1, Runtime: "docker"})
+	store.PutWorkload(packages.WorkloadSpec{Name: "atomic-test", Image: "nginx:alpine", Replicas: 1, Runtime: "docker"}, "admin")
 
 	tmpPath := path + ".tmp"
 	if _, err := os.Stat(tmpPath); !os.IsNotExist(err) {

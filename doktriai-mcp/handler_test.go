@@ -20,12 +20,16 @@ func testHandler(t *testing.T) *ProtocolHandler {
 	if err != nil {
 		t.Fatalf("OpenStore failed: %v", err)
 	}
+	t.Cleanup(func() {
+		_ = store.Close()
+	})
 	bus := core.NewEventBus(20)
 	driver := doktriruntime.NewDockerDriver("docker")
 	driver.SetSimulated(true)
 	engine := core.NewEngine(store, driver, bus, 30*time.Second)
 	plans := core.NewPlanStore()
-	return NewProtocolHandler(store, engine, plans)
+	tracker := core.NewBehaviorTracker()
+	return NewProtocolHandler(store, engine, plans, tracker)
 }
 
 func rpcPayload(t *testing.T, method string, params any) []byte {
@@ -367,11 +371,15 @@ func TestMCP_ScopeValidation_Denied(t *testing.T) {
 func TestMCP_DeployBlockedByLock(t *testing.T) {
 	dir := t.TempDir()
 	store, _ := core.OpenStore(filepath.Join(dir, "state.json"))
+	t.Cleanup(func() {
+		_ = store.Close()
+	})
 	bus := core.NewEventBus(20)
 	driver := doktriruntime.NewDockerDriver("docker")
 	engine := core.NewEngine(store, driver, bus, 30*time.Second)
 	plans := core.NewPlanStore()
-	h := NewProtocolHandler(store, engine, plans)
+	tracker := core.NewBehaviorTracker()
+	h := NewProtocolHandler(store, engine, plans, tracker)
 
 	// Acquire lock as a different user
 	store.AcquireLock("admin-user", "maintenance window")

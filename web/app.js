@@ -174,7 +174,10 @@ function switchView(view, updateHash = true) {
   const target = qs(`#${view}`);
   if (target) target.classList.add("active-view");
   if (view === "gallery") {
-    setTimeout(drawArchitecture, 50);
+    setTimeout(() => {
+      drawArchitecture();
+      startArchitectureAnimation();
+    }, 50);
   }
   if (view === "runtime") {
     renderRuntimeView();
@@ -219,6 +222,7 @@ async function refreshAll() {
     renderAudit();
     renderPendingPlans();
     renderBehaviorMetrics();
+    refreshPolicy();
     
     // Live update overview stat cards
     const wlCountEl = qs("#overviewWorkloadsCount");
@@ -318,6 +322,7 @@ function renderWorkloads() {
       <td>${escapeHtml(item.spec.runtime)}</td>
       <td class="${item.healthy ? "ok" : "danger"}">${escapeHtml(item.drift || "healthy")}</td>
       <td>
+        <button class="row-action" style="margin-right: 6px;" data-history="${escapeHtml(item.spec.name)}">history</button>
         <button class="row-action" style="margin-right: 6px;" data-edit="${escapeHtml(item.spec.name)}">edit</button>
         <button class="row-action" data-delete="${escapeHtml(item.spec.name)}">delete</button>
       </td>
@@ -869,48 +874,266 @@ function pushEvent(raw) {
   }
 }
 
+let hoveredNode = null;
+let animationFrameId = null;
+let animationProgress = 0;
+
+// Multi-colored layered node specs
+const mapNodes = [
+  // Layer 1: Client/Inputs
+  { id: "agent", label: "⓵ developer-agent / CLI / MCP", sub: "User inputs, YAML manifests & tool triggers", x: 550, y: 50, w: 360, h: 46, type: "client", status: "ok", bg: "rgba(186, 104, 200, 0.12)", border: "#ab47bc", metrics: { reqs: "6.5 req/s", latency: "60ms", health: "99.2%" } },
+  // Layer 2: Gateways
+  { id: "api", label: "⓶ doktriai-api Gateway", sub: "REST endpoints, auth validation, SSE logs", x: 350, y: 130, w: 260, h: 46, type: "gateway", status: "ok", bg: "rgba(38, 166, 154, 0.12)", border: "#26a69a", metrics: { reqs: "5.7 req/s", latency: "2ms", health: "100%" } },
+  { id: "operator", label: "⓶ GitOps operator Bridge", sub: "Watches cluster namespace CRD templates", x: 750, y: 130, w: 260, h: 46, type: "gateway", status: "ok", bg: "rgba(38, 166, 154, 0.12)", border: "#26a69a", metrics: { reqs: "0.8 req/s", latency: "45ms", health: "100%" } },
+  // Layer 3A: Config & Auth (inside backend box)
+  { id: "policy", label: "doktri-policy.yaml", sub: "Intent Guard registry allowlists", x: 300, y: 245, w: 230, h: 42, type: "middleware", status: "ok", bg: "rgba(255, 202, 40, 0.12)", border: "#ffca28", metrics: { reqs: "6.5 req/s", latency: "1ms", health: "100%" } },
+  { id: "jwt", label: "JWT Auth validator", sub: "Decrypts cryptographic key claims", x: 550, y: 245, w: 230, h: 42, type: "middleware", status: "ok", bg: "rgba(92, 107, 192, 0.12)", border: "#5c6bc0", metrics: { reqs: "5.7 req/s", latency: "2ms", health: "100%" } },
+  { id: "sqlite", label: "⓸ sqlite / postgres DB", sub: "Persists specs & version snaps", x: 800, y: 245, w: 230, h: 42, type: "middleware", status: "ok", bg: "rgba(66, 165, 245, 0.12)", border: "#42a5f5", metrics: { reqs: "4.5 req/s", latency: "4ms", health: "100%" } },
+  // Layer 3B: Core engine (inside backend box)
+  { id: "engine", label: "⓷ doktriai-core Reconciler", sub: "Compares desired vs actual state, runs drift loop", x: 550, y: 325, w: 380, h: 48, type: "engine", status: "ok", bg: "rgba(38, 166, 154, 0.18)", border: "#26a69a", metrics: { reqs: "14.2 req/s", latency: "6ms", health: "100%" } },
+  // Layer 3C: Runtime & Telemetry (inside backend box)
+  { id: "runtime", label: "⓹ docker / k8s Runtime", sub: "Executes recreate & rolling strategy upgrades", x: 300, y: 405, w: 230, h: 44, type: "executor", status: "ok", bg: "rgba(102, 187, 106, 0.12)", border: "#66bb6a", metrics: { reqs: "8.1 req/s", latency: "8ms", health: "100%" } },
+  { id: "prometheus", label: "prometheus Exporter", sub: "Scrapes metrics & publishes telemetry", x: 550, y: 405, w: 230, h: 44, type: "executor", status: "ok", bg: "rgba(255, 112, 67, 0.12)", border: "#ff7043", metrics: { reqs: "12.0 req/s", latency: "2ms", health: "100%" } },
+  { id: "packages", label: "packages Spec Schema", sub: "Structural validation & schema metadata", x: 800, y: 405, w: 230, h: 44, type: "executor", status: "ok", bg: "rgba(189, 189, 189, 0.12)", border: "#bdbdbd", metrics: { reqs: "1.2 req/s", latency: "0ms", health: "100%" } }
+];
+
+// Helper to draw thick arrowheads
+function drawArrow(ctx, fromx, fromy, tox, toy, color) {
+  const headlen = 10;
+  const dx = tox - fromx;
+  const dy = toy - fromy;
+  const angle = Math.atan2(dy, dx);
+  
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.5;
+  ctx.moveTo(fromx, fromy);
+  ctx.lineTo(tox, toy);
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.fillStyle = color;
+  ctx.moveTo(tox, toy);
+  ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+  ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+  ctx.fill();
+}
+
+function startArchitectureAnimation() {
+  if (animationFrameId) return;
+  const tick = () => {
+    animationProgress += 0.008;
+    if (animationProgress > 1) animationProgress = 0;
+    
+    drawArchitecture();
+    
+    if (state.activeView === "gallery") {
+      animationFrameId = requestAnimationFrame(tick);
+    } else {
+      animationFrameId = null;
+    }
+  };
+  animationFrameId = requestAnimationFrame(tick);
+}
+
 function drawArchitecture() {
   const canvas = qs("#architectureCanvas");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#07080c";
+  
+  // Set dimensions and backgrounds
+  canvas.height = 480;
+  const isLinen = document.body.dataset.theme === "linen";
+  const canvasBg = isLinen ? "#f3f0e8" : "#07080c";
+  const textColor = isLinen ? "#4a4538" : "#e2e8f0";
+  const mutedColor = isLinen ? "#8a8370" : "#718096";
+  const arrowColor = isLinen ? "rgba(74, 69, 56, 0.4)" : "rgba(226, 232, 240, 0.4)";
+  const backendBoxBg = isLinen ? "rgba(235, 231, 223, 0.4)" : "rgba(18, 18, 22, 0.4)";
+  const backendBoxBorder = isLinen ? "dashed 1.5px #d4cebe" : "dashed 1.5px #202738";
+
+  ctx.fillStyle = canvasBg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  const nodes = [
-    ["Developer / AI Agent", 550, 50],
-    ["doktriai-cli | doktriai-mcp", 550, 125],
-    ["doktriai-api", 550, 200],
-    ["doktriai-core", 550, 275],
-    ["doktriai-runtime", 300, 360],
-    ["operator", 550, 360],
-    ["packages", 800, 360]
-  ];
-  ctx.strokeStyle = "#00d2ff";
-  ctx.fillStyle = "#e2e8f0";
-  ctx.lineWidth = 2;
-  for (let i = 0; i < nodes.length - 3; i++) line(ctx, nodes[i][1], nodes[i][2] + 24, nodes[i + 1][1], nodes[i + 1][2] - 24);
-  line(ctx, 550, 300, 300, 336);
-  line(ctx, 550, 300, 550, 336);
-  line(ctx, 550, 300, 800, 336);
-  nodes.forEach(([label, x, y]) => box(ctx, x, y, label));
-}
 
-function line(ctx, x1, y1, x2, y2) {
+  // 1. Draw big Backend boundary box (Level 3 container)
   ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
+  ctx.rect(100, 205, 900, 255);
+  ctx.fillStyle = backendBoxBg;
+  ctx.fill();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = isLinen ? "#d4cebe" : "#202738";
+  ctx.setLineDash([6, 6]);
   ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Label for backend container
+  ctx.fillStyle = mutedColor;
+  ctx.font = "bold 9px Inter, sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText("DOKTRIAI BACKEND CONTROL PLANE BOUNDARY", 115, 222);
+
+  // 2. Draw Connection Arrows
+  // Trigger -> API (x: 550, y: 73 -> x: 350, y: 107)
+  drawArrow(ctx, 420, 73, 350, 107, arrowColor);
+  // Trigger -> Operator (x: 550, y: 73 -> x: 750, y: 107)
+  drawArrow(ctx, 680, 73, 750, 107, arrowColor);
+
+  // API -> JWT Auth (x: 350, y: 153 -> x: 550, y: 224)
+  drawArrow(ctx, 410, 153, 500, 224, arrowColor);
+  // API -> Core (x: 350, y: 153 -> x: 550, y: 301)
+  drawArrow(ctx, 350, 153, 440, 301, arrowColor);
+
+  // Operator -> Core (x: 750, y: 153 -> x: 550, y: 301)
+  drawArrow(ctx, 750, 153, 660, 301, arrowColor);
+
+  // Core -> Policy (x: 550, y: 325 -> x: 300, y: 266)
+  drawArrow(ctx, 450, 325, 360, 266, arrowColor);
+  // Core -> DB (x: 550, y: 325 -> x: 800, y: 266)
+  drawArrow(ctx, 650, 325, 740, 266, arrowColor);
+
+  // Core -> Runtime (x: 550, y: 349 -> x: 300, y: 383)
+  drawArrow(ctx, 480, 349, 360, 383, arrowColor);
+  // Core -> Prometheus (x: 550, y: 349 -> x: 550, y: 383)
+  drawArrow(ctx, 550, 349, 550, 383, arrowColor);
+  // Core -> Packages (x: 550, y: 349 -> x: 800, y: 383)
+  drawArrow(ctx, 620, 349, 740, 383, arrowColor);
+
+  // Draw animated flow pulses
+  ctx.fillStyle = isLinen ? "#a16207" : "#00d2ff";
+  const pulses = [
+    { x1: 420, y1: 73, x2: 350, y2: 107 },
+    { x1: 680, y1: 73, x2: 750, y2: 107 },
+    { x1: 350, y1: 153, x2: 440, y2: 301 },
+    { x1: 750, y1: 153, x2: 660, y2: 301 },
+    { x1: 480, y1: 349, x2: 360, y2: 383 },
+    { x1: 550, y1: 349, x2: 550, y2: 383 }
+  ];
+  pulses.forEach(p => {
+    const px = p.x1 + (p.x2 - p.x1) * animationProgress;
+    const py = p.y1 + (p.y2 - p.y1) * animationProgress;
+    ctx.beginPath();
+    ctx.arc(px, py, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // 3. Draw Nodes (Enterprise Blocks)
+  mapNodes.forEach(node => {
+    const isHovered = hoveredNode && hoveredNode.id === node.id;
+    const hw = node.w / 2;
+    const hh = node.h / 2;
+
+    // Pulse outer border on hover
+    if (isHovered) {
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = node.border;
+    }
+
+    // Node background block
+    ctx.fillStyle = node.bg;
+    ctx.strokeStyle = node.border;
+    ctx.lineWidth = 1.5;
+    ctx.fillRect(node.x - hw, node.y - hh, node.w, node.h);
+    ctx.strokeRect(node.x - hw, node.y - hh, node.w, node.h);
+    ctx.shadowBlur = 0; // Reset shadow
+
+    // Icon representations (simple shapes)
+    if (node.id === "sqlite" || node.id === "packages") {
+      // Draw small Cylinder icon for DBs
+      ctx.fillStyle = node.border;
+      ctx.fillRect(node.x - hw + 10, node.y - 10, 12, 16);
+    } else if (node.id === "policy" || node.id === "jwt") {
+      // Draw small Key/Lock symbol
+      ctx.fillStyle = node.border;
+      ctx.beginPath();
+      ctx.arc(node.x - hw + 16, node.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Bold title text
+    ctx.fillStyle = textColor;
+    ctx.font = "bold 11px JetBrains Mono, monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(node.label, node.x, node.y - 3);
+
+    // Muted subtitle text
+    ctx.fillStyle = mutedColor;
+    ctx.font = "9px Inter, sans-serif";
+    ctx.fillText(node.sub, node.x, node.y + 11);
+  });
+
+  // 4. Draw Tooltip Box on hover
+  if (hoveredNode) {
+    drawTooltip(ctx, hoveredNode);
+  }
 }
 
-function box(ctx, x, y, label) {
-  ctx.fillStyle = "#111622";
-  ctx.strokeStyle = "#202738";
-  ctx.fillRect(x - 130, y - 24, 260, 48);
-  ctx.strokeRect(x - 130, y - 24, 260, 48);
+function drawTooltip(ctx, node) {
+  const boxW = 210;
+  const boxH = 92;
+  const tooltipX = node.x + (node.w / 2) + 10;
+  const tooltipY = node.y - 45;
+
+  ctx.fillStyle = "rgba(10, 10, 12, 0.95)";
+  ctx.strokeStyle = node.border;
+  ctx.lineWidth = 1.5;
+  ctx.fillRect(tooltipX, tooltipY, boxW, boxH);
+  ctx.strokeRect(tooltipX, tooltipY, boxW, boxH);
+
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 11px JetBrains Mono, monospace";
+  ctx.textAlign = "left";
+  ctx.fillText(node.label, tooltipX + 12, tooltipY + 22);
+
+  ctx.fillStyle = "#86868b";
+  ctx.font = "9px Inter, sans-serif";
+  ctx.fillText(node.sub, tooltipX + 12, tooltipY + 38);
+
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+  ctx.beginPath();
+  ctx.moveTo(tooltipX + 12, tooltipY + 48);
+  ctx.lineTo(tooltipX + boxW - 12, tooltipY + 48);
+  ctx.stroke();
+
   ctx.fillStyle = "#e2e8f0";
-  ctx.textAlign = "center";
-  ctx.font = "13px JetBrains Mono, monospace";
-  ctx.fillText(label, x, y + 5);
+  ctx.font = "9px JetBrains Mono, monospace";
+  ctx.fillText(`Reqs: ${node.metrics.reqs}`, tooltipX + 12, tooltipY + 64);
+  ctx.fillText(`Latency: ${node.metrics.latency}`, tooltipX + 12, tooltipY + 78);
+  
+  ctx.fillStyle = "#30d158";
+  ctx.fillText(`Health: ${node.metrics.health}`, tooltipX + 118, tooltipY + 64);
+}
+
+function initCanvasInteraction() {
+  const canvas = qs("#architectureCanvas");
+  if (!canvas) return;
+  
+  canvas.addEventListener("mousemove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    let found = null;
+    for (const node of mapNodes) {
+      const hw = node.w / 2;
+      const hh = node.h / 2;
+      if (x >= node.x - hw && x <= node.x + hw && y >= node.y - hh && y <= node.y + hh) {
+        found = node;
+        break;
+      }
+    }
+    
+    if (found !== hoveredNode) {
+      hoveredNode = found;
+      drawArchitecture();
+    }
+  });
+
+  canvas.addEventListener("mouseleave", () => {
+    if (hoveredNode !== null) {
+      hoveredNode = null;
+      drawArchitecture();
+    }
+  });
 }
 
 // Command Search / Routing Palette Logic
@@ -1082,6 +1305,108 @@ function updateShipDates() {
     el.textContent = `${formattedDate} · ${category}`;
   });
 }
+
+async function openHistoryModal(name) {
+  const modal = qs("#historyModal");
+  const title = qs("#historyModalTitle");
+  const content = qs("#historyModalContent");
+  if (!modal || !title || !content) return;
+
+  title.textContent = `Version History: ${name}`;
+  content.innerHTML = `<div style="color: var(--muted); font-size:12px;">Fetching history logs...</div>`;
+  modal.style.display = "flex";
+
+  try {
+    const history = await api.json(`/api/workloads/${encodeURIComponent(name)}/history`);
+    if (!history || history.length === 0) {
+      content.innerHTML = `<div style="color: var(--muted); font-size:12px;">No historical versions logged in database yet.</div>`;
+      return;
+    }
+
+    content.innerHTML = "";
+    history.forEach(entry => {
+      const div = document.createElement("div");
+      div.style.border = "1px solid var(--line)";
+      div.style.borderRadius = "6px";
+      div.style.padding = "10px";
+      div.style.background = "var(--panel)";
+      div.style.display = "flex";
+      div.style.justifyContent = "space-between";
+      div.style.alignItems = "center";
+      
+      const dateStr = new Date(entry.timestamp).toLocaleString();
+      
+      div.innerHTML = `
+        <div style="font-size:12px; text-align:left;">
+          <div style="font-weight: 600; color: #fff;">Version #${entry.version}</div>
+          <div style="color: var(--muted); margin-top:2px;">Image: ${escapeHtml(entry.spec.image)} (replicas: ${entry.spec.replicas})</div>
+          <div style="font-size:10px; color: var(--orange); margin-top:2px;">By: ${escapeHtml(entry.actor)} · ${dateStr}</div>
+        </div>
+        <button class="row-action-rollback" data-wl-name="${escapeHtml(name)}" data-wl-ver="${entry.version}" style="font-size: 11px; padding: 4px 8px; background: var(--orange); color: #fff; border: 0; border-radius: 4px; cursor: pointer;">Rollback</button>
+      `;
+      content.appendChild(div);
+    });
+
+    // Bind rollback action
+    content.querySelectorAll(".row-action-rollback").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const wlName = btn.dataset.wlName;
+        const wlVer = btn.dataset.wlVer;
+        try {
+          await api.json(`/api/workloads/${encodeURIComponent(wlName)}/rollback`, {
+            method: "POST",
+            body: JSON.stringify({ version: Number(wlVer) })
+          });
+          showToast(`Successfully rolled back ${wlName} to version #${wlVer}!`, "success");
+          modal.style.display = "none";
+          await refreshAll();
+        } catch (e) {
+          showToast(`Rollback failed: ${e.message}`, "error");
+        }
+      });
+    });
+  } catch (e) {
+    content.innerHTML = `<div class="danger">Error loading history: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+let policyLoaded = false;
+async function refreshPolicy() {
+  if (policyLoaded) return;
+  try {
+    const policy = await api.json("/api/policy");
+    if (!policy) return;
+    
+    const registriesList = qs("#policyRegistriesList");
+    if (registriesList) {
+      registriesList.innerHTML = (policy.Security?.ApprovedImagePrefixes || [])
+        .map(prefix => `<li><code>${escapeHtml(prefix)}</code></li>`)
+        .join("");
+    }
+    
+    const credsList = qs("#policyCredsList");
+    if (credsList) {
+      credsList.innerHTML = (policy.Security?.SensitiveEnvKeyPatterns || [])
+        .map(pattern => `<li><code>${escapeHtml(pattern)}</code></li>`)
+        .join("");
+    }
+    
+    const maxReplicas = qs("#policyMaxReplicas");
+    if (maxReplicas) {
+      maxReplicas.textContent = policy.Security?.PTEReplicaThreshold || "-";
+    }
+    
+    const requireDigest = qs("#policyRequireDigest");
+    if (requireDigest) {
+      requireDigest.textContent = policy.Security?.RequireDigestPinInProduction ? "Enabled" : "Disabled";
+    }
+    
+    policyLoaded = true;
+  } catch (err) {
+    // ignore
+  }
+}
+
 
 function bind() {
   qsa(".tree").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
@@ -1283,6 +1608,13 @@ function bind() {
         return;
       }
 
+      const historyButton = event.target.closest("[data-history]");
+      if (historyButton) {
+        const name = historyButton.dataset.history;
+        openHistoryModal(name);
+        return;
+      }
+
       const editButton = event.target.closest("[data-edit]");
       if (editButton) {
         const name = editButton.dataset.edit;
@@ -1295,10 +1627,29 @@ function bind() {
             form.querySelector('[name="replicas"]').value = wl.spec.replicas;
             form.querySelector('[name="port"]').value = wl.spec.port || "";
             form.querySelector('[name="containerPort"]').value = wl.spec.containerPort || "";
-            
-            form.scrollIntoView({ behavior: "smooth" });
-            writeTerminal(`Loaded workload "${name}" into the deploy form for editing.`);
           }
+          
+          const manifestArea = qs("#manifestTextarea");
+          if (manifestArea) {
+            const yamlStr = `apiVersion: doktriai/v1
+kind: Workload
+metadata:
+  name: ${wl.spec.name}
+spec:
+  image: ${wl.spec.image}
+  replicas: ${wl.spec.replicas}
+  port: ${wl.spec.port || 0}
+  containerPort: ${wl.spec.containerPort || 0}
+  runtime: ${wl.spec.runtime || 'docker'}
+  deployStrategy: ${wl.spec.deployStrategy || 'recreate'}`;
+            manifestArea.value = yamlStr;
+          }
+          
+          const targetSection = form || manifestArea;
+          if (targetSection) {
+            targetSection.scrollIntoView({ behavior: "smooth" });
+          }
+          writeTerminal(`Loaded workload "${name}" into the form and YAML editor.`);
         }
       }
     });
@@ -1473,18 +1824,84 @@ spec:
   }
 
   // CLI token generator
+  const cliTokenType = qs("#cliTokenType");
+  const cliJwtFields = qs("#cliJwtFields");
+  if (cliTokenType && cliJwtFields) {
+    cliTokenType.addEventListener("change", () => {
+      cliJwtFields.style.display = cliTokenType.value === "jwt" ? "flex" : "none";
+    });
+  }
+
   const cliGenerateToken = qs("#cliGenerateTokenBtn");
   if (cliGenerateToken) {
     cliGenerateToken.addEventListener("click", async () => {
+      const type = qs("#cliTokenType").value;
       const role = qs("#cliTokenRole").value;
       const actor = qs("#cliTokenActor").value.trim() || "developer";
+      const scope = qs("#cliTokenScope").value.trim() || "deploy_workload";
+      
       try {
-        const token = await generateToken(actor, role, "cli-agent", "cluster:deploy", "Local Scaling");
-        qs("#cliTokenOutput").value = token;
-        writeTerminal(`Minted security token for actor ${actor} (role=${role})`);
+        if (type === "jwt") {
+          const res = await api.json("/api/agents/issue-token", {
+            method: "POST",
+            body: JSON.stringify({ agentId: actor, scope: scope, ttl: "24h" })
+          });
+          qs("#cliTokenOutput").value = res.token;
+          writeTerminal(`Minted cryptographic JWT keycard for agent ${actor} (scope=${scope})`);
+        } else {
+          const token = await generateToken(actor, role, "cli-agent", "cluster:deploy", "Local Scaling");
+          qs("#cliTokenOutput").value = token;
+          writeTerminal(`Minted signature token for actor ${actor} (role=${role})`);
+        }
       } catch (err) {
         writeTerminal(`Token generation error: ${err.message}`);
       }
+    });
+  }
+
+  // History modal closer
+  const closeHistoryModal = qs("#closeHistoryModalBtn");
+  const historyModal = qs("#historyModal");
+  if (closeHistoryModal && historyModal) {
+    closeHistoryModal.addEventListener("click", () => {
+      historyModal.style.display = "none";
+    });
+    historyModal.addEventListener("click", (e) => {
+      if (e.target === historyModal) {
+        historyModal.style.display = "none";
+      }
+    });
+  }
+
+  // Copy-paste YAML Manifest Deploy
+  const deployManifestTextBtn = qs("#deployManifestTextBtn");
+  const manifestTextarea = qs("#manifestTextarea");
+  if (deployManifestTextBtn && manifestTextarea) {
+    deployManifestTextBtn.addEventListener("click", async () => {
+      const yamlContent = manifestTextarea.value.trim();
+      if (!yamlContent) {
+        showToast("Please paste YAML manifest content first!", "error");
+        return;
+      }
+      writeTerminal("Parsing manifest text payload...");
+      try {
+        const result = await api.json("/api/workloads/deploy-manifest", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-yaml" },
+          body: yamlContent
+        });
+        if (result.status === "pending_approval") {
+          writeTerminal(`⏳ PTE Gate: manifest workload requires approval. Plan ID: ${result.planId}`);
+          showToast(`Manifest deployment requires human approval: ${result.approvalReason}`, "warning");
+        } else {
+          writeTerminal(`Manifest deploy accepted successfully!`);
+          showToast(`Manifest deployment successful!`, "success");
+        }
+      } catch (err) {
+        writeTerminal(`error: ${err.message}`);
+        showToast(`Failed to deploy manifest: ${err.message}`, "error");
+      }
+      await refreshAll();
     });
   }
 
@@ -1966,6 +2383,7 @@ const savedTheme = localStorage.getItem("doktriai_theme") || "linen";
 document.body.dataset.theme = savedTheme;
 
 bind();
+initCanvasInteraction();
 connectEvents();
 refreshAll();
 handleRouting();

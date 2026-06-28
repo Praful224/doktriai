@@ -21,17 +21,6 @@ var safeEnvKey = regexp.MustCompile(`^[A-Z_][A-Z0-9_]{0,63}$`)
 // imageDigestPin: requires <image>@sha256:<64-hex-chars>
 var imageDigestPin = regexp.MustCompile(`^.+@sha256:[0-9a-f]{64}$`)
 
-// approvedPrefixes lists the baseline approved image name prefixes.
-// In production, images must also carry a @sha256: digest pin.
-var approvedPrefixes = []string{
-	"nginx", "redis", "node", "mysql", "postgres", "doktri/", "doktriai/",
-}
-
-// sensitiveEnvKeys triggers PTE gate when present.
-var sensitiveEnvKeyPatterns = []string{
-	"SECRET", "KEY", "TOKEN", "PASSWORD", "PASSWD", "CREDENTIAL", "PRIVATE",
-}
-
 // shellMetachars: shell injection characters forbidden in image refs and env values.
 const shellMetachars = ";|&`$<>()\r\n\x00"
 
@@ -129,8 +118,8 @@ func CheckAgentIntent(spec packages.WorkloadSpec) error {
 		return err
 	}
 
-	// Stage 3: Production mode requires digest pinning (ASI04 — supply chain)
-	if spec.SecurityMode == packages.SecurityModeProduction {
+	// Stage 3: Production mode requires digest pinning (if enabled) (ASI04 — supply chain)
+	if spec.SecurityMode == packages.SecurityModeProduction && GetPolicy().Security.RequireDigestPinInProduction {
 		if err := ValidateImageDigestPin(image); err != nil {
 			return err
 		}
@@ -147,12 +136,13 @@ func CheckAgentIntent(spec packages.WorkloadSpec) error {
 // RequiresHumanApproval returns true and a reason string if the spec is
 // high-risk enough to require PTE gate approval (Layer 2 — ASI09).
 func RequiresHumanApproval(spec packages.WorkloadSpec) (bool, string) {
-	if spec.Replicas > 5 {
-		return true, fmt.Sprintf("replica count %d exceeds safe auto-apply threshold (5)", spec.Replicas)
+	threshold := GetPolicy().Security.PTEReplicaThreshold
+	if spec.Replicas > threshold {
+		return true, fmt.Sprintf("replica count %d exceeds safe auto-apply threshold (%d)", spec.Replicas, threshold)
 	}
 	for key := range spec.Env {
 		upper := strings.ToUpper(key)
-		for _, pattern := range sensitiveEnvKeyPatterns {
+		for _, pattern := range GetPolicy().Security.SensitiveEnvKeyPatterns {
 			if strings.Contains(upper, pattern) {
 				return true, fmt.Sprintf("env key %q matches sensitive credential pattern", key)
 			}
@@ -220,14 +210,15 @@ func normalizeString(s string) string {
 
 // validateRegistry checks the normalized image against the approved prefix allowlist.
 func validateRegistry(image string) error {
-	for _, p := range approvedPrefixes {
+	prefixes := GetPolicy().Security.ApprovedImagePrefixes
+	for _, p := range prefixes {
 		if strings.HasPrefix(image, p) {
 			return nil
 		}
 	}
 	return fmt.Errorf(
 		"DOKTRIAI Security Violation: image registry %q fails allowlist verification — "+
-			"approved prefixes: %s", image, strings.Join(approvedPrefixes, ", "))
+			"approved prefixes: %s", image, strings.Join(prefixes, ", "))
 }
 
 // validateEnvValues performs deep scanning of env variable values.

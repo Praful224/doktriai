@@ -13,3 +13,8 @@ bin/
 # OS specific files
 .DS_Store
 Thumbs.db
+
+# Test data & temp files
+test-data/
+*~
+*.exe~

@@ -152,3 +152,17 @@ func (c *CachedStorage) ListPlans(ctx context.Context) ([]*packages.PendingPlan,
 func (c *CachedStorage) UpdatePlanStatus(ctx context.Context, id string, status string, actor string, comment string) error {
 	return c.underlying.UpdatePlanStatus(ctx, id, status, actor, comment)
 }
+
+// --- Workload History Delegation ---
+
+func (c *CachedStorage) InsertHistory(ctx context.Context, name, specJSON, actor string) error {
+	return c.underlying.InsertHistory(ctx, name, specJSON, actor)
+}
+
+func (c *CachedStorage) GetHistory(ctx context.Context, name string, limit int) ([]packages.WorkloadHistoryEntry, error) {
+	return c.underlying.GetHistory(ctx, name, limit)
+}
+
+func (c *CachedStorage) GetHistoryVersion(ctx context.Context, name string, version int64) (packages.WorkloadSpec, error) {
+	return c.underlying.GetHistoryVersion(ctx, name, version)
+}

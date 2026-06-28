@@ -20,16 +20,18 @@ type RPCRequest struct {
 // ProtocolHandler implements the MCP (Model Context Protocol) JSON-RPC bridge.
 // All tool calls are routed through the same security layers as the HTTP API.
 type ProtocolHandler struct {
-	store  *core.Store
-	engine *core.Engine
-	plans  *core.PlanStore
+	store   *core.Store
+	engine  *core.Engine
+	plans   *core.PlanStore
+	tracker *core.BehaviorTracker
 }
 
-func NewProtocolHandler(store *core.Store, engine *core.Engine, plans *core.PlanStore) *ProtocolHandler {
+func NewProtocolHandler(store *core.Store, engine *core.Engine, plans *core.PlanStore, tracker *core.BehaviorTracker) *ProtocolHandler {
 	return &ProtocolHandler{
-		store:  store,
-		engine: engine,
-		plans:  plans,
+		store:   store,
+		engine:  engine,
+		plans:   plans,
+		tracker: tracker,
 	}
 }
 
@@ -226,7 +228,7 @@ func (h *ProtocolHandler) callTool(
 		return nil, fmt.Errorf("workload %q not found", payload.Name)
 
 	case "get_behavior_metrics":
-		return map[string]string{"note": "use GET /api/behavior for real-time metrics"}, nil
+		return h.tracker.AllMetrics(), nil
 
 	default:
 		return nil, fmt.Errorf("unknown tool %q", name)

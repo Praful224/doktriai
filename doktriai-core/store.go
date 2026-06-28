@@ -190,13 +190,21 @@ func (s *Store) GetWorkload(name string) (packages.WorkloadSpec, bool) {
 	return spec, ok
 }
 
-func (s *Store) PutWorkload(spec packages.WorkloadSpec) error {
+func (s *Store) PutWorkload(spec packages.WorkloadSpec, actor string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	return s.sqlite.PutWorkload(ctx, spec)
+	err := s.sqlite.PutWorkload(ctx, spec)
+	if err != nil {
+		return err
+	}
+
+	// Record version history entry
+	specJSON, _ := json.Marshal(spec)
+	_ = s.sqlite.InsertHistory(ctx, spec.Name, string(specJSON), actor)
+	return nil
 }
 
 func (s *Store) DeleteWorkload(name string) error {
@@ -206,6 +214,29 @@ func (s *Store) DeleteWorkload(name string) error {
 	defer cancel()
 
 	return s.sqlite.DeleteWorkload(ctx, name)
+}
+
+func (s *Store) GetWorkloadHistory(name string, limit int) []packages.WorkloadHistoryEntry {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	history, err := s.sqlite.GetHistory(ctx, name, limit)
+	if err != nil {
+		log.Printf("store: GetWorkloadHistory failed: %v", err)
+		return nil
+	}
+	return history
+}
+
+func (s *Store) RollbackWorkload(name string, version int64) (packages.WorkloadSpec, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	return s.sqlite.GetHistoryVersion(ctx, name, version)
 }
 
 func (s *Store) AddAudit(record packages.AuditRecord) (packages.AuditRecord, error) {

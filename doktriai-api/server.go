@@ -32,13 +32,14 @@ type Server struct {
 
 func NewServer(store *core.Store, engine *core.Engine, bus *core.EventBus, webDir string) *Server {
 	plans := core.NewPlanStore()
+	behavior := core.NewBehaviorTracker()
 	return &Server{
 		store:    store,
 		engine:   engine,
 		bus:      bus,
 		plans:    plans,
-		behavior: core.NewBehaviorTracker(),
-		mcp:      mcp.NewProtocolHandler(store, engine, plans),
+		behavior: behavior,
+		mcp:      mcp.NewProtocolHandler(store, engine, plans, behavior),
 		webDir:   webDir,
 	}
 }
@@ -48,11 +49,13 @@ func (s *Server) Routes() http.Handler {
 
 	// Health
 	mux.HandleFunc("GET /api/health", s.health)
+	mux.HandleFunc("GET /api/policy", s.getPolicy)
 
 	// Workload management
 	mux.HandleFunc("GET /api/workloads", s.workloads)
 	mux.HandleFunc("GET /api/workloads/{name}", s.getWorkload)
 	mux.HandleFunc("POST /api/workloads", s.applyWorkload)
+	mux.HandleFunc("POST /api/workloads/deploy-manifest", s.deployManifest)
 	mux.HandleFunc("PATCH /api/workloads/{name}", s.patchWorkload)
 	mux.HandleFunc("DELETE /api/workloads/{name}", s.deleteWorkload)
 	mux.HandleFunc("POST /api/reconcile", s.reconcile)
@@ -85,8 +88,15 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("GET /api/runtime/status", s.runtimeStatus)
 	mux.HandleFunc("POST /api/charts/render", s.renderChart)
 
+	// Workload Rollback & History (F1.2)
+	mux.HandleFunc("GET /api/workloads/{name}/history", s.workloadHistory)
+	mux.HandleFunc("POST /api/workloads/{name}/rollback", s.rollbackWorkload)
+
 	// Prometheus-compatible metrics
 	mux.HandleFunc("GET /api/metrics", s.metrics)
+
+	// Token management (F2.5)
+	mux.HandleFunc("POST /api/agents/issue-token", s.issueAgentToken)
 
 	// Static web dashboard
 	mux.Handle("/", http.FileServer(http.Dir(filepath.Clean(s.webDir))))
@@ -260,6 +270,53 @@ func (s *Server) applyWorkload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusAccepted, map[string]string{"status": "accepted"})
+}
+
+func (s *Server) workloadHistory(w http.ResponseWriter, r *http.Request) {
+	claims := s.authenticate(w, r)
+	if claims == nil {
+		return
+	}
+	if !authorizeRole(w, r, claims.Role, "read") {
+		return
+	}
+	name := r.PathValue("name")
+	limitStr := r.URL.Query().Get("limit")
+	limit := 10
+	if limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+		}
+	}
+
+	history := s.store.GetWorkloadHistory(name, limit)
+	writeJSON(w, http.StatusOK, history)
+}
+
+func (s *Server) rollbackWorkload(w http.ResponseWriter, r *http.Request) {
+	claims := s.authenticate(w, r)
+	if claims == nil {
+		return
+	}
+	if !authorizeRole(w, r, claims.Role, "apply") {
+		return
+	}
+	name := r.PathValue("name")
+
+	var body struct {
+		Version int64 `json:"version"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := s.engine.Rollback(r.Context(), claims.ActorName, name, body.Version); err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]string{"status": "rolled_back", "workload": name})
 }
 
 func (s *Server) deleteWorkload(w http.ResponseWriter, r *http.Request) {
@@ -577,6 +634,14 @@ func (s *Server) releaseLock(w http.ResponseWriter, r *http.Request) {
 func (s *Server) authenticate(w http.ResponseWriter, r *http.Request) *core.AgentClaims {
 	tokenStr := strings.TrimSpace(r.Header.Get("X-Doktri-Token"))
 	if tokenStr != "" {
+		if strings.HasPrefix(tokenStr, "eyJ") {
+			claims, err := core.VerifyAgentJWT(tokenStr)
+			if err != nil {
+				writeError(w, http.StatusUnauthorized, fmt.Errorf("JWT verification failed: %v", err))
+				return nil
+			}
+			return &claims
+		}
 		claims, err := core.VerifyRequestToken(tokenStr)
 		if err != nil {
 			writeError(w, http.StatusUnauthorized, fmt.Errorf("authentication failed: %v", err))
@@ -610,12 +675,16 @@ func authorizeRole(w http.ResponseWriter, r *http.Request, role, action string) 
 
 func (s *Server) metrics(w http.ResponseWriter, r *http.Request) {
 	status, _ := s.engine.Status(r.Context())
+
+	// --- Workload aggregates ---
 	totalDesired := 0
 	totalActual := 0
 	for _, ws := range status {
 		totalDesired += ws.Spec.Replicas
 		totalActual += len(ws.Actual)
 	}
+
+	// --- Audit aggregates ---
 	audit := s.store.ListAudit()
 	allowedOps := 0
 	deniedOps := 0
@@ -626,26 +695,105 @@ func (s *Server) metrics(w http.ResponseWriter, r *http.Request) {
 			deniedOps++
 		}
 	}
+
+	// --- PTE plan breakdown ---
+	plans := s.plans.List()
+	planCounts := map[string]int{"pending": 0, "approved": 0, "rejected": 0, "expired": 0}
+	for _, p := range plans {
+		planCounts[string(p.Status)]++
+	}
+
+	// --- Behavior anomaly ---
+	behaviorMetrics := s.behavior.AllMetrics()
+	flaggedActors := 0
+	for _, m := range behaviorMetrics {
+		if m.Flagged {
+			flaggedActors++
+		}
+	}
+
+	// --- Circuit breaker ---
+	circuits := s.engine.ListCircuitBreakers()
+	openCircuits := 0
+	for _, v := range circuits {
+		if m, ok := v.(map[string]any); ok {
+			if open, _ := m["open"].(bool); open {
+				openCircuits++
+			}
+		}
+	}
+
+	// --- Reconcile timing ---
+	lastReconcile := s.engine.LastReconcileAt()
+	lastDuration := s.engine.LastReconcileDur()
+
 	w.Header().Set("Content-Type", "text/plain; version=0.0.4")
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "# HELP doktriai_workloads_desired Total desired replica count across all workloads\n")
-	fmt.Fprintf(w, "# TYPE doktriai_workloads_desired gauge\n")
-	fmt.Fprintf(w, "doktriai_workloads_desired %d\n", totalDesired)
-	fmt.Fprintf(w, "# HELP doktriai_workloads_actual Total actual running replica count\n")
-	fmt.Fprintf(w, "# TYPE doktriai_workloads_actual gauge\n")
-	fmt.Fprintf(w, "doktriai_workloads_actual %d\n", totalActual)
+
+	// Workload totals
 	fmt.Fprintf(w, "# HELP doktriai_workloads_total Total number of tracked workloads\n")
 	fmt.Fprintf(w, "# TYPE doktriai_workloads_total gauge\n")
 	fmt.Fprintf(w, "doktriai_workloads_total %d\n", len(status))
+	fmt.Fprintf(w, "# HELP doktriai_workloads_desired_replicas_total Total desired replicas\n")
+	fmt.Fprintf(w, "# TYPE doktriai_workloads_desired_replicas_total gauge\n")
+	fmt.Fprintf(w, "doktriai_workloads_desired_replicas_total %d\n", totalDesired)
+	fmt.Fprintf(w, "# HELP doktriai_workloads_actual_replicas_total Total actual running replicas\n")
+	fmt.Fprintf(w, "# TYPE doktriai_workloads_actual_replicas_total gauge\n")
+	fmt.Fprintf(w, "doktriai_workloads_actual_replicas_total %d\n", totalActual)
+
+	// Per-workload metrics
+	fmt.Fprintf(w, "# HELP doktriai_workload_desired_replicas Desired replicas per workload\n")
+	fmt.Fprintf(w, "# TYPE doktriai_workload_desired_replicas gauge\n")
+	fmt.Fprintf(w, "# HELP doktriai_workload_actual_replicas Actual running replicas per workload\n")
+	fmt.Fprintf(w, "# TYPE doktriai_workload_actual_replicas gauge\n")
+	fmt.Fprintf(w, "# HELP doktriai_workload_healthy Whether workload is fully converged\n")
+	fmt.Fprintf(w, "# TYPE doktriai_workload_healthy gauge\n")
+	for _, ws := range status {
+		fmt.Fprintf(w, "doktriai_workload_desired_replicas{name=%q,runtime=%q} %d\n",
+			ws.Spec.Name, ws.Spec.Runtime, ws.Spec.Replicas)
+		fmt.Fprintf(w, "doktriai_workload_actual_replicas{name=%q,runtime=%q} %d\n",
+			ws.Spec.Name, ws.Spec.Runtime, len(ws.Actual))
+		healthy := 0
+		if ws.Healthy {
+			healthy = 1
+		}
+		fmt.Fprintf(w, "doktriai_workload_healthy{name=%q} %d\n", ws.Spec.Name, healthy)
+	}
+
+	// Audit counters
 	fmt.Fprintf(w, "# HELP doktriai_audit_allowed_total Cumulative allowed operations\n")
 	fmt.Fprintf(w, "# TYPE doktriai_audit_allowed_total counter\n")
 	fmt.Fprintf(w, "doktriai_audit_allowed_total %d\n", allowedOps)
 	fmt.Fprintf(w, "# HELP doktriai_audit_denied_total Cumulative denied operations\n")
 	fmt.Fprintf(w, "# TYPE doktriai_audit_denied_total counter\n")
 	fmt.Fprintf(w, "doktriai_audit_denied_total %d\n", deniedOps)
-	fmt.Fprintf(w, "# HELP doktriai_pending_plans Pending PTE approval plans\n")
-	fmt.Fprintf(w, "# TYPE doktriai_pending_plans gauge\n")
-	fmt.Fprintf(w, "doktriai_pending_plans %d\n", len(s.plans.List()))
+
+	// PTE plan breakdown
+	fmt.Fprintf(w, "# HELP doktriai_pte_plans PTE approval plans by status\n")
+	fmt.Fprintf(w, "# TYPE doktriai_pte_plans gauge\n")
+	for status, count := range planCounts {
+		fmt.Fprintf(w, "doktriai_pte_plans{status=%q} %d\n", status, count)
+	}
+
+	// Circuit breaker
+	fmt.Fprintf(w, "# HELP doktriai_circuit_breakers_open Number of active open circuit breakers\n")
+	fmt.Fprintf(w, "# TYPE doktriai_circuit_breakers_open gauge\n")
+	fmt.Fprintf(w, "doktriai_circuit_breakers_open %d\n", openCircuits)
+
+	// Behavioral anomaly
+	fmt.Fprintf(w, "# HELP doktriai_behavior_flagged_actors Actors flagged with anomaly score above 1.0\n")
+	fmt.Fprintf(w, "# TYPE doktriai_behavior_flagged_actors gauge\n")
+	fmt.Fprintf(w, "doktriai_behavior_flagged_actors %d\n", flaggedActors)
+
+	// Reconcile loop timing
+	if !lastReconcile.IsZero() {
+		fmt.Fprintf(w, "# HELP doktriai_last_reconcile_timestamp_seconds Unix timestamp of last reconcile tick\n")
+		fmt.Fprintf(w, "# TYPE doktriai_last_reconcile_timestamp_seconds gauge\n")
+		fmt.Fprintf(w, "doktriai_last_reconcile_timestamp_seconds %d\n", lastReconcile.Unix())
+		fmt.Fprintf(w, "# HELP doktriai_reconcile_duration_seconds Duration of last reconcile loop in seconds\n")
+		fmt.Fprintf(w, "# TYPE doktriai_reconcile_duration_seconds gauge\n")
+		fmt.Fprintf(w, "doktriai_reconcile_duration_seconds %.6f\n", lastDuration.Seconds())
+	}
 }
 
 // --- Rate limiter (Layer 5 — per-IP token bucket, 60 req/min) ---
@@ -910,4 +1058,129 @@ func (s *Server) renderChart(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusOK, map[string]string{"yaml": yamlBuilder.String()})
 }
+
+func (s *Server) issueAgentToken(w http.ResponseWriter, r *http.Request) {
+	claims := s.authenticate(w, r)
+	if claims == nil {
+		return
+	}
+	if !authorizeRole(w, r, claims.Role, "apply") {
+		return
+	}
+	
+	var body struct {
+		AgentID string `json:"agentId"`
+		Scope   string `json:"scope"`
+		TTL     string `json:"ttl"` // duration string like "24h"
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	ttl := 24 * time.Hour
+	if body.TTL != "" {
+		if d, err := time.ParseDuration(body.TTL); err == nil && d > 0 {
+			ttl = d
+		}
+	}
+
+	token, err := core.IssueAgentJWT(body.AgentID, claims.ActorName, "operator", body.Scope, ttl)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]any{
+		"token":     token,
+		"expiresIn": ttl.String(),
+		"type":      "jwt",
+	})
+}
+
+func (s *Server) deployManifest(w http.ResponseWriter, r *http.Request) {
+	claims := s.authenticate(w, r)
+	if claims == nil {
+		return
+	}
+	if !authorizeRole(w, r, claims.Role, "apply") {
+		return
+	}
+
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	spec, err := packages.ParseManifest(bodyBytes)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	s.behavior.Record(claims.ActorName, "apply")
+	if anomalous, score := s.behavior.IsAnomalous(claims.ActorName); anomalous {
+		s.bus.Publish(packages.Event{
+			Level: "error", Source: "behavior-tracker",
+			Message: fmt.Sprintf("ANOMALY: actor %q flagged (score=%.2f) — rate limit exceeded", claims.ActorName, score),
+		})
+	}
+
+	lockState := s.store.GetLock()
+	if lockState.Locked && lockState.AcquiredBy != claims.ActorName {
+		writeError(w, http.StatusConflict, fmt.Errorf("environment locked by %s: %s", lockState.AcquiredBy, lockState.Reason))
+		return
+	}
+
+	if err := core.CheckAgentIntent(*spec); err != nil {
+		s.behavior.Record(claims.ActorName, "reject")
+		_, _ = s.store.AddAudit(packages.AuditRecord{
+			Actor: claims.ActorName, Action: "apply", Workload: spec.Name,
+			Allowed: false, Reason: err.Error(),
+			AgentID: claims.AgentID, AgentScope: claims.Scope, AgentGoal: claims.Goal,
+			SignatureVerified: !claims.Dev,
+		})
+		s.bus.Publish(packages.Event{Level: "error", Source: "api", Workload: spec.Name, Message: fmt.Sprintf("Intent Guard block: %v", err)})
+		writeError(w, http.StatusForbidden, err)
+		return
+	}
+
+	if needsApproval, reason := core.RequiresHumanApproval(*spec); needsApproval {
+		plan, err := s.plans.Submit(claims.ActorName, claims.AgentID, claims.Goal, reason, *spec)
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, err)
+			return
+		}
+		s.bus.Publish(packages.Event{
+			Level: "warn", Source: "pte-gate", Workload: spec.Name,
+			Message: fmt.Sprintf("PTE Gate: plan %s created — awaiting human approval (%s)", plan.ID, reason),
+		})
+		writeJSON(w, http.StatusAccepted, map[string]any{
+			"status":         "pending_approval",
+			"planId":         plan.ID,
+			"approvalReason": reason,
+			"expiresAt":      plan.ExpiresAt,
+		})
+		return
+	}
+
+	if err := s.engine.Apply(r.Context(), claims.ActorName, *spec); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	writeJSON(w, http.StatusAccepted, map[string]string{"status": "accepted"})
+}
+
+func (s *Server) getPolicy(w http.ResponseWriter, r *http.Request) {
+	claims := s.authenticate(w, r)
+	if claims == nil {
+		return
+	}
+	policy := core.GetPolicy()
+	writeJSON(w, http.StatusOK, policy)
+}
+
+
+
 

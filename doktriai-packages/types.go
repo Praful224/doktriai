@@ -61,8 +61,11 @@ type WorkloadSpec struct {
 	SecurityMode  SecurityMode      `json:"securityMode,omitempty"`
 	Resources     ResourceLimits    `json:"resources,omitempty"`
 	HealthCheck   *HealthCheck      `json:"healthCheck,omitempty"`
-	Volumes       []VolumeMount     `json:"volumes,omitempty"`
-	Labels        map[string]string `json:"labels,omitempty"`
+	Volumes        []VolumeMount     `json:"volumes,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty"`
+	DeployStrategy string            `json:"deployStrategy,omitempty"` // "recreate" (default) or "rolling"
+	MaxSurge       int               `json:"maxSurge,omitempty"`
+	MaxUnavailable int               `json:"maxUnavailable,omitempty"`
 }
 
 // ActualWorkload is the observed container state from the runtime driver.
@@ -125,6 +128,14 @@ type AuditRecord struct {
 	// State diff hashes (Layer 3 — ASI06, ASI10)
 	StateHashBefore string `json:"stateHashBefore,omitempty"`
 	StateHashAfter  string `json:"stateHashAfter,omitempty"`
+}
+
+// WorkloadHistoryEntry represents a single timestamped version of a workload spec.
+type WorkloadHistoryEntry struct {
+	ID        int64        `json:"id"`
+	Spec      WorkloadSpec `json:"spec"`
+	AppliedBy string       `json:"appliedBy"`
+	AppliedAt time.Time    `json:"appliedAt"`
 }
 
 // PendingPlan is a high-risk workload change waiting for human approval (PTE Gate).

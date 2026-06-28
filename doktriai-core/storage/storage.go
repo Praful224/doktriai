@@ -30,4 +30,9 @@ type Storage interface {
 	GetPlan(ctx context.Context, id string) (*packages.PendingPlan, error)
 	ListPlans(ctx context.Context) ([]*packages.PendingPlan, error)
 	UpdatePlanStatus(ctx context.Context, id string, status string, actor string, comment string) error
+
+	// Workload History
+	InsertHistory(ctx context.Context, name, specJSON, actor string) error
+	GetHistory(ctx context.Context, name string, limit int) ([]packages.WorkloadHistoryEntry, error)
+	GetHistoryVersion(ctx context.Context, name string, version int64) (packages.WorkloadSpec, error)
 }

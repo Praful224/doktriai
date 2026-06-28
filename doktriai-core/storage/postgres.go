@@ -34,6 +34,9 @@ func (p *PostgresStorage) Migrate(ctx context.Context) error {
 			volumes JSONB NOT NULL DEFAULT '[]'::jsonb,
 			labels JSONB NOT NULL DEFAULT '{}'::jsonb,
 			security_mode VARCHAR(50) NOT NULL DEFAULT 'dev',
+			deploy_strategy VARCHAR(50) NOT NULL DEFAULT 'recreate',
+			max_surge INTEGER NOT NULL DEFAULT 1,
+			max_unavailable INTEGER NOT NULL DEFAULT 0,
 			created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 			updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 		);`,
@@ -78,6 +81,13 @@ func (p *PostgresStorage) Migrate(ctx context.Context) error {
 			rejected_at TIMESTAMP WITH TIME ZONE,
 			rejection_comment TEXT
 		);`,
+		`CREATE TABLE IF NOT EXISTS workload_history (
+			id          BIGSERIAL PRIMARY KEY,
+			name        VARCHAR(253) NOT NULL,
+			spec_json   TEXT NOT NULL,
+			applied_by  VARCHAR(255) NOT NULL DEFAULT '',
+			applied_at  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+		);`,
 	}
 
 	for _, q := range queries {
@@ -85,13 +95,19 @@ func (p *PostgresStorage) Migrate(ctx context.Context) error {
 			return fmt.Errorf("migration query failed: %w", err)
 		}
 	}
+	
+	// Upgrade existing postgres table columns if they don't exist
+	_, _ = p.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN IF NOT EXISTS deploy_strategy VARCHAR(50) DEFAULT 'recreate'")
+	_, _ = p.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN IF NOT EXISTS max_surge INTEGER DEFAULT 1")
+	_, _ = p.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN IF NOT EXISTS max_unavailable INTEGER DEFAULT 0")
+
 	return nil
 }
 
 // --- Workloads ---
 
 func (p *PostgresStorage) ListWorkloads(ctx context.Context) ([]packages.WorkloadSpec, error) {
-	rows, err := p.db.QueryContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode FROM workloads ORDER BY name ASC")
+	rows, err := p.db.QueryContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable FROM workloads ORDER BY name ASC")
 	if err != nil {
 		return nil, err
 	}
@@ -104,6 +120,7 @@ func (p *PostgresStorage) ListWorkloads(ctx context.Context) ([]packages.Workloa
 		err := rows.Scan(
 			&spec.Name, &spec.Image, &spec.Replicas, &spec.Port, &spec.ContainerPort, &spec.Runtime,
 			&envJSON, &resJSON, &volJSON, &lblJSON, &spec.SecurityMode,
+			&spec.DeployStrategy, &spec.MaxSurge, &spec.MaxUnavailable,
 		)
 		if err != nil {
 			return nil, err
@@ -120,9 +137,10 @@ func (p *PostgresStorage) ListWorkloads(ctx context.Context) ([]packages.Workloa
 func (p *PostgresStorage) GetWorkload(ctx context.Context, name string) (packages.WorkloadSpec, bool, error) {
 	var spec packages.WorkloadSpec
 	var envJSON, resJSON, volJSON, lblJSON []byte
-	err := p.db.QueryRowContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode FROM workloads WHERE name = $1", name).Scan(
+	err := p.db.QueryRowContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable FROM workloads WHERE name = $1", name).Scan(
 		&spec.Name, &spec.Image, &spec.Replicas, &spec.Port, &spec.ContainerPort, &spec.Runtime,
 		&envJSON, &resJSON, &volJSON, &lblJSON, &spec.SecurityMode,
+		&spec.DeployStrategy, &spec.MaxSurge, &spec.MaxUnavailable,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		return spec, false, nil
@@ -143,9 +161,16 @@ func (p *PostgresStorage) PutWorkload(ctx context.Context, spec packages.Workloa
 	volJSON, _ := json.Marshal(spec.Volumes)
 	lblJSON, _ := json.Marshal(spec.Labels)
 
+	if spec.DeployStrategy == "" {
+		spec.DeployStrategy = "recreate"
+	}
+	if spec.MaxSurge == 0 && spec.DeployStrategy == "rolling" {
+		spec.MaxSurge = 1
+	}
+
 	query := `
-		INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP)
+		INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, CURRENT_TIMESTAMP)
 		ON CONFLICT (name) DO UPDATE SET
 			image = EXCLUDED.image,
 			replicas = EXCLUDED.replicas,
@@ -157,11 +182,15 @@ func (p *PostgresStorage) PutWorkload(ctx context.Context, spec packages.Workloa
 			volumes = EXCLUDED.volumes,
 			labels = EXCLUDED.labels,
 			security_mode = EXCLUDED.security_mode,
+			deploy_strategy = EXCLUDED.deploy_strategy,
+			max_surge = EXCLUDED.max_surge,
+			max_unavailable = EXCLUDED.max_unavailable,
 			updated_at = CURRENT_TIMESTAMP
 	`
 	_, err := p.db.ExecContext(ctx, query,
 		spec.Name, spec.Image, spec.Replicas, spec.Port, spec.ContainerPort, spec.Runtime,
 		envJSON, resJSON, volJSON, lblJSON, spec.SecurityMode,
+		spec.DeployStrategy, spec.MaxSurge, spec.MaxUnavailable,
 	)
 	return err
 }
@@ -414,4 +443,56 @@ func (p *PostgresStorage) UpdatePlanStatus(ctx context.Context, id string, statu
 		return err
 	}
 	return fmt.Errorf("unsupported update status %q", status)
+}
+
+// --- Workload History ---
+
+func (p *PostgresStorage) InsertHistory(ctx context.Context, name, specJSON, actor string) error {
+	_, err := p.db.ExecContext(ctx, `
+		INSERT INTO workload_history (name, spec_json, applied_by, applied_at)
+		VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
+	`, name, specJSON, actor)
+	return err
+}
+
+func (p *PostgresStorage) GetHistory(ctx context.Context, name string, limit int) ([]packages.WorkloadHistoryEntry, error) {
+	rows, err := p.db.QueryContext(ctx, `
+		SELECT id, spec_json, applied_by, applied_at 
+		FROM workload_history 
+		WHERE name = $1 
+		ORDER BY id DESC 
+		LIMIT $2
+	`, name, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var history []packages.WorkloadHistoryEntry
+	for rows.Next() {
+		var entry packages.WorkloadHistoryEntry
+		var specJSON string
+		err := rows.Scan(&entry.ID, &specJSON, &entry.AppliedBy, &entry.AppliedAt)
+		if err != nil {
+			return nil, err
+		}
+		_ = json.Unmarshal([]byte(specJSON), &entry.Spec)
+		history = append(history, entry)
+	}
+	return history, nil
+}
+
+func (p *PostgresStorage) GetHistoryVersion(ctx context.Context, name string, version int64) (packages.WorkloadSpec, error) {
+	var spec packages.WorkloadSpec
+	var specJSON string
+	err := p.db.QueryRowContext(ctx, `
+		SELECT spec_json 
+		FROM workload_history 
+		WHERE name = $1 AND id = $2
+	`, name, version).Scan(&specJSON)
+	if err != nil {
+		return spec, err
+	}
+	err = json.Unmarshal([]byte(specJSON), &spec)
+	return spec, err
 }

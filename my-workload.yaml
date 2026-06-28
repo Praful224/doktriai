@@ -1,0 +1,13 @@
+apiVersion: doktriai/v1
+kind: Workload
+metadata:
+  name: billing-service
+  labels:
+    tier: backend
+spec:
+  image: nginx:1.26-alpine
+  replicas: 3
+  port: 8080
+  containerPort: 80
+  runtime: docker
+  deployStrategy: rolling
