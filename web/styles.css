@@ -377,6 +377,9 @@ button:hover {
     gap: 16px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
 }
 
 /* Header & Toggle Arrow */
@@ -702,8 +705,10 @@ button:hover {
 .ide.sidebar-collapsed .sidebar-container {
     padding: 16px 8px;
     align-items: center;
+    width: 76px;
+    min-width: 76px;
+    max-width: 76px;
 }
-
 .ide.sidebar-collapsed .sidebar-brand .brand-text,
 .ide.sidebar-collapsed .sidebar-search input,
 .ide.sidebar-collapsed .sidebar-search .search-kbd,
@@ -1654,11 +1659,14 @@ canvas {
     grid-template-columns: 0px minmax(0, 1fr) !important;
 }
 
-.ide.sidebar-hidden .explorer {
+.ide.sidebar-hidden .sidebar-container {
     width: 0 !important;
     min-width: 0 !important;
+    max-width: 0 !important;
+    padding: 0 !important;
     overflow: hidden !important;
     visibility: hidden !important;
+    border-right: 0 !important;
 }
 
 .ide.sidebar-hidden .main {
@@ -2343,7 +2351,7 @@ canvas {
     .system-tray #clock {
         display: none !important;
     }
-    .explorer {
+    .sidebar-container {
         display: none !important;
     }
     .main {
