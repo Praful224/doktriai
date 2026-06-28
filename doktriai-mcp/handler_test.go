@@ -205,7 +205,7 @@ func TestMCP_GetWorkload_Exists(t *testing.T) {
 	h := testHandler(t)
 	payload := rpcPayload(t, "tools/call", map[string]any{
 		"name":      "get_workload",
-		"arguments": map[string]any{"name": "secure-ingress"},
+		"arguments": map[string]any{"name": "hello-web"},
 	})
 
 	_, err := h.HandleRPC(context.Background(), "test-agent", payload)
@@ -233,7 +233,7 @@ func TestMCP_GetLogs(t *testing.T) {
 	h := testHandler(t)
 	payload := rpcPayload(t, "tools/call", map[string]any{
 		"name":      "get_logs",
-		"arguments": map[string]any{"name": "secure-ingress", "tail": 10},
+		"arguments": map[string]any{"name": "hello-web", "tail": 10},
 	})
 
 	_, err := h.HandleRPC(context.Background(), "test-agent", payload)
