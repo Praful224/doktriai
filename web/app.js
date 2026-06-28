@@ -1401,6 +1401,17 @@ async function refreshPolicy() {
       requireDigest.textContent = policy.Security?.RequireDigestPinInProduction ? "Enabled" : "Disabled";
     }
     
+    const opaEngine = qs("#policyOPAEngine");
+    if (opaEngine) {
+      opaEngine.textContent = policy.Security?.UseOPA ? "Active" : "Inactive";
+      opaEngine.style.color = policy.Security?.UseOPA ? "var(--green)" : "var(--muted)";
+    }
+    
+    const opaPath = qs("#policyOPAPath");
+    if (opaPath) {
+      opaPath.textContent = policy.Security?.OPAPolicyPath || "-";
+    }
+    
     policyLoaded = true;
   } catch (err) {
     // ignore
