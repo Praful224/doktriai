@@ -169,7 +169,7 @@ function switchView(view, updateHash = true) {
   }
 
   qsa(".view").forEach((item) => item.classList.remove("active-view"));
-  qsa(".tree, .menu-item").forEach((item) => item.classList.toggle("active", item.dataset.view === view));
+  qsa(".tree, .menu-item, .sub-item").forEach((item) => item.classList.toggle("active", item.dataset.view === view));
   
   const target = qs(`#${view}`);
   if (target) target.classList.add("active-view");
@@ -296,7 +296,8 @@ async function refreshAll() {
       }
     }
     
-    qs("#mcpStatus").textContent = "MCP ready · alpha-v1";
+    const mcpStatus = qs("#mcpStatus");
+    if (mcpStatus) mcpStatus.textContent = "MCP ready · alpha-v1";
     const sbMcp = qs("#sbMcpStatus");
     if (sbMcp) sbMcp.textContent = "MCP ready · alpha-v1";
   } catch (error) {
@@ -1489,7 +1490,7 @@ async function refreshPolicy() {
 
 
 function bind() {
-  qsa(".tree, .menu-item").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
+  qsa(".tree, .menu-item, .sub-item").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
 
   // Project Name Inline Editing
   const nameContainer = qs("#projectNameContainer");

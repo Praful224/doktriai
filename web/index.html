@@ -178,9 +178,9 @@
                     </button>
                     <!-- Sub tree items -->
                     <div class="sub-tree">
-                        <button class="sub-item" onclick="switchView('overview')">Dashboard</button>
-                        <button class="sub-item" onclick="switchView('projects')">Platform Modules</button>
-                        <button class="sub-item" onclick="switchView('activity')">Live Activity</button>
+                        <button class="sub-item" data-view="overview">Dashboard</button>
+                        <button class="sub-item" data-view="projects">Platform Modules</button>
+                        <button class="sub-item" data-view="activity">Live Activity</button>
                     </div>
                 </div>
 
@@ -190,9 +190,9 @@
                         <span class="menu-text">Workloads</span>
                     </button>
                     <div class="sub-tree">
-                        <button class="sub-item" onclick="switchView('workloads')">Active Workloads</button>
-                        <button class="sub-item" onclick="switchView('core')">Reconciler Core</button>
-                        <button class="sub-item" onclick="switchView('runtime')">Runtime Drivers</button>
+                        <button class="sub-item" data-view="workloads">Active Workloads</button>
+                        <button class="sub-item" data-view="core">Reconciler Core</button>
+                        <button class="sub-item" data-view="runtime">Runtime Drivers</button>
                     </div>
                 </div>
 
@@ -202,8 +202,8 @@
                         <span class="menu-text">Security Gate</span>
                     </button>
                     <div class="sub-tree">
-                        <button class="sub-item" onclick="switchView('security')">PTE Approvals</button>
-                        <button class="sub-item" onclick="switchView('security')">Anomaly Metrics</button>
+                        <button class="sub-item" data-view="security">PTE Approvals</button>
+                        <button class="sub-item" data-view="security">Anomaly Metrics</button>
                     </div>
                 </div>
 
