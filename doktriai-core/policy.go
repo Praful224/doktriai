@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"regexp"
@@ -110,6 +111,17 @@ func RoleCan(role, action string) bool {
 // It runs 4 stages: normalization → registry check → env scan → scope check.
 // Returns a descriptive DOKTRIAI Security Violation error on any failure.
 func CheckAgentIntent(spec packages.WorkloadSpec) error {
+	if GetPolicy().Security.UseOPA {
+		allow, _, reason, err := EvaluateOPAPolicy(context.Background(), "agent", "operator", "apply", spec)
+		if err != nil {
+			return fmt.Errorf("DOKTRIAI OPA Error: %w", err)
+		}
+		if !allow {
+			return fmt.Errorf("DOKTRIAI Security Violation: %s", reason)
+		}
+		return nil
+	}
+
 	// Stage 1: Normalize image to defeat Unicode lookalike attacks (ASI01, ASI05)
 	image := normalizeString(spec.Image)
 
@@ -136,6 +148,14 @@ func CheckAgentIntent(spec packages.WorkloadSpec) error {
 // RequiresHumanApproval returns true and a reason string if the spec is
 // high-risk enough to require PTE gate approval (Layer 2 — ASI09).
 func RequiresHumanApproval(spec packages.WorkloadSpec) (bool, string) {
+	if GetPolicy().Security.UseOPA {
+		_, requiresApproval, reason, err := EvaluateOPAPolicy(context.Background(), "agent", "operator", "apply", spec)
+		if err == nil && requiresApproval {
+			return true, reason
+		}
+		return false, ""
+	}
+
 	threshold := GetPolicy().Security.PTEReplicaThreshold
 	if spec.Replicas > threshold {
 		return true, fmt.Sprintf("replica count %d exceeds safe auto-apply threshold (%d)", spec.Replicas, threshold)
@@ -154,6 +174,15 @@ func RequiresHumanApproval(spec packages.WorkloadSpec) (bool, string) {
 // RequiresDeleteApproval returns true for any delete of a named workload
 // to prevent automated mass-deletion by a rogue agent.
 func RequiresDeleteApproval(workloadName string) (bool, string) {
+	if GetPolicy().Security.UseOPA {
+		spec := packages.WorkloadSpec{Name: workloadName}
+		_, requiresApproval, reason, err := EvaluateOPAPolicy(context.Background(), "agent", "operator", "delete", spec)
+		if err == nil && requiresApproval {
+			return true, reason
+		}
+		return true, fmt.Sprintf("deletion of workload %q requires human approval (ASI09 policy)", workloadName)
+	}
+
 	return true, fmt.Sprintf("deletion of workload %q requires human approval (ASI09 policy)", workloadName)
 }
 

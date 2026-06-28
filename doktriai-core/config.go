@@ -15,6 +15,8 @@ type PolicyConfig struct {
 		ApprovedImagePrefixes        []string `yaml:"approvedImagePrefixes"`
 		SensitiveEnvKeyPatterns      []string `yaml:"sensitiveEnvKeyPatterns"`
 		RequireDigestPinInProduction bool     `yaml:"requireDigestPinInProduction"`
+		UseOPA                       bool     `yaml:"useOPA"`
+		OPAPolicyPath                string   `yaml:"opaPolicyPath"`
 	} `yaml:"security"`
 	Notifications struct {
 		PTEWebhookURL        string `yaml:"pteWebhookURL"`
@@ -40,6 +42,8 @@ func init() {
 		"SECRET", "KEY", "TOKEN", "PASSWORD", "PASSWD", "CREDENTIAL", "PRIVATE",
 	}
 	defaultPolicy.Security.RequireDigestPinInProduction = true
+	defaultPolicy.Security.UseOPA = false
+	defaultPolicy.Security.OPAPolicyPath = "./policy.rego"
 }
 
 // LoadPolicy parses the policy YAML file. If path doesn't exist, uses defaults.
@@ -64,6 +68,9 @@ func LoadPolicy(path string) error {
 	}
 	if cfg.Security.PTEReplicaThreshold == 0 {
 		cfg.Security.PTEReplicaThreshold = defaultPolicy.Security.PTEReplicaThreshold
+	}
+	if cfg.Security.OPAPolicyPath == "" {
+		cfg.Security.OPAPolicyPath = defaultPolicy.Security.OPAPolicyPath
 	}
 	policyMu.Lock()
 	globalPolicy = &cfg
