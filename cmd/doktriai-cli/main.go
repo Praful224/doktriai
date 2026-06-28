@@ -45,6 +45,8 @@ func main() {
 		err = client.Call("GET", "/api/workloads/"+flag.Arg(1), nil)
 	case "reconcile":
 		err = client.Call("POST", "/api/reconcile", map[string]string{})
+	case "discover", "connect":
+		err = client.Call("POST", "/api/runtime/discover", nil)
 	case "validate":
 		err = deploy(client, flag.Args()[1:], "/api/validate", "POST")
 	case "deploy", "apply":
@@ -252,6 +254,7 @@ Workload Commands:
   delete | rm <name>                Delete a workload (requires PTE approval)
   logs <name> [tail]                Stream container logs
   reconcile                         Trigger manual reconciliation
+  discover | connect                Auto-scan and import local containers as workloads
   history <name>                    Show version history for a workload
   rollback <name> <versionId>       Rollback a workload to a specific history version
 

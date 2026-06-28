@@ -271,3 +271,99 @@ func (d *DockerDriver) SetSimulated(sim bool) {
 	d.simulated = sim
 }
 
+func (d *DockerDriver) DiscoverContainers(ctx context.Context) ([]packages.WorkloadSpec, error) {
+	d.mu.RLock()
+	isSimulated := d.simulated
+	d.mu.RUnlock()
+
+	if isSimulated {
+		// Return sample mock workloads in simulated mode
+		return []packages.WorkloadSpec{
+			{
+				Name:          "redis-cache",
+				Image:         "redis:alpine",
+				Replicas:      1,
+				Port:          6379,
+				ContainerPort: 6379,
+				Runtime:       "docker",
+				SecurityMode:  "dev",
+			},
+			{
+				Name:          "hello-nginx",
+				Image:         "nginx:alpine",
+				Replicas:      1,
+				Port:          80,
+				ContainerPort: 80,
+				Runtime:       "docker",
+				SecurityMode:  "dev",
+			},
+		}, nil
+	}
+
+	args := []string{
+		"ps", "-a",
+		"--format", "{{.Names}}\t{{.Image}}\t{{.Ports}}",
+	}
+	out, err := exec.CommandContext(ctx, d.binary, args...).CombinedOutput()
+	if err != nil {
+		return nil, err
+	}
+
+	var discovered []packages.WorkloadSpec
+	scanner := bufio.NewScanner(bytes.NewReader(out))
+	for scanner.Scan() {
+		text := scanner.Text()
+		if text == "" {
+			continue
+		}
+		parts := strings.Split(text, "\t")
+		if len(parts) < 2 {
+			continue
+		}
+		name := parts[0]
+		image := parts[1]
+		
+		// If container is managed by doktri (prefixed with doktri-), skip it
+		if strings.HasPrefix(name, "doktri-") {
+			continue
+		}
+
+		port := 80
+		containerPort := 80
+		portsStr := ""
+		if len(parts) > 2 {
+			portsStr = parts[2]
+		}
+		if portsStr != "" {
+			if idx := strings.Index(portsStr, "->"); idx != -1 {
+				left := portsStr[:idx]
+				right := portsStr[idx+2:]
+				
+				if colonIdx := strings.LastIndex(left, ":"); colonIdx != -1 {
+					p, _ := strconv.Atoi(left[colonIdx+1:])
+					if p > 0 {
+						port = p
+					}
+				}
+				if slashIdx := strings.Index(right, "/"); slashIdx != -1 {
+					p, _ := strconv.Atoi(right[:slashIdx])
+					if p > 0 {
+						containerPort = p
+					}
+				}
+			}
+		}
+
+		discovered = append(discovered, packages.WorkloadSpec{
+			Name:          name,
+			Image:         image,
+			Replicas:      1,
+			Port:          port,
+			ContainerPort: containerPort,
+			Runtime:       "docker",
+			SecurityMode:  "dev",
+		})
+	}
+	return discovered, scanner.Err()
+}
+

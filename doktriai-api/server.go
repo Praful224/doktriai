@@ -86,6 +86,7 @@ func (s *Server) Routes() http.Handler {
 	// Extended modules endpoints
 	mux.HandleFunc("GET /api/schema", s.schema)
 	mux.HandleFunc("GET /api/runtime/status", s.runtimeStatus)
+	mux.HandleFunc("POST /api/runtime/discover", s.discover)
 	mux.HandleFunc("POST /api/charts/render", s.renderChart)
 
 	// Workload Rollback & History (F1.2)
@@ -1016,6 +1017,43 @@ func (s *Server) runtimeStatus(w http.ResponseWriter, r *http.Request) {
 			"simulated": true,
 		},
 		"containers": containers,
+	})
+}
+
+func (s *Server) discover(w http.ResponseWriter, r *http.Request) {
+	driver := s.engine.Runtime()
+	d, ok := driver.(*doktriruntime.DockerDriver)
+	if !ok {
+		writeError(w, http.StatusBadRequest, fmt.Errorf("runtime driver is not Docker"))
+		return
+	}
+
+	discovered, err := d.DiscoverContainers(r.Context())
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	var imported []packages.WorkloadSpec
+	for _, spec := range discovered {
+		if _, err := s.store.Get(r.Context(), spec.Name); err != nil {
+			if err := s.store.Put(r.Context(), spec); err == nil {
+				s.bus.Publish(core.Event{
+					Time:     time.Now(),
+					Level:    "info",
+					Source:   "api",
+					Workload: spec.Name,
+					Message:  fmt.Sprintf("Auto-discovered and imported container workload from host: %s", spec.Image),
+				})
+				imported = append(imported, spec)
+			}
+		}
+	}
+
+	writeJSON(w, http.StatusOK, map[string]any{
+		"status":   "success",
+		"imported": imported,
+		"total":    len(imported),
 	})
 }
 
