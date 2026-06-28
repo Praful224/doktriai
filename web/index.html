@@ -324,6 +324,13 @@
                             <label>Container Port
                                 <input name="containerPort" type="number" placeholder="80" />
                             </label>
+                            <label>Deploy Strategy
+                                <select name="deployStrategy">
+                                    <option value="recreate" selected>Recreate</option>
+                                    <option value="rolling">Rolling</option>
+                                    <option value="canary">Canary</option>
+                                </select>
+                            </label>
                             <button type="submit">Deploy App</button>
                         </form>
                         
@@ -335,7 +342,7 @@
                             <button id="deployManifestTextBtn" style="background: var(--orange); color: #fff; height: 32px; font-size: 12px; border: 0; border-radius: 6px; cursor: pointer;">Deploy Manifest</button>
                         </div>
                     </div>
-
+ 
                     <h2 class="section-title">Active Workloads Status</h2>
                     <div class="table-wrap">
                         <table>
@@ -344,6 +351,7 @@
                                     <th>Workload Name</th>
                                     <th>Target Image</th>
                                     <th>Desired</th>
+                                    <th>Strategy / Canary</th>
                                     <th>Actual Count</th>
                                     <th>Runtime</th>
                                     <th>Drift Status</th>
@@ -352,7 +360,7 @@
                             </thead>
                             <tbody id="workloadRows">
                                 <tr>
-                                    <td colspan="7">Querying active workloads...</td>
+                                    <td colspan="8">Querying active workloads...</td>
                                 </tr>
                             </tbody>
                         </table>

@@ -210,6 +210,20 @@ async function refreshAll() {
     try { state.plans = await api.json("/api/plan") || []; } catch { state.plans = []; }
     // Behavior metrics (Layer 3)
     try { state.behaviorMetrics = await api.json("/api/behavior") || []; } catch { state.behaviorMetrics = []; }
+
+    state.canaries = {};
+    for (const w of state.workloads) {
+      if (w.spec.deployStrategy === "canary") {
+        try {
+          const canary = await api.json(`/api/workloads/${encodeURIComponent(w.spec.name)}/canary`);
+          if (canary && canary.active) {
+            state.canaries[w.spec.name] = canary;
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+    }
     
     let lockState = { locked: false };
     try {
@@ -305,7 +319,7 @@ function renderWorkloads() {
   if (!rows) return;
   rows.innerHTML = "";
   if (!state.workloads.length) {
-    rows.innerHTML = `<tr><td colspan="7">No declared workloads. Use the deploy form, terminal, CLI, or MCP.</td></tr>`;
+    rows.innerHTML = `<tr><td colspan="8">No declared workloads. Use the deploy form, terminal, CLI, or MCP.</td></tr>`;
     qs("#issueCount").textContent = "0";
     qs("#issueCountBadge").classList.add("healthy");
     return;
@@ -314,17 +328,34 @@ function renderWorkloads() {
   for (const item of state.workloads) {
     if (!item.healthy) issues++;
     const tr = document.createElement("tr");
+    
+    let strategyStr = escapeHtml(item.spec.deployStrategy || "recreate");
+    const canary = state.canaries && state.canaries[item.spec.name];
+    if (canary && canary.active) {
+      strategyStr = `<span class="badge-dev" style="background: rgba(255,157,0,0.15); color: var(--orange); padding: 2px 6px; border-radius: 4px; font-size: 10px;">Canary (${canary.weight}%)</span>
+                     <div style="font-size: 10px; color: var(--muted); margin-top: 4px;">Step ${canary.step + 1}/3</div>`;
+    } else if (item.spec.deployStrategy === "canary") {
+      strategyStr = `<span style="color: var(--green); font-size: 11px; font-weight: 500;">Canary (100%)</span>`;
+    } else {
+      strategyStr = `<span style="color: var(--muted); font-size: 11px;">${strategyStr}</span>`;
+    }
+
     tr.innerHTML = `
       <td><strong>${escapeHtml(item.spec.name)}</strong></td>
       <td>${escapeHtml(item.spec.image)}</td>
       <td>${item.spec.replicas}</td>
+      <td>${strategyStr}</td>
       <td>${item.actual ? item.actual.length : 0}</td>
       <td>${escapeHtml(item.spec.runtime)}</td>
       <td class="${item.healthy ? "ok" : "danger"}">${escapeHtml(item.drift || "healthy")}</td>
       <td>
         <button class="row-action" style="margin-right: 6px;" data-history="${escapeHtml(item.spec.name)}">history</button>
         <button class="row-action" style="margin-right: 6px;" data-edit="${escapeHtml(item.spec.name)}">edit</button>
-        <button class="row-action" data-delete="${escapeHtml(item.spec.name)}">delete</button>
+        <button class="row-action" style="margin-right: 6px;" data-delete="${escapeHtml(item.spec.name)}">delete</button>
+        ${canary && canary.active ? `
+          <button class="row-action" style="margin-right: 6px; background: rgba(48,209,88,0.2); border: 1px solid var(--green); color: var(--green);" data-canary-promote="${escapeHtml(item.spec.name)}">Promote</button>
+          <button class="row-action" style="background: rgba(255,69,58,0.2); border: 1px solid var(--red); color: var(--red);" data-canary-rollback="${escapeHtml(item.spec.name)}">Abort</button>
+        ` : ""}
       </td>
     `;
     rows.appendChild(tr);
@@ -776,7 +807,8 @@ async function deployFromForm(form) {
     replicas: Number(data.replicas),
     port: Number(data.port || 0),
     containerPort: Number(data.containerPort || 0),
-    runtime: "docker"
+    runtime: "docker",
+    deployStrategy: data.deployStrategy || "recreate"
   };
   try {
     const result = await api.json("/api/workloads", { method: "POST", body: JSON.stringify(payload) });
@@ -1619,6 +1651,34 @@ function bind() {
         return;
       }
 
+      const promoteBtn = event.target.closest("[data-canary-promote]");
+      if (promoteBtn) {
+        const name = promoteBtn.dataset.canaryPromote;
+        try {
+          await api.json(`/api/workloads/${encodeURIComponent(name)}/canary/promote`, { method: "POST", body: "{}" });
+          showToast(`Canary promoted for workload "${name}"!`, "success");
+          await refreshAll();
+        } catch (error) {
+          writeTerminal(`error: ${error.message}`);
+          showToast(`Promotion failed: ${error.message}`, "error");
+        }
+        return;
+      }
+
+      const rollbackCanaryBtn = event.target.closest("[data-canary-rollback]");
+      if (rollbackCanaryBtn) {
+        const name = rollbackCanaryBtn.dataset.canaryRollback;
+        try {
+          await api.json(`/api/workloads/${encodeURIComponent(name)}/canary/rollback`, { method: "POST", body: "{}" });
+          showToast(`Canary aborted and rolled back for workload "${name}"!`, "success");
+          await refreshAll();
+        } catch (error) {
+          writeTerminal(`error: ${error.message}`);
+          showToast(`Abort failed: ${error.message}`, "error");
+        }
+        return;
+      }
+
       const historyButton = event.target.closest("[data-history]");
       if (historyButton) {
         const name = historyButton.dataset.history;
@@ -1638,6 +1698,9 @@ function bind() {
             form.querySelector('[name="replicas"]').value = wl.spec.replicas;
             form.querySelector('[name="port"]').value = wl.spec.port || "";
             form.querySelector('[name="containerPort"]').value = wl.spec.containerPort || "";
+            if (form.querySelector('[name="deployStrategy"]')) {
+              form.querySelector('[name="deployStrategy"]').value = wl.spec.deployStrategy || "recreate";
+            }
           }
           
           const manifestArea = qs("#manifestTextarea");
