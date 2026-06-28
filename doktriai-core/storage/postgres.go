@@ -106,8 +106,9 @@ func (p *PostgresStorage) Migrate(ctx context.Context) error {
 	_ = p.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM workloads").Scan(&count)
 	if count == 0 {
 		_, _ = p.db.ExecContext(ctx, `INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable) VALUES 
-		('hello-web', 'nginx:alpine', 2, 8080, 80, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'rolling', 1, 0),
-		('redis-cache', 'redis:alpine', 1, 6379, 6379, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'recreate', 1, 0)`)
+		('secure-ingress', 'nginx:alpine', 2, 8080, 80, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'recreate', 1, 0),
+		('reconciler-daemon', 'busybox:latest', 1, 0, 0, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'recreate', 1, 0),
+		('agent-gateway', 'python:3.11-alpine', 1, 9000, 9000, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'recreate', 1, 0)`)
 	}
 
 	return nil

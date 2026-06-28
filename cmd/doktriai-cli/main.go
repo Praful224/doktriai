@@ -16,6 +16,7 @@ func main() {
 	apiURL := flag.String("api", "http://localhost:18080", "doktriai-api base URL")
 	role := flag.String("role", "admin", "Doktri role header (admin|operator|viewer)")
 	actor := flag.String("actor", "doktriai-cli", "Actor name (your identity)")
+	agent := flag.String("agent", "claude", "MCP agent to configure (claude|cursor)")
 	flag.Parse()
 
 	if flag.NArg() == 0 {
@@ -177,6 +178,26 @@ func main() {
 		err = client.CallMCP("tools/list", nil)
 	case "mcp", "mcp-serve":
 		err = client.StdioBridge()
+	case "setup-mcp":
+		err = cli.SetupMCP(*agent)
+	case "canary-promote":
+		if flag.NArg() < 2 {
+			err = fmt.Errorf("canary-promote requires workload name")
+			break
+		}
+		err = client.Call("POST", "/api/workloads/"+flag.Arg(1)+"/canary/promote", map[string]string{})
+	case "canary-rollback":
+		if flag.NArg() < 2 {
+			err = fmt.Errorf("canary-rollback requires workload name")
+			break
+		}
+		err = client.Call("POST", "/api/workloads/"+flag.Arg(1)+"/canary/rollback", map[string]string{})
+	case "canary-status":
+		if flag.NArg() < 2 {
+			err = fmt.Errorf("canary-status requires workload name")
+			break
+		}
+		err = client.Call("GET", "/api/workloads/"+flag.Arg(1)+"/canary", nil)
 
 	default:
 		usage()
@@ -257,6 +278,9 @@ Workload Commands:
   discover | connect                Auto-scan and import local containers as workloads
   history <name>                    Show version history for a workload
   rollback <name> <versionId>       Rollback a workload to a specific history version
+  canary-promote <name>             Promote canary deployment weight (10% -> 50% -> 100%)
+  canary-rollback <name>            Abort canary deployment and restore old image
+  canary-status <name>              Get active canary deployment progress
 
 PTE Approval Gate:
   plans                             List all pending/approved/rejected plans
@@ -281,5 +305,6 @@ Token Management:
 
 MCP Tools:
   mcp-tools                         List MCP agent tools
-  mcp | mcp-serve                   Run as a stdio MCP bridge server`)
+  mcp | mcp-serve                   Run as a stdio MCP bridge server
+  setup-mcp [--agent AGENT]         Configure Claude or Cursor with MCP server (agent: claude|cursor)`)
 }

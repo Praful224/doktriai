@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/praful224/doktriai/doktriai-packages"
@@ -77,20 +79,80 @@ func NotifySlack(plan *packages.PendingPlan, apiBaseURL string) {
 		apiBaseURL = "http://localhost:18080"
 	}
 	go func() {
+		token, _ := GenerateRequestToken("slack-operator", "admin", "slack-notifier", "cluster:deploy", "Slack Action Button")
+
+		proposedChange := fmt.Sprintf("Deploy image `%s` with replicas `%d`", plan.Spec.Image, plan.Spec.Replicas)
+		if plan.Spec.Image == "" {
+			proposedChange = "Delete workload"
+		}
+
+		riskLevel := "MEDIUM"
+		if plan.Spec.Replicas > 5 {
+			riskLevel = "HIGH (High replica count)"
+		} else if plan.Spec.Image == "" {
+			riskLevel = "HIGH (Deletion of workload)"
+		} else {
+			// Check sensitive env keys
+			sensitiveKeys := []string{"SECRET", "KEY", "TOKEN", "PASSWORD", "PASSWD", "CREDENTIAL", "PRIVATE_KEY"}
+			for k := range plan.Spec.Env {
+				for _, sk := range sensitiveKeys {
+					if strings.Contains(strings.ToUpper(k), sk) {
+						riskLevel = "HIGH (Sensitive credentials in environment)"
+						break
+					}
+				}
+			}
+		}
+
+		expiresStr := fmt.Sprintf("%s (15-minute countdown)", plan.ExpiresAt.Format("15:04:05 MST"))
+
 		emoji := "🔴"
-		text := fmt.Sprintf(
-			"%s *PTE Gate — Human Approval Required*\n"+
-				"*Workload:* `%s`\n"+
+		textHeader := fmt.Sprintf("%s *PTE Gate — Human Approval Required*", emoji)
+		textDetails := fmt.Sprintf(
+			"*Workload:* `%s`\n"+
 				"*Requested by:* `%s`\n"+
-				"*Reason:* %s\n"+
-				"*Expires:* <!date^%d^{date_time}|%s>\n\n"+
-				"✅ Approve: `POST %s/api/plan/%s/approve`\n"+
-				"❌ Reject:  `POST %s/api/plan/%s/reject`",
-			emoji, plan.Spec.Name, plan.RequestedBy, plan.ApprovalReason,
-			plan.ExpiresAt.Unix(), plan.ExpiresAt.Format(time.RFC3339),
-			apiBaseURL, plan.ID, apiBaseURL, plan.ID,
+				"*Proposed Change:* %s\n"+
+				"*Risk Level:* `%s`\n"+
+				"*Expires:* %s",
+			plan.Spec.Name, plan.RequestedBy, proposedChange, riskLevel, expiresStr,
 		)
-		payload := SlackBlock{Text: text}
+
+		payload := SlackBlock{
+			Text: "PTE Gate — Human Approval Required",
+			Blocks: []any{
+				map[string]any{
+					"type": "section",
+					"text": map[string]string{
+						"type": "mrkdwn",
+						"text": textHeader + "\n\n" + textDetails,
+					},
+				},
+				map[string]any{
+					"type": "actions",
+					"elements": []any{
+						map[string]any{
+							"type": "button",
+							"text": map[string]string{
+								"type": "plain_text",
+								"text": "✅ Approve",
+							},
+							"style": "primary",
+							"url":   fmt.Sprintf("%s/api/plan/%s/approve?token=%s", apiBaseURL, plan.ID, token),
+						},
+						map[string]any{
+							"type": "button",
+							"text": map[string]string{
+								"type": "plain_text",
+								"text": "❌ Reject",
+							},
+							"style": "danger",
+							"url":   fmt.Sprintf("%s/api/plan/%s/reject?token=%s", apiBaseURL, plan.ID, token),
+						},
+					},
+				},
+			},
+		}
+
 		body, _ := json.Marshal(payload)
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
@@ -103,28 +165,78 @@ func NotifySlack(plan *packages.PendingPlan, apiBaseURL string) {
 	}()
 }
 
-// NotifyDrift sends a drift alert to the configured drift webhook.
+// NotifyDrift sends a drift alert to the configured webhooks.
 func NotifyDrift(workload string, desired, actual int) {
-	url := GetPolicy().Notifications.DriftWebhookURL
-	if url == "" {
-		return
+	driftURL := GetPolicy().Notifications.DriftWebhookURL
+	if driftURL != "" {
+		go func() {
+			event := DriftEvent{
+				Event:           "drift_detected",
+				Workload:        workload,
+				DesiredReplicas: desired,
+				ActualReplicas:  actual,
+				Timestamp:       time.Now().UTC(),
+			}
+			body, _ := json.Marshal(event)
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			req, err := http.NewRequestWithContext(ctx, "POST", driftURL, bytes.NewReader(body))
+			if err != nil {
+				return
+			}
+			req.Header.Set("Content-Type", "application/json")
+			resp, err := http.DefaultClient.Do(req)
+			if err == nil && resp != nil {
+				resp.Body.Close()
+			}
+		}()
 	}
-	go func() {
-		event := DriftEvent{
-			Event:           "drift_detected",
-			Workload:        workload,
-			DesiredReplicas: desired,
-			ActualReplicas:  actual,
-			Timestamp:       time.Now().UTC(),
-		}
-		body, _ := json.Marshal(event)
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		req, _ := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-		resp, _ := http.DefaultClient.Do(req)
-		if resp != nil {
-			resp.Body.Close()
-		}
-	}()
+
+	slackURL := GetPolicy().Notifications.SlackWebhookURL
+	if slackURL != "" {
+		go func() {
+			emoji := "⚠️"
+			textHeader := fmt.Sprintf("%s *Workload Replica Drift Detected*", emoji)
+			
+			clusterCtx := os.Getenv("DOKTRIAI_CLUSTER_CONTEXT")
+			if clusterCtx == "" {
+				clusterCtx = "local-dev-cluster"
+			}
+
+			textDetails := fmt.Sprintf(
+				"*Workload:* `%s`\n"+
+					"*Expected Replicas:* `%d`\n"+
+					"*Actual Replicas:* `%d`\n"+
+					"*Cluster Context:* `%s`\n"+
+					"*Status:* 🔴 Diverged from desired state",
+				workload, desired, actual, clusterCtx,
+			)
+
+			payload := SlackBlock{
+				Text: "Workload Replica Drift Detected",
+				Blocks: []any{
+					map[string]any{
+						"type": "section",
+						"text": map[string]string{
+							"type": "mrkdwn",
+							"text": textHeader + "\n\n" + textDetails,
+						},
+					},
+				},
+			}
+
+			body, _ := json.Marshal(payload)
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			req, err := http.NewRequestWithContext(ctx, "POST", slackURL, bytes.NewReader(body))
+			if err != nil {
+				return
+			}
+			req.Header.Set("Content-Type", "application/json")
+			resp, err := http.DefaultClient.Do(req)
+			if err == nil && resp != nil {
+				resp.Body.Close()
+			}
+		}()
+	}
 }

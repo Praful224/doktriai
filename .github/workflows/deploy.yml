@@ -1,0 +1,25 @@
+name: DoktriAI Git-to-Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build CLI Binary
+        run: |
+          go build -o doktriai-cli cmd/doktriai-cli/main.go
+
+      - name: Deploy to DoktriAI
+        uses: ./.github/actions/deploy
+        with:
+          api_url: 'https://doktriai.enterprise.internal'
+          token: ${{ secrets.DOKTRIAI_TOKEN }}
+          workload_name: 'hello-web'
+          image: 'nginx:alpine'
+          replicas: '3'

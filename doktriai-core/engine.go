@@ -25,6 +25,17 @@ type circuitState struct {
 	openSince time.Time
 }
 
+type CanaryStatus struct {
+	WorkloadName  string    `json:"workloadName"`
+	Active        bool      `json:"active"`
+	Step          int       `json:"step"`          // 0: 10%, 1: 50%, 2: 100%
+	Weight        int       `json:"weight"`        // 10, 50, 100
+	OldImage      string    `json:"oldImage"`
+	NewImage      string    `json:"newImage"`
+	TotalReplicas int       `json:"totalReplicas"`
+	StartedAt     time.Time `json:"startedAt"`
+}
+
 // Engine drives the reconciliation loop and state application.
 type Engine struct {
 	store    *Store
@@ -36,6 +47,9 @@ type Engine struct {
 	// circuit: per-workload failure tracking (Layer 3 — ASI08 cascading failure prevention)
 	circuitMu sync.Mutex
 	circuit   map[string]*circuitState
+
+	canaryMu sync.RWMutex
+	canaries map[string]*CanaryStatus
 
 	// Reconcile timing for Prometheus observability
 	reconcileMu      sync.RWMutex
@@ -50,6 +64,7 @@ func NewEngine(store *Store, runtime packages.RuntimeDriver, bus *EventBus, inte
 		bus:      bus,
 		interval: interval,
 		circuit:  make(map[string]*circuitState),
+		canaries: make(map[string]*CanaryStatus),
 	}
 }
 
@@ -78,6 +93,29 @@ func (e *Engine) Apply(ctx context.Context, actor string, spec packages.Workload
 			Actor: actor, Action: "apply", Workload: spec.Name, Allowed: false, Reason: err.Error(),
 		})
 		return err
+	}
+
+	existing, ok := e.store.GetWorkload(spec.Name)
+	if ok && spec.DeployStrategy == "canary" && existing.Image != spec.Image && existing.Image != "" {
+		e.canaryMu.Lock()
+		if e.canaries == nil {
+			e.canaries = make(map[string]*CanaryStatus)
+		}
+		e.canaries[spec.Name] = &CanaryStatus{
+			WorkloadName:  spec.Name,
+			Active:        true,
+			Step:          0,
+			Weight:        10,
+			OldImage:      existing.Image,
+			NewImage:      spec.Image,
+			TotalReplicas: spec.Replicas,
+			StartedAt:     time.Now().UTC(),
+		}
+		e.canaryMu.Unlock()
+		e.emit(packages.Event{
+			Level: "warn", Source: "core", Workload: spec.Name,
+			Message: fmt.Sprintf("Canary rollout started for %q: 10%% weight on new version %s", spec.Name, spec.Image),
+		})
 	}
 
 	hashBefore := e.store.SnapshotHash()
@@ -182,8 +220,14 @@ func (e *Engine) Reconcile(ctx context.Context) error {
 			NotifyDrift(spec.Name, spec.Replicas, len(replicas))
 		}
 		
+		e.canaryMu.RLock()
+		canary, isCanary := e.canaries[spec.Name]
+		e.canaryMu.RUnlock()
+
 		hadError := false
-		if spec.DeployStrategy == "rolling" {
+		if isCanary && canary.Active {
+			hadError = e.applyCanary(ctx, spec, replicas, canary)
+		} else if spec.DeployStrategy == "rolling" {
 			hadError = e.applyRolling(ctx, spec, replicas)
 		} else {
 			hadError = e.applyRecreate(ctx, spec, replicas)
@@ -415,4 +459,156 @@ func (e *Engine) applyRolling(ctx context.Context, spec packages.WorkloadSpec, r
 		}
 	}
 	return hadError
+}
+
+func (e *Engine) applyCanary(ctx context.Context, spec packages.WorkloadSpec, replicas map[int]packages.ActualWorkload, canary *CanaryStatus) bool {
+	hadError := false
+	
+	// Calculate how many replicas should be running NewImage (canary) vs OldImage
+	canaryReplicas := (spec.Replicas * canary.Weight) / 100
+	if canaryReplicas < 1 && canary.Weight > 0 {
+		canaryReplicas = 1
+	}
+	if canaryReplicas > spec.Replicas {
+		canaryReplicas = spec.Replicas
+	}
+	
+	canarySpec := spec
+	canarySpec.Image = canary.NewImage
+
+	for r := 0; r < canaryReplicas; r++ {
+		act, ok := replicas[r]
+		if ok {
+			if act.Image != canary.NewImage {
+				e.emit(packages.Event{Level: "info", Source: "core", Workload: spec.Name, Message: fmt.Sprintf("canary upgrade replica %d to %s", r, canary.NewImage)})
+				if err := e.runtime.Delete(ctx, spec.Name, r); err != nil {
+					hadError = true
+					continue
+				}
+				if err := e.runtime.Apply(ctx, canarySpec, r); err != nil {
+					hadError = true
+					continue
+				}
+				e.emit(packages.Event{Level: "ok", Source: "core", Workload: spec.Name, Message: fmt.Sprintf("started canary replica %d", r)})
+			}
+		} else {
+			if err := e.runtime.Apply(ctx, canarySpec, r); err != nil {
+				hadError = true
+				continue
+			}
+			e.emit(packages.Event{Level: "ok", Source: "core", Workload: spec.Name, Message: fmt.Sprintf("started canary replica %d", r)})
+		}
+	}
+
+	oldSpec := spec
+	oldSpec.Image = canary.OldImage
+
+	for r := canaryReplicas; r < spec.Replicas; r++ {
+		act, ok := replicas[r]
+		if ok {
+			if act.Image != canary.OldImage {
+				e.emit(packages.Event{Level: "info", Source: "core", Workload: spec.Name, Message: fmt.Sprintf("canary restore/keep replica %d at %s", r, canary.OldImage)})
+				if err := e.runtime.Delete(ctx, spec.Name, r); err != nil {
+					hadError = true
+					continue
+				}
+				if err := e.runtime.Apply(ctx, oldSpec, r); err != nil {
+					hadError = true
+					continue
+				}
+				e.emit(packages.Event{Level: "ok", Source: "core", Workload: spec.Name, Message: fmt.Sprintf("restored replica %d to old image", r)})
+			}
+		} else {
+			if err := e.runtime.Apply(ctx, oldSpec, r); err != nil {
+				hadError = true
+				continue
+			}
+			e.emit(packages.Event{Level: "ok", Source: "core", Workload: spec.Name, Message: fmt.Sprintf("started old image replica %d", r)})
+		}
+	}
+
+	return hadError
+}
+
+// GetCanary retrieves the current canary rollout status.
+func (e *Engine) GetCanary(name string) (*CanaryStatus, bool) {
+	e.canaryMu.RLock()
+	defer e.canaryMu.RUnlock()
+	if e.canaries == nil {
+		return nil, false
+	}
+	c, ok := e.canaries[name]
+	return c, ok
+}
+
+// PromoteCanary advances the canary rollout step (10% -> 50% -> 100%).
+func (e *Engine) PromoteCanary(ctx context.Context, name string) (*CanaryStatus, error) {
+	e.canaryMu.Lock()
+	if e.canaries == nil {
+		e.canaries = make(map[string]*CanaryStatus)
+	}
+	c, ok := e.canaries[name]
+	if !ok || !c.Active {
+		e.canaryMu.Unlock()
+		return nil, fmt.Errorf("no active canary rollout found for workload %q", name)
+	}
+
+	if c.Step == 0 {
+		c.Step = 1
+		c.Weight = 50
+		e.emit(packages.Event{
+			Level: "warn", Source: "core", Workload: name,
+			Message: fmt.Sprintf("Canary rollout promoted to 50%% for %q", name),
+		})
+	} else if c.Step == 1 {
+		c.Step = 2
+		c.Weight = 100
+		e.emit(packages.Event{
+			Level: "ok", Source: "core", Workload: name,
+			Message: fmt.Sprintf("Canary rollout promoted to 100%% (complete) for %q", name),
+		})
+	} else {
+		// Already at 100%, finalize and deactivate
+		c.Active = false
+		delete(e.canaries, name)
+		e.canaryMu.Unlock()
+		return nil, fmt.Errorf("canary rollout is already fully promoted")
+	}
+	e.canaryMu.Unlock()
+
+	err := e.Reconcile(ctx)
+	return c, err
+}
+
+// RollbackCanary aborts the rollout and returns to the old image version.
+func (e *Engine) RollbackCanary(ctx context.Context, name string, actor string) error {
+	e.canaryMu.Lock()
+	if e.canaries == nil {
+		e.canaryMu.Unlock()
+		return fmt.Errorf("no active canary rollout found for workload %q", name)
+	}
+	c, ok := e.canaries[name]
+	if !ok || !c.Active {
+		e.canaryMu.Unlock()
+		return fmt.Errorf("no active canary rollout found for workload %q", name)
+	}
+	oldImage := c.OldImage
+	delete(e.canaries, name)
+	e.canaryMu.Unlock()
+
+	// Update desired spec back to the old image in the store
+	spec, ok := e.store.GetWorkload(name)
+	if ok {
+		spec.Image = oldImage
+		if err := e.store.PutWorkload(spec, actor); err != nil {
+			return err
+		}
+	}
+	
+	e.emit(packages.Event{
+		Level: "warn", Source: "core", Workload: name,
+		Message: fmt.Sprintf("Canary rollout aborted/rolled back for %q (restoring %s)", name, oldImage),
+	})
+
+	return e.Reconcile(ctx)
 }

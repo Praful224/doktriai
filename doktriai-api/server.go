@@ -66,6 +66,8 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("GET /api/plan", s.listPlans)
 	mux.HandleFunc("POST /api/plan/{id}/approve", s.approvePlan)
 	mux.HandleFunc("POST /api/plan/{id}/reject", s.rejectPlan)
+	mux.HandleFunc("GET /api/plan/{id}/approve", s.approvePlanGet)
+	mux.HandleFunc("GET /api/plan/{id}/reject", s.rejectPlanGet)
 
 	// Real-time & observability
 	mux.HandleFunc("GET /api/events", s.events)
@@ -92,6 +94,11 @@ func (s *Server) Routes() http.Handler {
 	// Workload Rollback & History (F1.2)
 	mux.HandleFunc("GET /api/workloads/{name}/history", s.workloadHistory)
 	mux.HandleFunc("POST /api/workloads/{name}/rollback", s.rollbackWorkload)
+
+	// Canary endpoints
+	mux.HandleFunc("GET /api/workloads/{name}/canary", s.getCanary)
+	mux.HandleFunc("POST /api/workloads/{name}/canary/promote", s.promoteCanary)
+	mux.HandleFunc("POST /api/workloads/{name}/canary/rollback", s.rollbackCanary)
 
 	// Prometheus-compatible metrics
 	mux.HandleFunc("GET /api/metrics", s.metrics)
@@ -634,6 +641,9 @@ func (s *Server) releaseLock(w http.ResponseWriter, r *http.Request) {
 // In production mode: requires a valid X-Doktri-Token.
 func (s *Server) authenticate(w http.ResponseWriter, r *http.Request) *core.AgentClaims {
 	tokenStr := strings.TrimSpace(r.Header.Get("X-Doktri-Token"))
+	if tokenStr == "" {
+		tokenStr = strings.TrimSpace(r.URL.Query().Get("token"))
+	}
 	if tokenStr != "" {
 		if strings.HasPrefix(tokenStr, "eyJ") {
 			claims, err := core.VerifyAgentJWT(tokenStr)
@@ -1225,12 +1235,194 @@ func (s *Server) deployManifest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) getPolicy(w http.ResponseWriter, r *http.Request) {
+		claims := s.authenticate(w, r)
+		if claims == nil {
+			return
+		}
+		policy := core.GetPolicy()
+		writeJSON(w, http.StatusOK, policy)
+	}
+	
+	func (s *Server) approvePlanGet(w http.ResponseWriter, r *http.Request) {
+		claims := s.authenticate(w, r)
+		if claims == nil {
+			return
+		}
+		if !authorizeRole(w, r, claims.Role, "reconcile") {
+			return
+		}
+		id := r.PathValue("id")
+		plan, err := s.plans.Approve(id, claims.ActorName)
+		if err != nil {
+			s.writeHTMLResponse(w, "Approval Failed", err.Error(), false)
+			return
+		}
+		if err := s.engine.Apply(r.Context(), claims.ActorName, plan.Spec); err != nil {
+			s.writeHTMLResponse(w, "Apply Failed", err.Error(), false)
+			return
+		}
+		s.bus.Publish(packages.Event{
+			Level: "ok", Source: "pte-gate", Workload: plan.Spec.Name,
+			Message: fmt.Sprintf("Plan %s approved by %s and applied", id, claims.ActorName),
+		})
+		_, _ = s.store.AddAudit(packages.AuditRecord{
+			Actor: claims.ActorName, Action: "plan_approve", Workload: plan.Spec.Name,
+			Allowed: true, PlanID: id, PlanApproved: true, ApprovedBy: claims.ActorName,
+			AgentID: claims.AgentID, SignatureVerified: !claims.Dev,
+		})
+		s.writeHTMLResponse(w, "Plan Approved", fmt.Sprintf("Plan <strong>%s</strong> for workload <strong>%s</strong> was approved and applied successfully.", id, plan.Spec.Name), true)
+	}
+	
+	func (s *Server) rejectPlanGet(w http.ResponseWriter, r *http.Request) {
+		claims := s.authenticate(w, r)
+		if claims == nil {
+			return
+		}
+		if !authorizeRole(w, r, claims.Role, "reconcile") {
+			return
+		}
+		id := r.PathValue("id")
+		comment := r.URL.Query().Get("comment")
+		if comment == "" {
+			comment = "Rejected via Slack link"
+		}
+		if err := s.plans.Reject(id, claims.ActorName, comment); err != nil {
+			s.writeHTMLResponse(w, "Rejection Failed", err.Error(), false)
+			return
+		}
+		s.bus.Publish(packages.Event{
+			Level: "warn", Source: "pte-gate",
+			Message: fmt.Sprintf("Plan %s rejected by %s: %s", id, claims.ActorName, comment),
+		})
+		s.writeHTMLResponse(w, "Plan Rejected", fmt.Sprintf("Plan <strong>%s</strong> was rejected successfully.", id), true)
+	}
+	
+	func (s *Server) writeHTMLResponse(w http.ResponseWriter, title, message string, success bool) {
+		w.Header().Set("Content-Type", "text/html")
+		w.WriteHeader(http.StatusOK)
+		themeColor := "#FF3B30" // red
+		statusIcon := "❌"
+		if success {
+			themeColor = "#30D158" // green
+			statusIcon = "✅"
+		}
+		fmt.Fprintf(w, `<!DOCTYPE html>
+	<html>
+	<head>
+		<title>DOKTRIAI - %s</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<style>
+			body {
+				background-color: #0b0f19;
+				color: #f3f4f6;
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 100vh;
+				margin: 0;
+			}
+			.container {
+				background-color: #111827;
+				border: 1px solid #1f2937;
+				border-radius: 8px;
+				padding: 32px;
+				max-width: 480px;
+				width: 90%%;
+				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+				text-align: center;
+			}
+			.icon {
+				font-size: 48px;
+				margin-bottom: 16px;
+			}
+			h1 {
+				color: #ffffff;
+				font-size: 20px;
+				margin: 0 0 16px 0;
+				border-bottom: 2px solid %s;
+				padding-bottom: 12px;
+			}
+			p {
+				font-size: 14px;
+				line-height: 1.6;
+				color: #9ca3af;
+				margin: 0 0 24px 0;
+			}
+			.close-btn {
+				background-color: #1f2937;
+				color: #ffffff;
+				border: 1px solid #374151;
+				border-radius: 6px;
+				padding: 8px 16px;
+				font-size: 12px;
+				cursor: pointer;
+				text-decoration: none;
+			}
+			.close-btn:hover {
+				background-color: #374151;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="icon">%s</div>
+			<h1>%s</h1>
+			<p>%s</p>
+			<button class="close-btn" onclick="window.close()">Close Window</button>
+		</div>
+	</body>
+	</html>`, title, themeColor, statusIcon, title, message)
+	}
+
+func (s *Server) getCanary(w http.ResponseWriter, r *http.Request) {
 	claims := s.authenticate(w, r)
 	if claims == nil {
 		return
 	}
-	policy := core.GetPolicy()
-	writeJSON(w, http.StatusOK, policy)
+	if !authorizeRole(w, r, claims.Role, "read") {
+		return
+	}
+	name := r.PathValue("name")
+	canary, ok := s.engine.GetCanary(name)
+	if !ok {
+		writeJSON(w, http.StatusOK, map[string]any{"active": false})
+		return
+	}
+	writeJSON(w, http.StatusOK, canary)
+}
+
+func (s *Server) promoteCanary(w http.ResponseWriter, r *http.Request) {
+	claims := s.authenticate(w, r)
+	if claims == nil {
+		return
+	}
+	if !authorizeRole(w, r, claims.Role, "apply") {
+		return
+	}
+	name := r.PathValue("name")
+	canary, err := s.engine.PromoteCanary(r.Context(), name)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, canary)
+}
+
+func (s *Server) rollbackCanary(w http.ResponseWriter, r *http.Request) {
+	claims := s.authenticate(w, r)
+	if claims == nil {
+		return
+	}
+	if !authorizeRole(w, r, claims.Role, "apply") {
+		return
+	}
+	name := r.PathValue("name")
+	if err := s.engine.RollbackCanary(r.Context(), name, claims.ActorName); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"status": "rolled_back"})
 }
 
 

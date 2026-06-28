@@ -1,0 +1,52 @@
+name: 'DoktriAI Deploy'
+description: 'Deploy workloads to DoktriAI control plane using the CLI wrapper'
+inputs:
+  api_url:
+    description: 'DoktriAI Control Plane API URL'
+    required: false
+    default: 'http://localhost:18080'
+  token:
+    description: 'Auth token for deployment authentication'
+    required: true
+  workload_name:
+    description: 'Name of the workload to deploy'
+    required: true
+  image:
+    description: 'Container image reference'
+    required: true
+  replicas:
+    description: 'Desired replica count'
+    required: false
+    default: '1'
+  port:
+    description: 'External port mapping'
+    required: false
+    default: '0'
+  container_port:
+    description: 'Internal container port'
+    required: false
+    default: '0'
+  runtime:
+    description: 'Runtime environment (docker or kubernetes)'
+    required: false
+    default: 'docker'
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate Token Input
+      shell: bash
+      run: |
+        if [ -z "${{ inputs.token }}" ]; then
+          echo "::error::DOKTRIAI_TOKEN input is missing or empty!"
+          exit 1
+        fi
+        # Validate format is either standard HMAC hash or JWT
+        if [[ ! "${{ inputs.token }}" =~ ^[A-Za-z0-9._-]+$ && ! "${{ inputs.token }}" =~ ^eyJ ]]; then
+          echo "::error::Invalid Token format. Must be a valid JWT or signature hash."
+          exit 1
+        fi
+    - name: Run Deploy Command
+      shell: bash
+      run: |
+        export DOKTRIAI_TOKEN="${{ inputs.token }}"
+        ./doktriai-cli --api "${{ inputs.api_url }}" deploy "${{ inputs.workload_name }}" "${{ inputs.image }}" "${{ inputs.replicas }}" "${{ inputs.port }}" "${{ inputs.container_port }}" "${{ inputs.runtime }}"

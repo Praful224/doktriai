@@ -656,6 +656,13 @@ h1 {
     color: var(--green);
 }
 
+.deploy-forms-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
 .deploy-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -1963,19 +1970,46 @@ canvas {
         height: auto !important;
     }
     .ide {
-        grid-template-columns: 1fr !important;
-        grid-template-rows: 52px auto minmax(0, 1fr) 24px !important;
+        display: flex !important;
+        flex-direction: column !important;
         height: auto !important;
         overflow: visible !important;
+    }
+    .menubar {
+        height: 52px !important;
+        padding: 0 12px !important;
+        gap: 12px !important;
+        flex-shrink: 0 !important;
+        justify-content: space-between !important;
+    }
+    .brand {
+        font-size: 12px !important;
+        gap: 4px !important;
+    }
+    .search {
+        display: none !important;
+    }
+    .system-tray {
+        gap: 8px !important;
+    }
+    .system-tray > span,
+    .system-tray #clock {
+        display: none !important;
     }
     .explorer {
         display: none !important;
     }
     .main {
-        grid-row: 2 / 4 !important;
+        display: flex !important;
+        flex-direction: column !important;
         height: auto !important;
-        grid-template-rows: auto auto auto !important;
         overflow: visible !important;
+    }
+    .tabs {
+        height: 38px !important;
+    }
+    .tab {
+        flex-shrink: 0 !important;
     }
     .editor {
         height: auto !important;
@@ -1991,6 +2025,33 @@ canvas {
     .terminal-body {
         height: 240px !important;
         overflow-y: auto !important;
+    }
+    .statusbar {
+        height: auto !important;
+        padding: 8px 12px !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+        flex-shrink: 0 !important;
+        border-top: 1px solid var(--line) !important;
+    }
+    .statusbar-left {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 4px !important;
+    }
+    .statusbar-left .separator {
+        display: none !important;
+    }
+    .statusbar-right {
+        margin-left: 0 !important;
+        margin-top: 4px !important;
+        border-top: 1px dashed var(--line) !important;
+        width: 100% !important;
+        padding-top: 4px !important;
+    }
+    .statusbar-right .separator {
+        display: none !important;
     }
     .deploy-grid {
         grid-template-columns: 1fr !important;

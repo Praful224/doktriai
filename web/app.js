@@ -2009,11 +2009,18 @@ spec:
     copyTokenBtn.addEventListener("click", async () => {
       const role = mcpTokenRole ? mcpTokenRole.value : "admin";
       try {
-        const token = await generateToken("developer", role, "mcp-agent", "cluster:deploy", "Local Scaling");
-        navigator.clipboard.writeText(token);
-        showToast(`Copied ${role.toUpperCase()} test token to clipboard`, "ok");
+        const res = await api.json("/api/agents/issue-token", {
+          method: "POST",
+          body: JSON.stringify({
+            agentId: "mcp-agent-web",
+            scope: "deploy_workload,list_workloads,delete_workload,get_logs,approve_plan,reject_plan",
+            ttl: "720h" // 30 days
+          })
+        });
+        navigator.clipboard.writeText(res.token);
+        showToast(`Copied JWT ${role.toUpperCase()} agent token to clipboard`, "ok");
       } catch (e) {
-        showToast("Error generating token", "error");
+        showToast("Error generating JWT token: " + e.message, "error");
       }
     });
   }
@@ -2077,16 +2084,8 @@ spec:
   }
 
   async function updateMcpClientConfigs() {
-    const role = mcpTokenRole ? mcpTokenRole.value : "admin";
     const pathEl = qs("#mcpWorkspacePath");
     const workspaceDir = (pathEl && pathEl.textContent !== "Detecting...") ? pathEl.textContent : "c:/Users/prafu/OneDrive/Documents/Placement/DevOps/doktriai-control-plane";
-    
-    let token = "";
-    try {
-      token = await generateToken("developer", role, "mcp-agent", "cluster:deploy", "Local Scaling");
-    } catch (e) {
-      token = "error-generating-token";
-    }
     
     const activeTab = qs("#mcpTabHeader .tab-btn.active");
     const client = activeTab ? activeTab.dataset.client : "cursor";
@@ -2105,7 +2104,7 @@ spec:
             "args": ["mcp"],
             "env": {
               "DOKTRIAI_API": "http://localhost:18080",
-              "DOKTRIAI_TOKEN": token
+              "DOKTRIAI_TOKEN": "$DOKTRIAI_TOKEN"
             }
           }
         }
@@ -2119,12 +2118,12 @@ spec:
             "args": ["mcp"],
             "env": {
               "DOKTRIAI_API": "http://localhost:18080",
-              "DOKTRIAI_TOKEN": token
+              "DOKTRIAI_TOKEN": "$DOKTRIAI_TOKEN"
             }
           }
         }
       };
-    } else {
+    } else if (client === "claude") {
       filename = "claude_desktop_config.json";
       configObj = {
         "mcpServers": {
@@ -2133,10 +2132,22 @@ spec:
             "args": ["mcp"],
             "env": {
               "DOKTRIAI_API": "http://localhost:18080",
-              "DOKTRIAI_TOKEN": token
+              "DOKTRIAI_TOKEN": "$DOKTRIAI_TOKEN"
             }
           }
         }
+      };
+    } else if (client === "vault") {
+      filename = "vault-secret.json";
+      configObj = {
+        "secret": {
+          "path": "secret/data/doktriai",
+          "data": {
+            "api_url": "http://localhost:18080",
+            "token": "$DOKTRIAI_TOKEN"
+          }
+        },
+        "description": "Store DOKTRIAI_TOKEN in HashiCorp Vault or AWS Secrets Manager and inject it into your runner container at runtime."
       };
     }
     
