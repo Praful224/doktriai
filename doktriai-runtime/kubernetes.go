@@ -119,10 +119,7 @@ func (k *K8sDriver) List(ctx context.Context) ([]packages.ActualWorkload, error)
 			image = parts[2]
 		}
 		// Parse workload name from pod name: doktri-<workload>-<hash>
-		wl := podName
-		if strings.HasPrefix(wl, "doktri-") {
-			wl = strings.TrimPrefix(wl, "doktri-")
-		}
+		wl := strings.TrimPrefix(podName, "doktri-")
 		actual = append(actual, packages.ActualWorkload{
 			ID:      podName,
 			Name:    wl,

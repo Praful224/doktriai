@@ -674,7 +674,7 @@ func (s *Server) authenticate(w http.ResponseWriter, r *http.Request) *core.Agen
 	return &claims
 }
 
-func authorizeRole(w http.ResponseWriter, r *http.Request, role, action string) bool {
+func authorizeRole(w http.ResponseWriter, _ *http.Request, role, action string) bool {
 	if core.RoleCan(role, action) {
 		return true
 	}
@@ -1089,11 +1089,11 @@ func (s *Server) renderChart(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	var yamlBuilder strings.Builder
-	yamlBuilder.WriteString("# Generated values.yaml for DOKTRIAI " + spec.Name + "\n")
+	fmt.Fprintf(&yamlBuilder, "# Generated values.yaml for DOKTRIAI %s\n", spec.Name)
 	yamlBuilder.WriteString("global:\n")
-	yamlBuilder.WriteString("  securityMode: " + string(spec.SecurityMode) + "\n")
-	yamlBuilder.WriteString("  runtime: " + spec.Runtime + "\n\n")
-	yamlBuilder.WriteString("replicaCount: " + strconv.Itoa(spec.Replicas) + "\n\n")
+	fmt.Fprintf(&yamlBuilder, "  securityMode: %s\n", string(spec.SecurityMode))
+	fmt.Fprintf(&yamlBuilder, "  runtime: %s\n\n", spec.Runtime)
+	fmt.Fprintf(&yamlBuilder, "replicaCount: %d\n\n", spec.Replicas)
 	yamlBuilder.WriteString("image:\n")
 	parts := strings.Split(spec.Image, ":")
 	repo := parts[0]
@@ -1101,18 +1101,18 @@ func (s *Server) renderChart(w http.ResponseWriter, r *http.Request) {
 	if len(parts) > 1 {
 		tag = parts[1]
 	}
-	yamlBuilder.WriteString("  repository: " + repo + "\n")
-	yamlBuilder.WriteString("  tag: " + tag + "\n")
+	fmt.Fprintf(&yamlBuilder, "  repository: %s\n", repo)
+	fmt.Fprintf(&yamlBuilder, "  tag: %s\n", tag)
 	yamlBuilder.WriteString("  pullPolicy: IfNotPresent\n\n")
 	yamlBuilder.WriteString("service:\n")
 	yamlBuilder.WriteString("  type: ClusterIP\n")
-	yamlBuilder.WriteString("  port: " + strconv.Itoa(spec.Port) + "\n")
-	yamlBuilder.WriteString("  targetPort: " + strconv.Itoa(spec.ContainerPort) + "\n\n")
+	fmt.Fprintf(&yamlBuilder, "  port: %d\n", spec.Port)
+	fmt.Fprintf(&yamlBuilder, "  targetPort: %d\n\n", spec.ContainerPort)
 	
 	if len(spec.Env) > 0 {
 		yamlBuilder.WriteString("env:\n")
 		for k, v := range spec.Env {
-			yamlBuilder.WriteString("  " + k + ": " + fmt.Sprintf("%q", v) + "\n")
+			fmt.Fprintf(&yamlBuilder, "  %s: %q\n", k, v)
 		}
 	} else {
 		yamlBuilder.WriteString("env: {}\n")

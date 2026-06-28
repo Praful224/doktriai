@@ -51,21 +51,21 @@ type VolumeMount struct {
 
 // WorkloadSpec is the desired state declaration for a container workload.
 type WorkloadSpec struct {
-	Name          string            `json:"name"`
-	Image         string            `json:"image"`
-	Replicas      int               `json:"replicas"`
-	Port          int               `json:"port"`
-	ContainerPort int               `json:"containerPort"`
-	Runtime       string            `json:"runtime"`
-	Env           map[string]string `json:"env,omitempty"`
-	SecurityMode  SecurityMode      `json:"securityMode,omitempty"`
-	Resources     ResourceLimits    `json:"resources,omitempty"`
-	HealthCheck   *HealthCheck      `json:"healthCheck,omitempty"`
-	Volumes        []VolumeMount     `json:"volumes,omitempty"`
-	Labels         map[string]string `json:"labels,omitempty"`
-	DeployStrategy string            `json:"deployStrategy,omitempty"` // "recreate" (default) or "rolling"
-	MaxSurge       int               `json:"maxSurge,omitempty"`
-	MaxUnavailable int               `json:"maxUnavailable,omitempty"`
+	Name          string            `json:"name" yaml:"name"`
+	Image         string            `json:"image" yaml:"image"`
+	Replicas      int               `json:"replicas" yaml:"replicas"`
+	Port          int               `json:"port" yaml:"port"`
+	ContainerPort int               `json:"containerPort" yaml:"containerPort"`
+	Runtime       string            `json:"runtime" yaml:"runtime"`
+	Env           map[string]string `json:"env,omitempty" yaml:"env,omitempty"`
+	SecurityMode  SecurityMode      `json:"securityMode,omitempty" yaml:"securityMode,omitempty"`
+	Resources     ResourceLimits    `json:"resources,omitempty" yaml:"resources,omitempty"`
+	HealthCheck   *HealthCheck      `json:"healthCheck,omitempty" yaml:"healthCheck,omitempty"`
+	Volumes        []VolumeMount     `json:"volumes,omitempty" yaml:"volumes,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty" yaml:"labels,omitempty"`
+	DeployStrategy string            `json:"deployStrategy,omitempty" yaml:"deployStrategy,omitempty"` // "recreate" (default) or "rolling"
+	MaxSurge       int               `json:"maxSurge,omitempty" yaml:"maxSurge,omitempty"`
+	MaxUnavailable int               `json:"maxUnavailable,omitempty" yaml:"maxUnavailable,omitempty"`
 }
 
 // ActualWorkload is the observed container state from the runtime driver.

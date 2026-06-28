@@ -479,22 +479,24 @@ func (s *SQLiteStorage) ListPlans(ctx context.Context) ([]*packages.PendingPlan,
 
 func (s *SQLiteStorage) UpdatePlanStatus(ctx context.Context, id string, status string, actor string, comment string) error {
 	now := time.Now().UTC()
-	if status == "approved" {
+	switch status {
+	case "approved":
 		_, err := s.db.ExecContext(ctx, `
 			UPDATE pte_plans 
 			SET status = ?, approved_by = ?, approved_at = ? 
 			WHERE id = ? AND status = 'pending'
 		`, status, actor, now, id)
 		return err
-	} else if status == "rejected" {
+	case "rejected":
 		_, err := s.db.ExecContext(ctx, `
 			UPDATE pte_plans 
 			SET status = ?, rejected_by = ?, rejected_at = ?, rejection_comment = ? 
 			WHERE id = ? AND status = 'pending'
 		`, status, actor, now, comment, id)
 		return err
+	default:
+		return fmt.Errorf("unsupported update status %q", status)
 	}
-	return fmt.Errorf("unsupported update status %q", status)
 }
 
 // --- Events ---

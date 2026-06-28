@@ -437,22 +437,24 @@ func (p *PostgresStorage) ListPlans(ctx context.Context) ([]*packages.PendingPla
 
 func (p *PostgresStorage) UpdatePlanStatus(ctx context.Context, id string, status string, actor string, comment string) error {
 	now := time.Now().UTC()
-	if status == "approved" {
+	switch status {
+	case "approved":
 		_, err := p.db.ExecContext(ctx, `
 			UPDATE pte_plans 
 			SET status = $2, approved_by = $3, approved_at = $4 
 			WHERE id = $1 AND status = 'pending'
 		`, id, status, actor, now)
 		return err
-	} else if status == "rejected" {
+	case "rejected":
 		_, err := p.db.ExecContext(ctx, `
 			UPDATE pte_plans 
 			SET status = $2, rejected_by = $3, rejected_at = $4, rejection_comment = $5 
 			WHERE id = $1 AND status = 'pending'
 		`, id, status, actor, now, comment)
 		return err
+	default:
+		return fmt.Errorf("unsupported update status %q", status)
 	}
-	return fmt.Errorf("unsupported update status %q", status)
 }
 
 // --- Workload History ---

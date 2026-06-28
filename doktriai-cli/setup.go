@@ -35,15 +35,16 @@ func SetupMCP(agent string) error {
 	switch agent {
 	case "claude":
 		configName = "Claude Desktop"
-		if runtime.GOOS == "windows" {
+		switch runtime.GOOS {
+		case "windows":
 			appData := os.Getenv("APPDATA")
 			if appData == "" {
 				appData = filepath.Join(homeDir, "AppData", "Roaming")
 			}
 			configPath = filepath.Join(appData, "Claude", "claude_desktop_config.json")
-		} else if runtime.GOOS == "darwin" {
+		case "darwin":
 			configPath = filepath.Join(homeDir, "Library", "Application Support", "Claude", "claude_desktop_config.json")
-		} else {
+		default:
 			// Linux/Other fallback
 			configPath = filepath.Join(homeDir, ".config", "Claude", "claude_desktop_config.json")
 		}

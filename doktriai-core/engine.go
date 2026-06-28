@@ -553,21 +553,22 @@ func (e *Engine) PromoteCanary(ctx context.Context, name string) (*CanaryStatus,
 		return nil, fmt.Errorf("no active canary rollout found for workload %q", name)
 	}
 
-	if c.Step == 0 {
+	switch c.Step {
+	case 0:
 		c.Step = 1
 		c.Weight = 50
 		e.emit(packages.Event{
 			Level: "warn", Source: "core", Workload: name,
 			Message: fmt.Sprintf("Canary rollout promoted to 50%% for %q", name),
 		})
-	} else if c.Step == 1 {
+	case 1:
 		c.Step = 2
 		c.Weight = 100
 		e.emit(packages.Event{
 			Level: "ok", Source: "core", Workload: name,
 			Message: fmt.Sprintf("Canary rollout promoted to 100%% (complete) for %q", name),
 		})
-	} else {
+	default:
 		// Already at 100%, finalize and deactivate
 		c.Active = false
 		delete(e.canaries, name)
