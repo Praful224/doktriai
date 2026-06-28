@@ -101,6 +101,15 @@ func (p *PostgresStorage) Migrate(ctx context.Context) error {
 	_, _ = p.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN IF NOT EXISTS max_surge INTEGER DEFAULT 1")
 	_, _ = p.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN IF NOT EXISTS max_unavailable INTEGER DEFAULT 0")
 
+	// Seed initial workloads if table is empty
+	var count int
+	_ = p.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM workloads").Scan(&count)
+	if count == 0 {
+		_, _ = p.db.ExecContext(ctx, `INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable) VALUES 
+		('hello-web', 'nginx:alpine', 2, 8080, 80, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'rolling', 1, 0),
+		('redis-cache', 'redis:alpine', 1, 6379, 6379, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'recreate', 1, 0)`)
+	}
+
 	return nil
 }
 
