@@ -1030,13 +1030,19 @@ func (s *Server) discover(w http.ResponseWriter, r *http.Request) {
 	}
 
 	driver := s.engine.Runtime()
-	d, ok := driver.(*doktriruntime.DockerDriver)
-	if !ok {
-		writeError(w, http.StatusBadRequest, fmt.Errorf("runtime driver is not Docker"))
+	
+	var discovered []packages.WorkloadSpec
+	var err error
+
+	if d, ok := driver.(*doktriruntime.DockerDriver); ok {
+		discovered, err = d.DiscoverContainers(r.Context())
+	} else if k, ok := driver.(*doktriruntime.K8sDriver); ok {
+		discovered, err = k.DiscoverDeployments(r.Context())
+	} else {
+		writeError(w, http.StatusBadRequest, fmt.Errorf("runtime driver is unsupported for discovery"))
 		return
 	}
 
-	discovered, err := d.DiscoverContainers(r.Context())
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err)
 		return

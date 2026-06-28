@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -194,3 +195,78 @@ func (k *K8sDriver) Logs(ctx context.Context, workload string, tail int) ([]stri
 }
 
 func (k *K8sDriver) IsSimulated() bool { return k.simulated }
+
+func (k *K8sDriver) DiscoverDeployments(ctx context.Context) ([]packages.WorkloadSpec, error) {
+	if k.simulated {
+		// Return sample k8s mock workloads in simulated mode
+		return []packages.WorkloadSpec{
+			{
+				Name:          "redis-cache-k8s",
+				Image:         "redis:alpine",
+				Replicas:      1,
+				Port:          6379,
+				ContainerPort: 6379,
+				Runtime:       "kubernetes",
+				SecurityMode:  "dev",
+			},
+			{
+				Name:          "hello-nginx-k8s",
+				Image:         "nginx:alpine",
+				Replicas:      2,
+				Port:          80,
+				ContainerPort: 80,
+				Runtime:       "kubernetes",
+				SecurityMode:  "dev",
+			},
+		}, nil
+	}
+
+	// Run kubectl to get deployments
+	out, err := exec.CommandContext(ctx, k.binary, "get", "deployments",
+		"-n", k.Namespace,
+		"--no-headers",
+		"-o", "custom-columns=NAME:.metadata.name,IMAGE:.spec.template.spec.containers[0].image,REPLICAS:.spec.replicas,PORT:.spec.template.spec.containers[0].ports[0].containerPort",
+	).CombinedOutput()
+	if err != nil {
+		return nil, err
+	}
+
+	var discovered []packages.WorkloadSpec
+	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) < 3 {
+			continue
+		}
+		name := fields[0]
+		image := fields[1]
+		replicasVal := fields[2]
+		
+		// If deployment is managed by doktri (prefixed with doktri-), skip it
+		if strings.HasPrefix(name, "doktri-") {
+			continue
+		}
+
+		replicas, _ := strconv.Atoi(replicasVal)
+		if replicas <= 0 {
+			replicas = 1
+		}
+
+		port := 80
+		if len(fields) > 3 && fields[3] != "<none>" {
+			if p, _ := strconv.Atoi(fields[3]); p > 0 {
+				port = p
+			}
+		}
+
+		discovered = append(discovered, packages.WorkloadSpec{
+			Name:          name,
+			Image:         image,
+			Replicas:      replicas,
+			Port:          port,
+			ContainerPort: port,
+			Runtime:       "kubernetes",
+			SecurityMode:  "dev",
+		})
+	}
+	return discovered, nil
+}
