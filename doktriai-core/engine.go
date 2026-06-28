@@ -8,8 +8,13 @@ import (
 	"sync"
 	"time"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+
 	"github.com/praful224/doktriai/doktriai-packages"
 )
+
+var engineTracer = otel.Tracer("doktriai-core-engine")
 
 const (
 	// circuitOpenThreshold: how many consecutive reconcile failures on the same
@@ -180,6 +185,9 @@ func (e *Engine) Delete(ctx context.Context, actor, name string) error {
 // Reconcile converges the actual workload state toward the desired state.
 // Per-workload circuit breakers prevent cascading failure storms (Layer 3 — ASI08).
 func (e *Engine) Reconcile(ctx context.Context) error {
+	ctx, span := engineTracer.Start(ctx, "Engine.Reconcile")
+	defer span.End()
+
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -191,8 +199,10 @@ func (e *Engine) Reconcile(ctx context.Context) error {
 		e.reconcileMu.Unlock()
 	}()
 	desired := e.store.ListWorkloads()
+	span.SetAttributes(attribute.Int("doktri.workloads.desired_count", len(desired)))
 	actual, err := e.runtime.List(ctx)
 	if err != nil {
+		span.RecordError(err)
 		e.emit(packages.Event{Level: "error", Source: "runtime", Message: err.Error()})
 		return err
 	}

@@ -32,6 +32,18 @@ func main() {
 		log.Printf("Loaded security policy from %q successfully", *policyPath)
 	}
 
+	// Initialize OpenTelemetry distributed tracing
+	shutdownTracer, err := core.InitTracer(context.Background(), "doktriai-api")
+	if err != nil {
+		log.Printf("Warning: Failed to initialize OpenTelemetry tracing: %v", err)
+	} else {
+		defer func() {
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+			defer cancel()
+			_ = shutdownTracer(shutdownCtx)
+		}()
+	}
+
 	if err := os.MkdirAll(*dataDir, 0o755); err != nil {
 		log.Fatalf("create data dir: %v", err)
 	}

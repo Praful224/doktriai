@@ -5,9 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+
 	"github.com/praful224/doktriai/doktriai-core"
 	"github.com/praful224/doktriai/doktriai-packages"
 )
+
+var mcpTracer = otel.Tracer("doktriai-mcp-handler")
 
 // RPCRequest is the standard JSON-RPC 2.0 request envelope.
 type RPCRequest struct {
@@ -94,6 +99,29 @@ func (h *ProtocolHandler) HandleRPC(ctx context.Context, actor string, payload [
 }
 
 func (h *ProtocolHandler) callTool(
+	ctx context.Context,
+	actor, agentID, scope, goal, name string,
+	args json.RawMessage,
+) (any, error) {
+	ctx, span := mcpTracer.Start(ctx, fmt.Sprintf("MCP/Tool/%s", name))
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.String("doktri.actor", actor),
+		attribute.String("doktri.agent.id", agentID),
+		attribute.String("doktri.agent.scope", scope),
+		attribute.String("doktri.agent.goal", goal),
+		attribute.String("doktri.tool.name", name),
+	)
+
+	res, err := h.executeTool(ctx, actor, agentID, scope, goal, name, args)
+	if err != nil {
+		span.RecordError(err)
+	}
+	return res, err
+}
+
+func (h *ProtocolHandler) executeTool(
 	ctx context.Context,
 	actor, agentID, scope, goal, name string,
 	args json.RawMessage,

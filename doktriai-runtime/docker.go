@@ -10,8 +10,13 @@ import (
 	"strings"
 	"sync"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+
 	"github.com/praful224/doktriai/doktriai-packages"
 )
+
+var dockerTracer = otel.Tracer("doktriai-runtime-docker")
 
 type DockerDriver struct {
 	binary          string
@@ -37,6 +42,9 @@ func (d *DockerDriver) Name() string {
 }
 
 func (d *DockerDriver) List(ctx context.Context) ([]packages.ActualWorkload, error) {
+	ctx, span := dockerTracer.Start(ctx, "DockerDriver.List")
+	defer span.End()
+
 	d.mu.RLock()
 	isSimulated := d.simulated
 	d.mu.RUnlock()
@@ -87,6 +95,13 @@ func (d *DockerDriver) listSimulated() []packages.ActualWorkload {
 }
 
 func (d *DockerDriver) Apply(ctx context.Context, spec packages.WorkloadSpec, replica int) error {
+	ctx, span := dockerTracer.Start(ctx, "DockerDriver.Apply")
+	defer span.End()
+	span.SetAttributes(
+		attribute.String("doktri.workload.name", spec.Name),
+		attribute.Int("doktri.workload.replica", replica),
+	)
+
 	d.mu.Lock()
 	isSimulated := d.simulated
 	d.mu.Unlock()
@@ -173,6 +188,13 @@ func (d *DockerDriver) Apply(ctx context.Context, spec packages.WorkloadSpec, re
 }
 
 func (d *DockerDriver) Delete(ctx context.Context, workload string, replica int) error {
+	ctx, span := dockerTracer.Start(ctx, "DockerDriver.Delete")
+	defer span.End()
+	span.SetAttributes(
+		attribute.String("doktri.workload.name", workload),
+		attribute.Int("doktri.workload.replica", replica),
+	)
+
 	d.mu.Lock()
 	isSimulated := d.simulated
 	d.mu.Unlock()
@@ -199,6 +221,10 @@ func (d *DockerDriver) Delete(ctx context.Context, workload string, replica int)
 }
 
 func (d *DockerDriver) DeleteWorkload(ctx context.Context, workload string) error {
+	ctx, span := dockerTracer.Start(ctx, "DockerDriver.DeleteWorkload")
+	defer span.End()
+	span.SetAttributes(attribute.String("doktri.workload.name", workload))
+
 	actual, err := d.List(ctx)
 	if err != nil {
 		return err
@@ -214,6 +240,10 @@ func (d *DockerDriver) DeleteWorkload(ctx context.Context, workload string) erro
 }
 
 func (d *DockerDriver) Logs(ctx context.Context, workload string, tail int) ([]string, error) {
+	ctx, span := dockerTracer.Start(ctx, "DockerDriver.Logs")
+	defer span.End()
+	span.SetAttributes(attribute.String("doktri.workload.name", workload))
+
 	d.mu.Lock()
 	isSimulated := d.simulated
 	d.mu.Unlock()
@@ -272,6 +302,9 @@ func (d *DockerDriver) SetSimulated(sim bool) {
 }
 
 func (d *DockerDriver) DiscoverContainers(ctx context.Context) ([]packages.WorkloadSpec, error) {
+	ctx, span := dockerTracer.Start(ctx, "DockerDriver.DiscoverContainers")
+	defer span.End()
+
 	d.mu.RLock()
 	isSimulated := d.simulated
 	d.mu.RUnlock()
