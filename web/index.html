@@ -1245,60 +1245,116 @@
                     <div class="doc-title"><span>&gt;_</span>
                         <h1>workspace://documentation</h1>
                     </div>
-                    <p class="lede">Step-by-step guides, API references, CLI usage, and platform integration documentation for DOKTRIAI.</p>
+                    <p class="lede">Comprehensive developer portal, schema reference, RBAC policy guides, and AI agent integration reference for DOKTRIAI.</p>
 
                     <div class="split-docs-layout">
                         <!-- Left Guide Column -->
-                        <div class="docs-guide-col">
-                            <div class="step-card">
-                                <span class="step-number">1</span>
-                                <span class="step-title">Obtain Deployment Token</span>
-                                <p style="font-size: 11.5px; color: var(--muted); margin: 8px 0 0; line-height: 1.55;">
-                                    Navigate to <strong>AI Agent Gateway</strong> or the token generator. Select <strong>SaaS Agent JWT</strong> or <strong>HCP Token</strong>, set scopes, and click <strong>Generate Token</strong>. Secure agent calls with the token in the <code>X-Doktri-Token</code> header.
+                        <div class="docs-guide-col" style="max-height: 72vh; overflow-y: auto; padding-right: 10px;">
+                            
+                            <!-- Section 1: Intro -->
+                            <div style="margin-bottom: 28px;">
+                                <h3 style="color:#fff; font-size:13px; margin-top:0; border-bottom:1px solid var(--line); padding-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">1. Platform Architecture</h3>
+                                <p style="font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: 8px;">
+                                    <strong>DOKTRIAI</strong> is an autonomous, declarative control plane designed to manage, self-heal, and scale containerized workloads. The control plane relies on a continuous <strong>Reconciliation Loop</strong> written in Go that constantly compares the target state (stored in sqlite) against the actual runtime state (Docker daemon or Kubernetes cluster via kubectl APIs).
                                 </p>
-                            </div>
-
-                            <div class="step-card">
-                                <span class="step-number">2</span>
-                                <span class="step-title">Install &amp; Set Up CLI</span>
-                                <p style="font-size: 11.5px; color: var(--muted); margin: 8px 0 0; line-height: 1.55;">
-                                    Install the local command-line interface helper. Target the control plane address:<br/>
-                                    <code style="display:block; background:var(--term); color:var(--green); padding:6px; border-radius:4px; margin-top:6px; font-family:monospace; font-size:10px;">doktriai-cli config set-server http://localhost:18080</code>
-                                </p>
-                            </div>
-
-                            <div class="step-card">
-                                <span class="step-number">3</span>
-                                <span class="step-title">Deploy Your First Workload</span>
-                                <p style="font-size: 11.5px; color: var(--muted); margin: 8px 0 0; line-height: 1.55;">
-                                    Apply your configuration manifest via CLI or web panel:<br/>
-                                    <code style="display:block; background:var(--term); color:var(--green); padding:6px; border-radius:4px; margin-top:6px; font-family:monospace; font-size:10px;">doktriai-cli apply -f app.doktri</code>
-                                    Reconciler loops check for drifts dynamically.
-                                </p>
-                            </div>
-
-                            <div class="doc-callout">
-                                <strong>ðŸ’¡ Security Gates Notice</strong>
-                                High-risk events (deploy scaling &gt; 5 replicas, namespace creations, workload deletions) automatically pause inside the <strong>PTE (Plan-to-Execute) Gate</strong>. Approvers must unlock actions in the <strong>Security</strong> panel.
-                            </div>
-
-                            <h3 style="color:#fff; font-size:13px; margin: 16px 0 8px; text-transform:uppercase; letter-spacing:0.04em;">Core API Endpoints</h3>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                                <div style="background:var(--panel); border:1px solid var(--line); padding:10px; border-radius:8px;">
-                                    <div style="font-size:9px; color:var(--orange); font-weight:700; margin-bottom:4px;">READ OPERATIONS</div>
-                                    <code style="font-size:10px; color:var(--muted); line-height:1.5; display:block;">
-                                        GET /api/health<br/>
-                                        GET /api/workloads<br/>
-                                        GET /api/events (SSE)
-                                    </code>
+                                <div class="doc-callout">
+                                    <strong>&#128161; Control Plane Lock Mutex</strong>
+                                    You can dynamically freeze the reconciler loop by acquiring the global lock (via <code>POST /api/lock</code> or the Reconciler panel). This stops self-healing temporarily so engineers can perform direct runtime debugging without automated rollbacks.
                                 </div>
-                                <div style="background:var(--panel); border:1px solid var(--line); padding:10px; border-radius:8px;">
-                                    <div style="font-size:9px; color:var(--orange); font-weight:700; margin-bottom:4px;">WRITE ACTIONS</div>
-                                    <code style="font-size:10px; color:var(--muted); line-height:1.5; display:block;">
-                                        POST /api/workloads<br/>
-                                        POST /api/reconcile<br/>
-                                        POST /api/lock
-                                    </code>
+                            </div>
+
+                            <!-- Section 2: YAML Schema Reference -->
+                            <div style="margin-bottom: 28px;">
+                                <h3 style="color:#fff; font-size:13px; border-bottom:1px solid var(--line); padding-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">2. Declarative Schema Keywords</h3>
+                                <p style="font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: 8px;">
+                                    Workloads are declared using a standard structured YAML manifest. Below is the specification reference for each keyword:
+                                </p>
+                                <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; margin-top: 10px; color: var(--text);">
+                                    <thead>
+                                        <tr style="border-bottom: 1px solid var(--line); text-align: left; color: #fff;">
+                                            <th style="padding: 6px 0; width: 28%;">Keyword</th>
+                                            <th style="padding: 6px 0; width: 15%;">Type</th>
+                                            <th style="padding: 6px 0;">Meaning &amp; Valid Values</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="border-bottom: 1px dashed rgba(255,255,255,0.05);">
+                                            <td style="padding: 8px 0; color: var(--orange); font-family: monospace;">apiVersion</td>
+                                            <td style="padding: 8px 0; color: var(--muted);">string</td>
+                                            <td style="padding: 8px 0; color: var(--muted); line-height: 1.45;">Specifies API schema version. Use <code>doktri.io/v1alpha1</code>.</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px dashed rgba(255,255,255,0.05);">
+                                            <td style="padding: 8px 0; color: var(--orange); font-family: monospace;">kind</td>
+                                            <td style="padding: 8px 0; color: var(--muted);">string</td>
+                                            <td style="padding: 8px 0; color: var(--muted); line-height: 1.45;">Resource type descriptor. Must be <code>Workload</code>.</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px dashed rgba(255,255,255,0.05);">
+                                            <td style="padding: 8px 0; color: var(--orange); font-family: monospace;">metadata.name</td>
+                                            <td style="padding: 8px 0; color: var(--muted);">string</td>
+                                            <td style="padding: 8px 0; color: var(--muted); line-height: 1.45;">Workload identity name. Lowercase alphanumeric, e.g. <code>nginx-web</code>.</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px dashed rgba(255,255,255,0.05);">
+                                            <td style="padding: 8px 0; color: var(--orange); font-family: monospace;">metadata.project</td>
+                                            <td style="padding: 8px 0; color: var(--muted);">string</td>
+                                            <td style="padding: 8px 0; color: var(--muted); line-height: 1.45;">Grouping namespace. Matches active sidebar explorer projects.</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px dashed rgba(255,255,255,0.05);">
+                                            <td style="padding: 8px 0; color: var(--orange); font-family: monospace;">spec.image</td>
+                                            <td style="padding: 8px 0; color: var(--muted);">string</td>
+                                            <td style="padding: 8px 0; color: var(--muted); line-height: 1.45;">Docker image tag, e.g. <code>nginx:alpine</code> or <code>redis:latest</code>.</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px dashed rgba(255,255,255,0.05);">
+                                            <td style="padding: 8px 0; color: var(--orange); font-family: monospace;">spec.replicas</td>
+                                            <td style="padding: 8px 0; color: var(--muted);">integer</td>
+                                            <td style="padding: 8px 0; color: var(--muted); line-height: 1.45;">Desired running containers count. Allowed bounds: <code>1</code> to <code>50</code>.</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px dashed rgba(255,255,255,0.05);">
+                                            <td style="padding: 8px 0; color: var(--orange); font-family: monospace;">spec.deployStrategy</td>
+                                            <td style="padding: 8px 0; color: var(--muted);">string</td>
+                                            <td style="padding: 8px 0; color: var(--muted); line-height: 1.45;">Deployment style: <code>rolling</code> (gradual replacement) or <code>recreate</code>.</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px dashed rgba(255,255,255,0.05);">
+                                            <td style="padding: 8px 0; color: var(--orange); font-family: monospace;">spec.ports</td>
+                                            <td style="padding: 8px 0; color: var(--muted);">array</td>
+                                            <td style="padding: 8px 0; color: var(--muted); line-height: 1.45;">List of maps matching public <code>hostPort</code> to internal <code>containerPort</code>.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Section 3: PTE & RBAC -->
+                            <div style="margin-bottom: 28px;">
+                                <h3 style="color:#fff; font-size:13px; border-bottom:1px solid var(--line); padding-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">3. OPA RBAC &amp; PTE Security Gate</h3>
+                                <p style="font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: 8px;">
+                                    DoktriAI implements policy-as-code guardrails via the Open Policy Agent (OPA) engine:
+                                </p>
+                                <ul style="font-size: 11px; color: var(--muted); padding-left: 18px; line-height: 1.6; margin-top: 8px;">
+                                    <li><strong>DevOps Lead (Admin)</strong>: Full operational rights. Can deploy instantly, scale up to 50 replicas, and manually approve plans.</li>
+                                    <li><strong>Junior SRE (Operator)</strong>: Basic deployment rights. Attempts to delete workloads or scale replicas &gt; 5 automatically triggers the <strong>Plan-To-Execute (PTE) Gate</strong>. The reconciler stalls changes until an Admin authorizes the plan.</li>
+                                    <li><strong>Security Auditor (Reader)</strong>: Read-only context. Any deployment write attempts are blocked at the router gateway level.</li>
+                                    <li><strong>Behavioral Anomaly Engine</strong>: Monitors actor rates in a 5-minute sliding window. Exceeding thresholds flags the actor and temporarily suspends their token validity.</li>
+                                </ul>
+                            </div>
+
+                            <!-- Section 4: MCP and AI Gateway -->
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="color:#fff; font-size:13px; border-bottom:1px solid var(--line); padding-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">4. AI Agent &amp; MCP Integration</h3>
+                                <p style="font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: 8px;">
+                                    AI Agents (Claude, GPT, Gemini) call control plane actions as standard tool invocations using the <strong>Model Context Protocol (MCP)</strong> served at <code>POST /api/mcp</code>.
+                                </p>
+                                <p style="font-size: 11.5px; color: var(--muted); line-height: 1.6;">
+                                    Exposed MCP tool bindings:
+                                </p>
+                                <ul style="font-size: 11px; color: var(--muted); padding-left: 18px; line-height: 1.6; margin-top: 8px; font-family: monospace;">
+                                    <li><strong>tools/list</strong>: Returns list of schema tool specs.</li>
+                                    <li><strong>deploy_workload</strong>: Creates/updates container workload spec.</li>
+                                    <li><strong>list_workloads</strong>: Queries running instances status list.</li>
+                                    <li><strong>delete_workload</strong>: Removes a workload spec from target provider.</li>
+                                    <li><strong>get_logs</strong>: Retrieves streaming logs from active containers.</li>
+                                </ul>
+                                <div class="doc-callout" style="background: rgba(255,255,255,0.02); border-left-color: var(--line);">
+                                    <strong>&#128065; Cryptographic JWT and HMAC Keys</strong>
+                                    All agent transactions must include a valid signed JWT key in the <code>X-Doktri-Token</code> header. Generate tokens using the generator in the <strong>CLI Reference</strong> workspace panel.
                                 </div>
                             </div>
                         </div>
@@ -1375,8 +1431,7 @@ print(res.json())</pre>
     req.Header.Set(<span style="color:#e6db74">"X-Doktri-Actor"</span>, <span style="color:#e6db74">"developer"</span>)
 
     http.DefaultClient.Do(req)
-}
-</pre>
+}</pre>
                             </div>
 
                             <!-- YAML Spec Content -->
