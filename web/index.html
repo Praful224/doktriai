@@ -1247,188 +1247,156 @@
                     </div>
                     <p class="lede">Step-by-step guides, API references, CLI usage, and platform integration documentation for DOKTRIAI.</p>
 
-                    <!-- Section 1: Getting Started -->
-                    <h2 class="section-title" style="margin-top:0;">Getting Started</h2>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:12px; margin-bottom:24px;">
-                        <div class="repo-card" style="cursor:default;">
-                            <strong style="color:#fff; font-size:13px;">① Start the Control Plane</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Setup · Server</span>
-                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
-                                Run the API server from the project root:<br/>
-                                <code style="display:block; background:var(--term); color:var(--green); padding:6px 8px; border-radius:4px; margin-top:6px; font-size:11px;">go run ./cmd/doktriai-api -addr :18080</code>
-                                Then open <code style="color:var(--orange);">http://localhost:18080</code> in your browser.
-                            </span>
-                        </div>
-                        <div class="repo-card" style="cursor:default;">
-                            <strong style="color:#fff; font-size:13px;">② Navigate the Workspace</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Setup · UI</span>
-                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
-                                • Use the <strong>left sidebar</strong> to switch between sections.<br/>
-                                • Click <strong>tabs</strong> in the top bar to jump between open views.<br/>
-                                • Press <kbd style="background:var(--panel); border:1px solid var(--line); border-radius:3px; padding:1px 5px; font-size:10px;">Ctrl+K</kbd> to open the command palette.
-                            </span>
-                        </div>
-                        <div class="repo-card" style="cursor:default;">
-                            <strong style="color:#fff; font-size:13px;">③ Deploy Your First Workload</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Setup · Workloads</span>
-                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
-                                Navigate to <strong>Workloads</strong> → fill in the form:<br/>
-                                • Name: <code style="color:var(--orange);">hello-web</code><br/>
-                                • Image: <code style="color:var(--orange);">nginx:alpine</code><br/>
-                                • Replicas: <code style="color:var(--orange);">1</code><br/>
-                                Click <strong>Deploy App</strong> to submit.
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Section 2: CLI Reference -->
-                    <h2 class="section-title">CLI Reference</h2>
-                    <div class="repo-card" style="cursor:default; margin-bottom:20px;">
-                        <strong style="color:#fff; font-size:13px;">doktriai-cli Commands</strong>
-                        <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Reference · CLI</span>
-                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:10px; margin-top:10px;">
-                            <div style="background:var(--term); border-radius:6px; padding:10px;">
-                                <div style="font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">Deploy</div>
-                                <code style="font-size:11px; color:var(--green); line-height:1.6; display:block;">go run ./cmd/doktriai-api -addr :18080</code>
-                                <code style="font-size:11px; color:var(--green); line-height:1.6; display:block;">doktriai-cli apply -f app.doktri</code>
+                    <div class="split-docs-layout">
+                        <!-- Left Guide Column -->
+                        <div class="docs-guide-col">
+                            <div class="step-card">
+                                <span class="step-number">1</span>
+                                <span class="step-title">Obtain Deployment Token</span>
+                                <p style="font-size: 11.5px; color: var(--muted); margin: 8px 0 0; line-height: 1.55;">
+                                    Navigate to <strong>AI Agent Gateway</strong> or the token generator. Select <strong>SaaS Agent JWT</strong> or <strong>HCP Token</strong>, set scopes, and click <strong>Generate Token</strong>. Secure agent calls with the token in the <code>X-Doktri-Token</code> header.
+                                </p>
                             </div>
-                            <div style="background:var(--term); border-radius:6px; padding:10px;">
-                                <div style="font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">Inspect</div>
-                                <code style="font-size:11px; color:var(--green); line-height:1.6; display:block;">doktriai-cli status</code>
-                                <code style="font-size:11px; color:var(--green); line-height:1.6; display:block;">doktriai-cli logs hello-web --tail=50</code>
+
+                            <div class="step-card">
+                                <span class="step-number">2</span>
+                                <span class="step-title">Install &amp; Set Up CLI</span>
+                                <p style="font-size: 11.5px; color: var(--muted); margin: 8px 0 0; line-height: 1.55;">
+                                    Install the local command-line interface helper. Target the control plane address:<br/>
+                                    <code style="display:block; background:var(--term); color:var(--green); padding:6px; border-radius:4px; margin-top:6px; font-family:monospace; font-size:10px;">doktriai-cli config set-server http://localhost:18080</code>
+                                </p>
                             </div>
-                            <div style="background:var(--term); border-radius:6px; padding:10px;">
-                                <div style="font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">Manage</div>
-                                <code style="font-size:11px; color:var(--green); line-height:1.6; display:block;">doktriai-cli delete workload hello-web</code>
-                                <code style="font-size:11px; color:var(--green); line-height:1.6; display:block;">doktriai-cli mcp-tools</code>
+
+                            <div class="step-card">
+                                <span class="step-number">3</span>
+                                <span class="step-title">Deploy Your First Workload</span>
+                                <p style="font-size: 11.5px; color: var(--muted); margin: 8px 0 0; line-height: 1.55;">
+                                    Apply your configuration manifest via CLI or web panel:<br/>
+                                    <code style="display:block; background:var(--term); color:var(--green); padding:6px; border-radius:4px; margin-top:6px; font-family:monospace; font-size:10px;">doktriai-cli apply -f app.doktri</code>
+                                    Reconciler loops check for drifts dynamically.
+                                </p>
+                            </div>
+
+                            <div class="doc-callout">
+                                <strong>ðŸ’¡ Security Gates Notice</strong>
+                                High-risk events (deploy scaling &gt; 5 replicas, namespace creations, workload deletions) automatically pause inside the <strong>PTE (Plan-to-Execute) Gate</strong>. Approvers must unlock actions in the <strong>Security</strong> panel.
+                            </div>
+
+                            <h3 style="color:#fff; font-size:13px; margin: 16px 0 8px; text-transform:uppercase; letter-spacing:0.04em;">Core API Endpoints</h3>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                                <div style="background:var(--panel); border:1px solid var(--line); padding:10px; border-radius:8px;">
+                                    <div style="font-size:9px; color:var(--orange); font-weight:700; margin-bottom:4px;">READ OPERATIONS</div>
+                                    <code style="font-size:10px; color:var(--muted); line-height:1.5; display:block;">
+                                        GET /api/health<br/>
+                                        GET /api/workloads<br/>
+                                        GET /api/events (SSE)
+                                    </code>
+                                </div>
+                                <div style="background:var(--panel); border:1px solid var(--line); padding:10px; border-radius:8px;">
+                                    <div style="font-size:9px; color:var(--orange); font-weight:700; margin-bottom:4px;">WRITE ACTIONS</div>
+                                    <code style="font-size:10px; color:var(--muted); line-height:1.5; display:block;">
+                                        POST /api/workloads<br/>
+                                        POST /api/reconcile<br/>
+                                        POST /api/lock
+                                    </code>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Section 3: REST API -->
-                    <h2 class="section-title">REST API Reference</h2>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:12px; margin-bottom:24px;">
-                        <div class="repo-card" style="cursor:default;">
-                            <strong style="color:#fff; font-size:13px;">Health &amp; Status</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">API · GET</span>
-                            <code style="display:block; background:var(--term); color:var(--green); padding:8px; border-radius:4px; margin-top:8px; font-size:11px; line-height:1.6;">GET /api/health<br/>GET /api/workloads<br/>GET /api/audit</code>
-                        </div>
-                        <div class="repo-card" style="cursor:default;">
-                            <strong style="color:#fff; font-size:13px;">Deploy &amp; Reconcile</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">API · POST</span>
-                            <code style="display:block; background:var(--term); color:var(--green); padding:8px; border-radius:4px; margin-top:8px; font-size:11px; line-height:1.6;">POST /api/workloads<br/>POST /api/reconcile<br/>POST /api/lock</code>
-                        </div>
-                        <div class="repo-card" style="cursor:default;">
-                            <strong style="color:#fff; font-size:13px;">Delete &amp; Stream</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">API · DELETE / SSE</span>
-                            <code style="display:block; background:var(--term); color:var(--green); padding:8px; border-radius:4px; margin-top:8px; font-size:11px; line-height:1.6;">DELETE /api/workloads/:name<br/>GET /api/events (SSE)<br/>GET /api/logs/:name</code>
-                        </div>
-                    </div>
+                        <!-- Right Code Column -->
+                        <div class="docs-code-col">
+                            <div class="code-tabs-header">
+                                <button class="code-tab-btn active" data-tab="curl">cURL CLI</button>
+                                <button class="code-tab-btn" data-tab="python">Python SDK</button>
+                                <button class="code-tab-btn" data-tab="go">Go Client</button>
+                                <button class="code-tab-btn" data-tab="yaml">YAML Spec</button>
+                            </div>
 
-                    <!-- Section 4: Connecting Projects -->
-                    <h2 class="section-title">Connecting Projects &amp; Modules</h2>
-                    <div class="repo-card" style="cursor:default; margin-bottom:20px;">
-                        <strong style="color:#fff; font-size:13px;">How Projects Connect</strong>
-                        <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Architecture · Modules</span>
-                        <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:8px;">
-                            • Navigate to <strong>Projects</strong> or <strong>Overview</strong> to see all platform modules.<br/>
-                            • <strong>Click any module card</strong> — the workspace auto-connects to it, renames the active project, and opens its console view.<br/>
-                            • Module connections flow: <code style="color:var(--orange);">Developer / Agent → CLI / MCP → API → Core → Runtime / Operator</code><br/>
-                            • Use the <strong>Gallery</strong> view to see a live architecture diagram of how modules link together.
-                        </span>
-                    </div>
+                            <!-- cURL Content -->
+                            <div class="code-tab-content active" data-tab="curl">
+                                <pre><span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/workloads \
+  -H <span style="color:#e6db74">"Content-Type: application/json"</span> \
+  -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span> \
+  -H <span style="color:#e6db74">"X-Doktri-Actor: developer"</span> \
+  -d <span style="color:#e6db74">'{
+    "name": "hello-web",
+    "image": "nginx:alpine",
+    "replicas": 3,
+    "port": 80,
+    "containerPort": 80
+  }'</span></pre>
+                            </div>
 
-                    <!-- Section 5: Security Gate -->
-                    <h2 class="section-title">Security &amp; PTE Approval Gate</h2>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:12px; margin-bottom:24px;">
-                        <div class="repo-card" style="cursor:default; border-color: rgba(255,157,0,0.3);">
-                            <strong style="color:#fff; font-size:13px;">Layer 2 — PTE Approval Gate</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Security · Required</span>
-                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
-                                High-risk deploys (replicas &gt; 5, sensitive keys, all deletes) require <strong>human approval</strong>. Navigate to <strong>Security → Pending Approvals</strong> to approve or reject them before they execute.
-                            </span>
-                        </div>
-                        <div class="repo-card" style="cursor:default; border-color: rgba(255,157,0,0.3);">
-                            <strong style="color:#fff; font-size:13px;">Layer 3 — Behavioral Anomaly</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Security · Detection</span>
-                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
-                                Rolling 5-minute windows track deploy/delete/reject rates per actor. Actors exceeding thresholds are <strong>flagged</strong> and emit anomaly events visible in the Security panel.
-                            </span>
-                        </div>
-                        <div class="repo-card" style="cursor:default;">
-                            <strong style="color:#fff; font-size:13px;">Control Plane Lock</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Security · Lock</span>
-                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
-                                Use <strong>Reconciler → Control Plane Lock</strong> to freeze all automated deployment changes. Enter a reason and click <strong>Acquire Lock</strong>. Release when safe to resume operations.
-                            </span>
-                        </div>
-                    </div>
+                            <!-- Python Content -->
+                            <div class="code-tab-content" data-tab="python">
+                                <pre><span style="color:#f92672">import</span> requests
 
-                    <!-- Section 6: MCP Agent -->
-                    <h2 class="section-title">MCP Agent Integration</h2>
-                    <div class="repo-card" style="cursor:default; margin-bottom:20px;">
-                        <strong style="color:#fff; font-size:13px;">Connecting an AI Agent via MCP</strong>
-                        <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Integration · AI Agents</span>
-                        <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:8px;">
-                            The MCP server exposes tools over JSON-RPC 2.0 at <code style="color:var(--orange);">POST /api/mcp</code>. Available tools:
-                        </span>
-                        <div style="background:var(--term); border-radius:6px; padding:10px; margin-top:10px;">
-                            <code style="font-size:11px; color:var(--green); line-height:1.7; display:block;">
-                                tools/list — list all agent-callable tools<br/>
-                                deploy_workload — deploy a container via agent<br/>
-                                list_workloads — fetch current workload state<br/>
-                                delete_workload — decommission a workload<br/>
-                                get_logs — stream container logs
-                            </code>
-                        </div>
-                        <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:8px;">
-                            Generate a signed HMAC token in <strong>CLI Reference → Secure Token Generator</strong> and attach it as <code style="color:var(--orange);">X-Doktri-Token</code> header in agent calls.
-                        </span>
-                    </div>
+payload = {
+    <span style="color:#e6db74">"name"</span>: <span style="color:#e6db74">"hello-web"</span>,
+    <span style="color:#e6db74">"image"</span>: <span style="color:#e6db74">"nginx:alpine"</span>,
+    <span style="color:#e6db74">"replicas"</span>: 3,
+    <span style="color:#e6db74">"port"</span>: 80,
+    <span style="color:#e6db74">"containerPort"</span>: 80
+}
+headers = {
+    <span style="color:#e6db74">"X-Doktri-Role"</span>: <span style="color:#e6db74">"admin"</span>,
+    <span style="color:#e6db74">"X-Doktri-Actor"</span>: <span style="color:#e6db74">"developer"</span>
+}
 
-                    <!-- Section 7: Phase 2 Upgrades & Operations -->
-                    <h2 class="section-title">Phase 2 Upgrades &amp; Advanced Operations</h2>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:12px; margin-bottom:24px;">
-                        <div class="repo-card" style="cursor:default;">
-                            <strong style="color:#fff; font-size:13px;">① YAML Manifest Deployments</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Operation · YAML Editor</span>
-                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
-                                Deploy declaratively using the <strong>YAML Editor</strong> on the Workloads page:<br/>
-                                • Paste your YAML manifest block.<br/>
-                                • Click <strong>Deploy Manifest</strong>.<br/>
-                                • Supports complete attributes like <code>deployStrategy: rolling</code>, <code>maxSurge</code>, etc.
-                            </span>
-                        </div>
-                        <div class="repo-card" style="cursor:default;">
-                            <strong style="color:#fff; font-size:13px;">② Rolling Upgrade Strategy</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Operation · Upgrades</span>
-                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
-                                Upgrade container workloads sequentially using the <strong>rolling</strong> strategy. Reconciler replaces replicas one-by-one with zero-downtime, keeping active traffic routed. Set <code>deployStrategy: rolling</code>.
-                            </span>
-                        </div>
-                        <div class="repo-card" style="cursor:default;">
-                            <strong style="color:#fff; font-size:13px;">③ Visual Database Rollbacks</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Operation · DB History</span>
-                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
-                                Look up full workload database version snapshots:<br/>
-                                • Find your workload in the status table.<br/>
-                                • Click the new <strong>history</strong> button.<br/>
-                                • Select a previous version and click <strong>Rollback</strong>.
-                            </span>
-                        </div>
-                        <div class="repo-card" style="cursor:default;">
-                            <strong style="color:#fff; font-size:13px;">④ Cryptographic JWT Keys</strong>
-                            <span class="ship-date" style="font-size:11px; color:var(--orange); display:block; margin:4px 0;">Operation · Security</span>
-                            <span style="font-size:12px; color:var(--muted); line-height:1.55; display:block; margin-top:6px;">
-                                Generate stateless JWT authentication keys:<br/>
-                                • Go to <strong>CLI Reference</strong> tab.<br/>
-                                • Select <strong>Token Type: SaaS Agent JWT</strong>.<br/>
-                                • Specify Actor Name &amp; Agent Scope and click <strong>Generate Token</strong>.
-                            </span>
+res = requests.post(
+    <span style="color:#e6db74">"http://localhost:18080/api/workloads"</span>,
+    json=payload,
+    headers=headers
+)
+print(res.json())</pre>
+                            </div>
+
+                            <!-- Go Content -->
+                            <div class="code-tab-content" data-tab="go">
+                                <pre><span style="color:#f92672">package</span> main
+
+<span style="color:#f92672">import</span> (
+    <span style="color:#e6db74">"bytes"</span>
+    <span style="color:#e6db74">"encoding/json"</span>
+    <span style="color:#e6db74">"net/http"</span>
+)
+
+<span style="color:#f92672">func</span> main() {
+    spec := map[string]any{
+        <span style="color:#e6db74">"name"</span>:          <span style="color:#e6db74">"hello-web"</span>,
+        <span style="color:#e6db74">"image"</span>:         <span style="color:#e6db74">"nginx:alpine"</span>,
+        <span style="color:#e6db74">"replicas"</span>:      3,
+        <span style="color:#e6db74">"port"</span>:          80,
+        <span style="color:#e6db74">"containerPort"</span>: 80,
+    }
+    body, _ := json.Marshal(spec)
+    req, _ := http.NewRequest(<span style="color:#e6db74">"POST"</span>, <span style="color:#e6db74">"http://localhost:18080/api/workloads"</span>, bytes.NewReader(body))
+    req.Header.Set(<span style="color:#e6db74">"X-Doktri-Role"</span>, <span style="color:#e6db74">"admin"</span>)
+    req.Header.Set(<span style="color:#e6db74">"X-Doktri-Actor"</span>, <span style="color:#e6db74">"developer"</span>)
+
+    http.DefaultClient.Do(req)
+}
+</pre>
+                            </div>
+
+                            <!-- YAML Spec Content -->
+                            <div class="code-tab-content" data-tab="yaml">
+                                <pre><span style="color:#f92672">apiVersion</span>: doktri.io/v1alpha1
+<span style="color:#f92672">kind</span>: Workload
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: hello-web
+  <span style="color:#f92672">project</span>: control-plane
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">image</span>: nginx:alpine
+  <span style="color:#f92672">replicas</span>: 3
+  <span style="color:#f92672">deployStrategy</span>: rolling
+  <span style="color:#f92672">ports</span>:
+    - <span style="color:#f92672">hostPort</span>: 80
+      <span style="color:#f92672">containerPort</span>: 80</pre>
+                            </div>
                         </div>
                     </div>
                 </article>
-
 
                 <!-- Notes View -->
                 <article id="notes" class="view">

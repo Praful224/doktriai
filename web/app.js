@@ -2612,4 +2612,18 @@ document.addEventListener("DOMContentLoaded", () => {
       roleDropdown.style.display = "none";
     }
   });
+
+  // Documentation code switcher tabs (Claude platform style)
+  qsa(".code-tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tabName = btn.dataset.tab;
+      const parent = btn.closest(".docs-code-col");
+      if (parent) {
+        parent.querySelectorAll(".code-tab-btn").forEach(b => b.classList.toggle("active", b === btn));
+        parent.querySelectorAll(".code-tab-content").forEach(content => {
+          content.classList.toggle("active", content.dataset.tab === tabName);
+        });
+      }
+    });
+  });
 });
