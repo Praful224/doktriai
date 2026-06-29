@@ -169,7 +169,7 @@ function switchView(view, updateHash = true) {
   }
 
   qsa(".view").forEach((item) => item.classList.remove("active-view"));
-  qsa(".tree, .menu-item, .sub-item").forEach((item) => item.classList.toggle("active", item.dataset.view === view));
+  updateSidebarActiveStates(view);
   
   const target = qs(`#${view}`);
   if (target) target.classList.add("active-view");
@@ -189,6 +189,32 @@ function switchView(view, updateHash = true) {
     window.location.hash = "/" + view;
   }
   renderTabs();
+}
+
+function updateSidebarActiveStates(view) {
+  qsa(".tree").forEach(item => item.classList.toggle("active", item.dataset.view === view));
+  
+  qsa(".menu-item, .sub-item").forEach(el => el.classList.remove("active"));
+  qsa(".menu-item-group").forEach(el => el.classList.remove("expanded"));
+
+  const subItem = qs(`.sub-item[data-view="${view}"]`);
+  if (subItem) {
+    subItem.classList.add("active");
+    const group = subItem.closest(".menu-item-group");
+    if (group) {
+      group.classList.add("expanded");
+      const parentBtn = group.querySelector(".menu-item");
+      if (parentBtn) parentBtn.classList.add("active");
+    }
+    return;
+  }
+
+  const parentItem = qs(`.menu-item[data-view="${view}"]`);
+  if (parentItem) {
+    parentItem.classList.add("active");
+    const group = parentItem.closest(".menu-item-group");
+    if (group) group.classList.add("expanded");
+  }
 }
 
 function handleRouting() {

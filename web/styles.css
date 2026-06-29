@@ -521,17 +521,32 @@ button:hover {
     width: 20px;
 }
 
-/* Nested sub-tree with connector lines */
+/* Nested sub-tree with smooth slide transitions and connector lines */
 .sub-tree {
     border-left: 1px solid var(--line);
     margin-left: 20px;
-    margin-top: 4px;
-    margin-bottom: 4px;
+    margin-top: 0;
+    margin-bottom: 0;
     padding-left: 12px;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin 0.25s ease;
+}
+
+.menu-item-group.expanded .sub-tree {
+    max-height: 200px;
+    opacity: 1;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.sub-item.active {
+    color: var(--orange, #ff6b00) !important;
+    font-weight: 600;
 }
 
 .sub-item {

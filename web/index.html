@@ -163,32 +163,35 @@
             <div class="sidebar-menu">
                 <div class="menu-category">MAIN</div>
                 
-                <!-- Navigation Items -->
+                <!-- Overview Group -->
                 <div class="menu-item-group">
                     <button class="menu-item active" data-view="overview" title="Overview">
                         <span class="menu-icon">🎛️</span>
                         <span class="menu-text">Overview</span>
                     </button>
-                    <!-- Sub tree items -->
                     <div class="sub-tree">
                         <button class="sub-item" data-view="overview">Dashboard</button>
-                        <button class="sub-item" data-view="projects">Platform Modules</button>
+                        <button class="sub-item" data-view="projects">Project Info</button>
                         <button class="sub-item" data-view="activity">Live Activity</button>
+                        <button class="sub-item" data-view="gallery">Architecture Map</button>
                     </div>
                 </div>
 
+                <!-- Workloads Group -->
                 <div class="menu-item-group">
                     <button class="menu-item" data-view="workloads" title="Workloads">
                         <span class="menu-icon">📦</span>
                         <span class="menu-text">Workloads</span>
                     </button>
                     <div class="sub-tree">
-                        <button class="sub-item" data-view="workloads">Active Workloads</button>
+                        <button class="sub-item" data-view="workloads">Active List</button>
                         <button class="sub-item" data-view="core">Reconciler Core</button>
                         <button class="sub-item" data-view="runtime">Runtime Drivers</button>
+                        <button class="sub-item" data-view="charts">Helm Charts</button>
                     </div>
                 </div>
 
+                <!-- Security Gate Group -->
                 <div class="menu-item-group">
                     <button class="menu-item" data-view="security" title="Security">
                         <span class="menu-icon">🛡️</span>
@@ -200,6 +203,7 @@
                     </div>
                 </div>
 
+                <!-- AI Agent Gateway Group -->
                 <div class="menu-item-group">
                     <button class="menu-item" data-view="mcp" title="AI Agent Gateway">
                         <span class="menu-icon">🤖</span>
@@ -207,20 +211,46 @@
                     </button>
                 </div>
 
+                <!-- CLI & Examples Group -->
                 <div class="menu-item-group">
                     <button class="menu-item" data-view="cli" title="CLI &amp; Reference">
                         <span class="menu-icon">💻</span>
                         <span class="menu-text">CLI &amp; SDKs</span>
                     </button>
+                    <div class="sub-tree">
+                        <button class="sub-item" data-view="cli">CLI Reference</button>
+                        <button class="sub-item" data-view="packages">Config Schema</button>
+                        <button class="sub-item" data-view="examples">Spec Templates</button>
+                    </div>
+                </div>
+
+                <div class="menu-category">CONTENT</div>
+
+                <!-- Documentation Group -->
+                <div class="menu-item-group">
+                    <button class="menu-item" data-view="writing" title="Documentation">
+                        <span class="menu-icon">📖</span>
+                        <span class="menu-text">Documentation</span>
+                    </button>
+                    <div class="sub-tree">
+                        <button class="sub-item" data-view="writing">Architecture Guide</button>
+                        <button class="sub-item" data-view="notes">Personal Notes</button>
+                        <button class="sub-item" data-view="experiments">Chaos Experiments</button>
+                    </div>
                 </div>
 
                 <div class="menu-category">SYSTEM</div>
 
+                <!-- Settings Group -->
                 <div class="menu-item-group">
                     <button class="menu-item" data-view="settings" title="Settings">
                         <span class="menu-icon">⚙️</span>
                         <span class="menu-text">Settings</span>
                     </button>
+                    <div class="sub-tree">
+                        <button class="sub-item" data-view="settings">Configuration</button>
+                        <button class="sub-item" data-view="contact">Developer Support</button>
+                    </div>
                 </div>
             </div>
 
