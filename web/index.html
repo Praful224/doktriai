@@ -38,7 +38,12 @@
                     <span class="edit-icon" style="font-size: 10px; opacity: 0.5;">✏️</span>
                 </span>
             </div>
-
+            <label class="search">
+                <span>⌘</span>
+                <input id="commandSearch" placeholder="Search or press ⌘K..." autocomplete="off" />
+                <kbd>⌘K</kbd>
+                <div class="search-results" id="searchResults"></div>
+            </label>
             <div class="system-tray">
                 <span class="wifi">◒</span>
                 <span>4G</span>
@@ -152,15 +157,7 @@
                 </button>
             </div>
 
-            <!-- Inline Search -->
-            <div class="sidebar-search-container">
-                <div class="sidebar-search">
-                    <span class="search-icon">🔍</span>
-                    <input id="commandSearch" placeholder="Search or press ⌘K..." autocomplete="off" />
-                    <span class="search-kbd">⌘K</span>
-                    <div class="search-results" id="searchResults"></div>
-                </div>
-            </div>
+
 
             <!-- Sidebar Navigation -->
             <div class="sidebar-menu">
