@@ -192,19 +192,26 @@ function switchView(view, updateHash = true) {
 }
 
 function updateSidebarActiveStates(view) {
+  console.log("DEBUG: view is", view);
   qsa(".tree").forEach(item => item.classList.toggle("active", item.dataset.view === view));
   
   qsa(".menu-item, .sub-item").forEach(el => el.classList.remove("active"));
   qsa(".menu-item-group").forEach(el => el.classList.remove("expanded"));
 
   const subItem = qs(`.sub-item[data-view="${view}"]`);
+  console.log("DEBUG: subItem matches", subItem ? subItem.outerHTML : "null");
   if (subItem) {
     subItem.classList.add("active");
     const group = subItem.closest(".menu-item-group");
+    console.log("DEBUG: closest group matches", group ? group.outerHTML : "null");
     if (group) {
       group.classList.add("expanded");
       const parentBtn = group.querySelector(".menu-item");
-      if (parentBtn) parentBtn.classList.add("active");
+      console.log("DEBUG: parentBtn matches", parentBtn ? parentBtn.outerHTML : "null");
+      if (parentBtn) {
+        parentBtn.classList.add("active");
+        console.log("DEBUG: parentBtn classList after add active is", parentBtn.className);
+      }
     }
     return;
   }
