@@ -271,14 +271,40 @@
                 <span class="status-label" id="statusText">reconciler online</span>
             </div>
 
-            <!-- Profile Block at Bottom -->
-            <div class="sidebar-profile">
-                <div class="profile-avatar" style="background-image: url('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&q=80');"></div>
-                <div class="profile-meta">
-                    <span class="profile-name">John Doe</span>
-                    <span class="profile-role">DevOps Lead</span>
+            <!-- Profile Block at Bottom with Role Swapper -->
+            <div class="sidebar-profile-container" style="position: relative; width: 100%;">
+                <div class="sidebar-profile" id="sidebarProfileCard" title="Click to switch role" style="cursor: pointer;">
+                    <div class="profile-avatar" style="background-image: url('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&q=80');"></div>
+                    <div class="profile-meta">
+                        <span class="profile-name" id="profileNameText">John Doe</span>
+                        <span class="profile-role" id="profileRoleText">DevOps Lead</span>
+                    </div>
+                    <span class="profile-action-icon">⚙️</span>
                 </div>
-                <span class="profile-action-icon">⚙️</span>
+                <div class="role-dropdown" id="roleDropdownMenu" style="display: none;">
+                    <div class="role-dropdown-header">SWITCH ROLE (OPA RBAC)</div>
+                    <div class="role-option active" data-role="admin" data-role-title="DevOps Lead">
+                        <span class="role-icon">👑</span>
+                        <div class="role-details">
+                            <strong>DevOps Lead</strong>
+                            <span>Admin · Full Access</span>
+                        </div>
+                    </div>
+                    <div class="role-option" data-role="operator" data-role-title="Junior SRE">
+                        <span class="role-icon">🔧</span>
+                        <div class="role-details">
+                            <strong>Junior SRE</strong>
+                            <span>Operator · PTE Rules Apply</span>
+                        </div>
+                    </div>
+                    <div class="role-option" data-role="reader" data-role-title="Guest Auditor">
+                        <span class="role-icon">👁️</span>
+                        <div class="role-details">
+                            <strong>Guest Auditor</strong>
+                            <span>Read-Only · Blocked Deploys</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </aside>
 

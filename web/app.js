@@ -2561,4 +2561,55 @@ document.addEventListener("DOMContentLoaded", () => {
   if (sbTheme) sbTheme.textContent = `${label} Theme`;
   updateBattery();
   updateShipDates();
+
+  // Load saved role preference on start
+  const savedRole = localStorage.getItem("doktriai_role") || "admin";
+  api.role = savedRole;
+  const initialOption = qs(`.role-option[data-role="${savedRole}"]`);
+  if (initialOption) {
+    qsa(".role-option").forEach(el => el.classList.remove("active"));
+    initialOption.classList.add("active");
+    const roleTitle = initialOption.dataset.roleTitle;
+    const roleTextEl = qs("#profileRoleText");
+    if (roleTextEl) roleTextEl.textContent = roleTitle;
+  }
+
+  // Toggle role selection dropdown
+  const profileCard = qs("#sidebarProfileCard");
+  const roleDropdown = qs("#roleDropdownMenu");
+  if (profileCard && roleDropdown) {
+    profileCard.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isHidden = roleDropdown.style.display === "none";
+      roleDropdown.style.display = isHidden ? "flex" : "none";
+    });
+  }
+
+  // Bind role option click handlers
+  qsa(".role-option").forEach(option => {
+    option.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const role = option.dataset.role;
+      const roleTitle = option.dataset.roleTitle;
+      
+      api.role = role;
+      localStorage.setItem("doktriai_role", role);
+      
+      qsa(".role-option").forEach(el => el.classList.remove("active"));
+      option.classList.add("active");
+      
+      const roleTextEl = qs("#profileRoleText");
+      if (roleTextEl) roleTextEl.textContent = roleTitle;
+      
+      writeTerminal(`Active security role switched to: ${roleTitle} (${role.toUpperCase()})`);
+      if (roleDropdown) roleDropdown.style.display = "none";
+    });
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (roleDropdown && profileCard && !profileCard.contains(e.target) && !roleDropdown.contains(e.target)) {
+      roleDropdown.style.display = "none";
+    }
+  });
 });

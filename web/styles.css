@@ -642,9 +642,13 @@ button:hover {
     white-space: nowrap;
 }
 
-/* Profile Section */
-.sidebar-profile {
+/* Profile Section with Swapper dropdown */
+.sidebar-profile-container {
     margin-top: auto;
+    width: 100%;
+}
+
+.sidebar-profile {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -653,6 +657,82 @@ button:hover {
     padding: 10px;
     border-radius: 10px;
     transition: all 0.2s ease;
+}
+
+.sidebar-profile:hover {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: var(--orange, #ff6b00);
+}
+
+/* Glassmorphism Role Swapper Dropdown */
+.role-dropdown {
+    position: absolute;
+    bottom: 54px;
+    left: 0;
+    right: 0;
+    background: rgba(18, 18, 18, 0.85);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 150;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.role-dropdown-header {
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    padding: 6px 8px 4px;
+    text-transform: uppercase;
+}
+
+.role-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.role-option:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.role-option.active {
+    background: rgba(255, 107, 0, 0.08);
+}
+
+.role-option.active strong {
+    color: var(--orange, #ff6b00);
+}
+
+.role-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.role-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.role-details strong {
+    font-size: 11px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.role-details span {
+    font-size: 9px;
+    color: var(--muted);
 }
 
 .profile-avatar {
