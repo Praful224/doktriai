@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -31,6 +32,7 @@ type Store struct {
 	dbPath string // Real SQLite DB path
 	db     *sql.DB
 	sqlite *storage.SQLiteStorage
+	Leader *LeaderElection
 }
 
 func OpenStore(path string) (*Store, error) {
@@ -62,6 +64,7 @@ func OpenStore(path string) (*Store, error) {
 		dbPath: dbPath,
 		db:     db,
 		sqlite: sqliteStorage,
+		Leader: NewLeaderElection(db),
 	}
 
 	// Check if we need to migrate from state.json
@@ -346,4 +349,76 @@ func (s *Store) ReleaseLock() error {
 	defer cancel()
 
 	return s.sqlite.ReleaseLock(ctx)
+}
+
+func (s *Store) SaveCheckpoint(cp packages.CheckpointEntry) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	return s.sqlite.SaveCheckpoint(ctx, cp)
+}
+
+func (s *Store) GetCheckpoint(threadID, checkpointID string) (packages.CheckpointEntry, bool, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	return s.sqlite.GetCheckpoint(ctx, threadID, checkpointID)
+}
+
+func (s *Store) ListCheckpoints(threadID string) ([]packages.CheckpointEntry, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	return s.sqlite.ListCheckpoints(ctx, threadID)
+}
+
+func (s *Store) IsWorkloadExpired(name string) (bool, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	var ttlSeconds int
+	var updatedAtVal any
+	err := s.db.QueryRowContext(ctx, `SELECT ttl_seconds, updated_at FROM workloads WHERE name = ?`, name).Scan(&ttlSeconds, &updatedAtVal)
+	if err != nil {
+		return false, err
+	}
+	if ttlSeconds <= 0 {
+		return false, nil
+	}
+
+	var updatedAt time.Time
+	switch v := updatedAtVal.(type) {
+	case time.Time:
+		updatedAt = v
+	case string:
+		formats := []string{
+			"2006-01-02 15:04:05.999999999-07:00",
+			"2006-01-02 15:04:05.999999999",
+			"2006-01-02T15:04:05Z07:00",
+			"2006-01-02T15:04:05.999999999Z",
+			time.RFC3339,
+			"2006-01-02 15:04:05",
+		}
+		for _, f := range formats {
+			if t, err := time.Parse(f, v); err == nil {
+				updatedAt = t
+				break
+			}
+		}
+		if updatedAt.IsZero() {
+			return false, fmt.Errorf("unable to parse updated_at string: %q", v)
+		}
+	default:
+		return false, fmt.Errorf("unexpected type for updated_at: %T", v)
+	}
+
+	return time.Now().UTC().After(updatedAt.Add(time.Duration(ttlSeconds) * time.Second)), nil
 }

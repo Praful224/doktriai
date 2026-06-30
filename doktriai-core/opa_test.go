@@ -102,3 +102,78 @@ reason = "replicas exceed 5" {
 		t.Error("expected operator to be denied based on mock policy rules")
 	}
 }
+
+func TestProductionPolicy(t *testing.T) {
+	// Set config to use local policy.rego
+	policy := GetPolicy()
+	originalUse := policy.Security.UseOPA
+	originalPath := policy.Security.OPAPolicyPath
+
+	policy.Security.UseOPA = true
+	policy.Security.OPAPolicyPath = "../policy.rego" // Relative to core package directory
+
+	defer func() {
+		policy.Security.UseOPA = originalUse
+		policy.Security.OPAPolicyPath = originalPath
+	}()
+
+	ctx := context.Background()
+
+	// Test 1: Admin requesting port without runsc -> should be rejected
+	spec1 := packages.WorkloadSpec{
+		Name:         "unsecured-port",
+		Image:        "nginx:alpine",
+		Replicas:     2,
+		Port:         80,
+		RuntimeClass: "",
+	}
+	allow, _, reason, err := EvaluateOPAPolicy(ctx, "admin-user", "admin", "apply", spec1)
+	if err != nil {
+		t.Fatalf("failed to evaluate policy: %v", err)
+	}
+	if allow {
+		t.Error("expected workload with port and empty runtimeClass to be rejected")
+	}
+	if !strings.Contains(reason, "must declare runtimeClass = 'runsc'") {
+		t.Errorf("expected gvisor sandbox requirement message, got: %q", reason)
+	}
+
+	// Test 2: Admin requesting port WITH runsc -> should be allowed
+	spec2 := packages.WorkloadSpec{
+		Name:         "secured-port",
+		Image:        "nginx:alpine",
+		Replicas:     2,
+		Port:         80,
+		RuntimeClass: "runsc",
+	}
+	allow, _, _, err = EvaluateOPAPolicy(ctx, "admin-user", "admin", "apply", spec2)
+	if err != nil {
+		t.Fatalf("failed to evaluate policy: %v", err)
+	}
+	if !allow {
+		t.Error("expected workload with port and runtimeClass='runsc' to be allowed")
+	}
+
+	// Test 3: Admin requesting hostPath volume mount -> should be blocked entirely
+	spec3 := packages.WorkloadSpec{
+		Name:     "escaped-container",
+		Image:    "nginx:alpine",
+		Replicas: 1,
+		Volumes: []packages.VolumeMount{
+			{
+				HostPath:      "/var/run/docker.sock",
+				ContainerPath: "/var/run/docker.sock",
+			},
+		},
+	}
+	allow, _, reason, err = EvaluateOPAPolicy(ctx, "admin-user", "admin", "apply", spec3)
+	if err != nil {
+		t.Fatalf("failed to evaluate policy: %v", err)
+	}
+	if allow {
+		t.Error("expected host path volume mount to be rejected")
+	}
+	if !strings.Contains(reason, "prohibited for security containment") {
+		t.Errorf("expected host path prohibited message, got: %q", reason)
+	}
+}

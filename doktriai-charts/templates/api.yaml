@@ -38,6 +38,10 @@ spec:
                   key: signingSecret
             - name: DOKTRIAI_CORS_ORIGINS
               value: {{ .Values.global.corsOrigins | quote }}
+            - name: DOKTRIAI_NODE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           volumeMounts:
             - name: data
               mountPath: /data

@@ -1,146 +1,126 @@
-# DOKTRIAI Control Plane
+# 🎛️ DoktriAI: The AI-Native GitOps Control Plane
 
-Autonomous control plane for declarative container clusters. `doktriai-api` coordinates multi-tenant workload requests, and `doktriai-core` reconciles desired state against local and remote Docker runtimes.
+<p align="center">
+  <img src="https://img.shields.io/badge/Go-1.22%2B-blue?style=for-the-badge&logo=go" alt="Go Version" />
+  <img src="https://img.shields.io/badge/Docker-Compatible-blue?style=for-the-badge&logo=docker" alt="Docker Support" />
+  <img src="https://img.shields.io/badge/MCP-Supported-purple?style=for-the-badge&logo=modelcontextprotocol" alt="MCP Support" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" />
+</p>
 
-## Platform Modules
+**DoktriAI** is a self-hosted, lightweight, and AI-native GitOps control plane. Think of it as a local, zero-dependency alternative to Heroku, Vercel, or Render, built specifically to let **AI Coding Agents (like Cursor, Windsurf, or Claude)** deploy, monitor, and self-heal container workloads directly on your infrastructure.
 
-| Module | Role |
-|---|---|
-| `doktriai-api` | REST & gRPC gateway — auth, audit, SSE streaming |
-| `doktriai-core` | Reconciler engine — drift detection, scheduling, events |
-| `doktriai-runtime` | Universal driver — Docker, Kubernetes, Podman, bare-metal |
-| `doktriai-operator` | GitOps Kubernetes bridge — CRDs, canary, drift alerts |
-| `doktriai-mcp` | AI agent gateway — Claude, GPT, multi-agent automation |
-| `doktriai-cli` | Terminal UX — deploy, logs, diagnose from shell |
-| `doktriai-packages` | Shared types, SDK, domain models |
-| `doktriai-charts` | Official Helm charts for cluster deployment |
-| `doktriai-examples` | Quickstarts, agent scripts, reference architectures |
+---
 
-## Requirements
+## ✨ Core Features
 
-- Go 1.22+
-- Docker Desktop or Docker Engine (available as `docker` on PATH)
+* 🤖 **AI-Native MCP Server**: Native Model Context Protocol (MCP) standard support. Hook it directly into **Cursor, Windsurf, or Claude Desktop** so your AI agent can deploy apps, read logs, and diagnose errors autonomously.
+* 🛡️ **Zero-Trust Security Gate**: 5-layer security check (including Open Policy Agent (OPA) policy rules, Unicode normalization, intent scan, and human-in-the-loop **Plan-Then-Execute (PTE) approval gates**).
+* 🔄 **GitOps & Preview Environments**: Connect GitHub Webhooks to spin up isolated, lease-based preview environments per Pull Request. Expired workloads are automatically reaped.
+* ⚡ **Declarative Reconciler Engine**: A lightweight Go engine (`doktriai-core`) that acts as a mini-Kubernetes, checking desired state against Docker or Podman and auto-correcting any container drift.
+* 🎛️ **Premium Web Console**: A sleek, dark-mode terminal IDE layout showing real-time SSE stream events, container status, and audit trails.
 
-## Run the Control Plane
+---
 
-```powershell
+## 🚀 1-Minute Quickstart
+
+### Option A: Run via Docker (Recommended)
+Spin up DoktriAI instantly and mount your local Docker daemon to orchestrate containers:
+
+```bash
+docker run -d -p 18080:18080 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v doktriai-data:/app/data \
+  --name doktriai \
+  ghcr.io/praful224/doktriai:latest
+```
+
+### Option B: Run via Go
+Clone and run the Go API server locally:
+
+```bash
 go run ./cmd/doktriai-api -addr :18080
 ```
 
-Open the web workspace:
+Once running, open the visual console at:
+👉 **[http://localhost:18080](http://localhost:18080)**
 
-```
-http://localhost:18080
-```
+---
 
-## CLI Usage
+## 🤖 Connect to your AI Editor (Cursor / Windsurf)
 
-```powershell
-# List running workloads
-go run ./cmd/doktriai-api -- list
+You can allow your AI assistant to deploy and manage containers on your machine. Add DoktriAI as an MCP server:
 
-# Deploy a container workload
-doktriai-cli apply -f app.doktri
+### Cursor Setup
+1. Open Cursor **Settings** -> **Features** -> **MCP**.
+2. Click **+ Add New MCP Server**.
+3. Configure:
+   * **Name**: `doktriai`
+   * **Type**: `command`
+   * **Command**: `doktriai-cli mcp-bridge` (or point to `go run ./cmd/doktriai-cli/main.go mcp-bridge`)
 
-# Check system status
+---
+
+## 🛠️ Developer CLI Reference
+
+DoktriAI comes with a CLI (`doktriai-cli`) to interact with your control plane from the command line:
+
+```bash
+# List active workloads
+doktriai-cli list
+
+# Apply/Deploy a container workload manifest
+doktriai-cli apply -f my-workload.yaml
+
+# Check system health & reconciler loops
 doktriai-cli status
 
 # Stream container logs
-doktriai-cli logs hello-web --tail=50
+doktriai-cli logs my-service --tail=50
 
-# Delete a workload
-doktriai-cli delete workload hello-web
-
-# List MCP agent tools
+# List active agent tools exposed to MCP
 doktriai-cli mcp-tools
 ```
 
-## REST API
+---
 
-```powershell
-# Health check
-Invoke-RestMethod http://localhost:18080/api/health
+## 🛡️ 5-Layer Security Blueprint
 
-# Deploy a Docker workload
-Invoke-RestMethod http://localhost:18080/api/workloads `
-  -Method POST `
-  -ContentType application/json `
-  -Body '{"name":"hello-nginx","image":"nginx:alpine","replicas":1,"port":8080,"containerPort":80,"runtime":"docker"}'
+DoktriAI secures AI-agent actions using an advanced multi-layered gate:
 
-# List all workloads (desired + actual state)
-Invoke-RestMethod http://localhost:18080/api/workloads
+| Layer | Security Gate | What it prevents |
+|---|---|---|
+| **Layer 0** | Token Authentication | Unauthorized API requests via signed HMAC-SHA256 tokens |
+| **Layer 1** | Intent & Sanitization | Injection attacks, directory traversal, and unicode bypasses |
+| **Layer 2** | Plan-Then-Execute (PTE) | Human-in-the-loop validation for high-risk actions (e.g. replica count > 5, deletes) |
+| **Layer 3** | Anomaly Detection | Rogue AI agents spamming the deployment control plane |
+| **Layer 4** | State Audit Trail | Tamper-proof SHA-256 historical hashing on desired state logs |
 
-# Force reconciliation loop
-Invoke-RestMethod http://localhost:18080/api/reconcile -Method POST
+---
 
-# Delete workload and containers
-Invoke-RestMethod http://localhost:18080/api/workloads/hello-nginx -Method DELETE
-
-# Stream live events (SSE)
-curl http://localhost:18080/api/events
-
-# Fetch workload logs
-Invoke-RestMethod http://localhost:18080/api/logs/hello-nginx
-```
-
-## MCP Agent Integration
-
-```powershell
-# List available agent tools
-Invoke-RestMethod http://localhost:18080/api/mcp `
-  -Method POST `
-  -ContentType application/json `
-  -Body '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
-```
-
-`tools/call` supports:
-
-- `deploy_workload` — deploy a container via AI agent
-- `list_workloads` — fetch current workload state
-- `delete_workload` — decommission a workload
-- `get_logs` — stream container logs
-
-Generate a signed HMAC auth token in the web UI → **CLI Reference → Secure Token Generator** and attach it as `X-Doktri-Token` header.
-
-## Security Layers
-
-| Layer | Purpose |
-|---|---|
-| Layer 0 | Token auth — HMAC-SHA256 signed tokens |
-| Layer 1 | Intent guard — Unicode normalisation, allowlist, Base64 scan |
-| Layer 2 | PTE Gate — high-risk actions held for human approval |
-| Layer 3 | Behavioral anomaly detection — rogue agent flagging |
-| Layer 4 | Audit trail — SHA256 state diff hashing per mutation |
-
-High-risk deploys (replicas > 5, sensitive env keys, all deletes) are gated at **Layer 2 — Plan-Then-Execute**. Navigate to the web UI → **Security → Pending Approvals** to approve or reject.
-
-## Architecture
+## 🏗️ Architecture Mapping
 
 ```text
-Developer / AI Agent
-        │
-   doktriai-cli  |  doktriai-mcp
-        │
-   doktriai-api          ← REST/gRPC, auth, audit, SSE
-        │
-   doktriai-core         ← reconcile, schedule, policy, events
-        │
-   ┌────┼────────────┐
-   ▼    ▼            ▼
-runtime  operator   packages
-   │
-Docker · K8s · Podman · Remote · Compose
+       Developer / AI Agent (Cursor, Windsurf, Claude)
+                           │
+       ┌───────────────────┴───────────────────┐
+       ▼                                       ▼
+  doktriai-cli                           doktriai-mcp (JSON-RPC)
+       │                                       │
+       └───────────────────┬───────────────────┘
+                           ▼
+                     doktriai-api (REST, Auth, Audit, SSE Stream)
+                           │
+                     doktriai-core (Reconciler, DAG Sorter, Policy)
+                           │
+             ┌─────────────┼─────────────┐
+             ▼             ▼             ▼
+          Runtime       Operator      Packages
+             │
+   Docker · K8s · Podman
 ```
 
-## Web Workspace
+---
 
-The web workspace at `http://localhost:18080` provides:
-- **Overview** — live stats, platform modules, quick-start buttons
-- **Workloads** — deploy and manage container workloads via form
-- **Projects** — view and connect all platform modules
-- **Documentation** — step-by-step guides, CLI & API reference, security docs
-- **Security** — PTE approval gate, behavioral anomaly metrics, audit trail
-- **Activity** — real-time SSE event stream and security audit trail
-- **Gallery** — architecture connection diagram
-- **Notes** — persistent workspace notes
-- **Settings** — RBAC role simulation
+## 📜 License
+
+Distributed under the MIT License. See `LICENSE` for more information.

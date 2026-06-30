@@ -11,6 +11,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 
+	"github.com/praful224/doktriai/doktriai-core/diagnostics"
 	"github.com/praful224/doktriai/doktriai-packages"
 )
 
@@ -77,12 +78,17 @@ func (e *Engine) Start(ctx context.Context) {
 	go func() {
 		ticker := time.NewTicker(e.interval)
 		defer ticker.Stop()
-		_ = e.Reconcile(ctx)
+		if e.store.Leader == nil || e.store.Leader.IsLeader() {
+			_ = e.Reconcile(ctx)
+		}
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
+				if e.store.Leader != nil && !e.store.Leader.IsLeader() {
+					continue
+				}
 				_ = e.Reconcile(ctx)
 			}
 		}
@@ -199,6 +205,30 @@ func (e *Engine) Reconcile(ctx context.Context) error {
 		e.reconcileMu.Unlock()
 	}()
 	desired := e.store.ListWorkloads()
+	var activeDesired []packages.WorkloadSpec
+	for _, spec := range desired {
+		expired, err := e.store.IsWorkloadExpired(spec.Name)
+		if err == nil && expired {
+			e.emit(packages.Event{
+				Level: "warn", Source: "reaper", Workload: spec.Name,
+				Message: fmt.Sprintf("Workload lease TTL expired after %d seconds — reaping preview containment", spec.TTLSeconds),
+			})
+			_ = e.Delete(ctx, "system:reaper", spec.Name)
+			continue
+		}
+		activeDesired = append(activeDesired, spec)
+	}
+	desired = activeDesired
+
+	if sorted, err := topologicalSort(desired); err != nil {
+		e.emit(packages.Event{
+			Level: "error", Source: "reconciler",
+			Message: fmt.Sprintf("Dependency DAG sorting error: %v (falling back to default order)", err),
+		})
+	} else {
+		desired = sorted
+	}
+
 	span.SetAttributes(attribute.Int("doktri.workloads.desired_count", len(desired)))
 	actual, err := e.runtime.List(ctx)
 	if err != nil {
@@ -352,6 +382,21 @@ func (e *Engine) circuitRecordFailure(workload string) {
 			Message: fmt.Sprintf("circuit OPENED for %q after %d consecutive failures — paused for %s",
 				workload, circuitOpenThreshold, circuitResetAfter),
 		})
+
+		// Trigger LLM-powered diagnostics asynchronously
+		logs, _ := e.Logs(context.Background(), workload, 30)
+		if len(logs) > 0 {
+			go func(wl string, lgs []string) {
+				fullLog := strings.Join(lgs, "\n")
+				diag, err := diagnostics.DiagnoseLog(context.Background(), fullLog)
+				if err == nil && diag != "" {
+					e.bus.Publish(packages.Event{
+						Level: "warn", Source: "diagnostics", Workload: wl,
+						Message: fmt.Sprintf("AI Diagnostics: %s", diag),
+					})
+				}
+			}(workload, logs)
+		}
 	}
 }
 
@@ -622,4 +667,52 @@ func (e *Engine) RollbackCanary(ctx context.Context, name string, actor string) 
 	})
 
 	return e.Reconcile(ctx)
+}
+
+func topologicalSort(specs []packages.WorkloadSpec) ([]packages.WorkloadSpec, error) {
+	specMap := make(map[string]packages.WorkloadSpec)
+	for _, spec := range specs {
+		specMap[spec.Name] = spec
+	}
+
+	visited := make(map[string]int) // 0: unvisited, 1: visiting, 2: visited
+	var result []packages.WorkloadSpec
+	var visit func(name string) error
+
+	visit = func(name string) error {
+		state := visited[name]
+		if state == 1 {
+			return fmt.Errorf("dependency cycle detected on workload %q", name)
+		}
+		if state == 2 {
+			return nil
+		}
+
+		visited[name] = 1
+
+		spec, exists := specMap[name]
+		if exists {
+			for _, dep := range spec.DependsOn {
+				if err := visit(dep); err != nil {
+					return err
+				}
+			}
+		}
+
+		visited[name] = 2
+		if exists {
+			result = append(result, spec)
+		}
+		return nil
+	}
+
+	for _, spec := range specs {
+		if visited[spec.Name] == 0 {
+			if err := visit(spec.Name); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return result, nil
 }

@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/praful224/doktriai/doktriai-packages"
 )
@@ -340,5 +341,76 @@ func TestStore_AtomicSave(t *testing.T) {
 	tmpPath := path + ".tmp"
 	if _, err := os.Stat(tmpPath); !os.IsNotExist(err) {
 		t.Error("expected .tmp file to be cleaned up after atomic save")
+	}
+}
+
+// ─── TTL Lease Expiry ──────────────────────────────────────────────────────────
+
+func TestStore_WorkloadTTL(t *testing.T) {
+	store, _ := tempStore(t)
+
+	spec := packages.WorkloadSpec{
+		Name:       "ttl-app",
+		Image:      "nginx:alpine",
+		Replicas:   1,
+		Runtime:    "docker",
+		TTLSeconds: 1, // Expires in 1 second
+	}
+	if err := store.PutWorkload(spec, "admin"); err != nil {
+		t.Fatalf("failed to put workload: %v", err)
+	}
+
+	// Should not be expired immediately
+	expired, err := store.IsWorkloadExpired("ttl-app")
+	if err != nil {
+		t.Fatalf("IsWorkloadExpired failed: %v", err)
+	}
+	if expired {
+		t.Error("expected workload to not be expired immediately")
+	}
+
+	// Wait 1.2 seconds for lease to expire
+	time.Sleep(1200 * time.Millisecond)
+
+	expired, err = store.IsWorkloadExpired("ttl-app")
+	if err != nil {
+		t.Fatalf("IsWorkloadExpired failed: %v", err)
+	}
+	if !expired {
+		t.Error("expected workload to be expired after 1.2 seconds")
+	}
+}
+
+// ─── Topological Sort ─────────────────────────────────────────────────────────
+
+func TestTopologicalSort(t *testing.T) {
+	specs := []packages.WorkloadSpec{
+		{Name: "app", DependsOn: []string{"backend"}},
+		{Name: "backend", DependsOn: []string{"db"}},
+		{Name: "db"},
+	}
+
+	sorted, err := topologicalSort(specs)
+	if err != nil {
+		t.Fatalf("topologicalSort failed: %v", err)
+	}
+
+	if len(sorted) != 3 {
+		t.Fatalf("expected 3 sorted workloads, got %d", len(sorted))
+	}
+
+	// db should be first, then backend, then app
+	if sorted[0].Name != "db" || sorted[1].Name != "backend" || sorted[2].Name != "app" {
+		t.Errorf("incorrect sort order: %s -> %s -> %s", sorted[0].Name, sorted[1].Name, sorted[2].Name)
+	}
+
+	// Test cycle detection
+	cycleSpecs := []packages.WorkloadSpec{
+		{Name: "app", DependsOn: []string{"backend"}},
+		{Name: "backend", DependsOn: []string{"app"}},
+	}
+	_, err = topologicalSort(cycleSpecs)
+	if err == nil {
+		t.Error("expected error due to dependency cycle, got nil")
 	}
 }

@@ -427,10 +427,10 @@
                     <!-- Quick Start Links -->
                     <h2 class="section-title" style="margin-top: 28px;">Quick Start</h2>
                     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px;">
-                        <button onclick="switchView('workloads')" style="font-size:12px; padding:8px 16px; background:var(--orange); color:#fff; border-radius:6px; border:0; cursor:pointer;">🚀 Deploy Workload</button>
-                        <button onclick="switchView('writing')" style="font-size:12px; padding:8px 16px; background:var(--panel-hover); color:var(--text); border-radius:6px; border:1px solid var(--line); cursor:pointer;">📖 Documentation</button>
-                        <button onclick="switchView('security')" style="font-size:12px; padding:8px 16px; background:var(--panel-hover); color:var(--text); border-radius:6px; border:1px solid var(--line); cursor:pointer;">🛡️ Security Gate</button>
-                        <button onclick="switchView('activity')" style="font-size:12px; padding:8px 16px; background:var(--panel-hover); color:var(--text); border-radius:6px; border:1px solid var(--line); cursor:pointer;">⚡ Live Activity</button>
+                        <button class="quick-start-btn" data-view="workloads" style="font-size:12px; padding:8px 16px; background:var(--orange); color:#fff; border-radius:6px; border:0; cursor:pointer;">🚀 Deploy Workload</button>
+                        <button class="quick-start-btn" data-view="writing" style="font-size:12px; padding:8px 16px; background:var(--panel-hover); color:var(--text); border-radius:6px; border:1px solid var(--line); cursor:pointer;">📖 Documentation</button>
+                        <button class="quick-start-btn" data-view="security" style="font-size:12px; padding:8px 16px; background:var(--panel-hover); color:var(--text); border-radius:6px; border:1px solid var(--line); cursor:pointer;">🛡️ Security Gate</button>
+                        <button class="quick-start-btn" data-view="activity" style="font-size:12px; padding:8px 16px; background:var(--panel-hover); color:var(--text); border-radius:6px; border:1px solid var(--line); cursor:pointer;">⚡ Live Activity</button>
                     </div>
 
                     <!-- End of Overview components -->
@@ -1622,6 +1622,21 @@
                                                 <td style="padding:7px 4px;color:var(--muted);">integer</td>
                                                 <td style="padding:7px 4px;color:var(--muted);">Max containers that may be stopped simultaneously during rolling update.</td>
                                             </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">dependsOn</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">[]string</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">List of workload names this workload depends on. Reconciler guarantees topological startup order.</td>
+                                            </tr>
+                                             <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                 <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">runtimeClass</td>
+                                                 <td style="padding:7px 4px;color:var(--muted);">string</td>
+                                                 <td style="padding:7px 4px;color:var(--muted);">Runtime sandbox engine constraint (e.g. <code>"runsc"</code> for gVisor, <code>"kata"</code>).</td>
+                                             </tr>
+                                             <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                 <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">ttlSeconds</td>
+                                                 <td style="padding:7px 4px;color:var(--muted);">integer</td>
+                                                 <td style="padding:7px 4px;color:var(--muted);">Ephemeral lease Time-To-Live (seconds). Orphaned preview containers are deleted automatically after this duration.</td>
+                                             </tr>
                                             <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
                                                 <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">securityMode</td>
                                                 <td style="padding:7px 4px;color:var(--muted);">string</td>

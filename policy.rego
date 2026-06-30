@@ -34,16 +34,35 @@ has_sensitive_env {
     is_sensitive_key(object.keys(input.spec.env)[_])
 }
 
+# Helper: check if volume mounts use hostPath
+has_host_path_mount {
+    # Check if any volume has a non-empty hostPath
+    vol := input.spec.volumes[_]
+    vol.hostPath != ""
+}
+
+# Helper: check if runtimeClass is valid for port bindings
+valid_runtime_class {
+    input.spec.port == 0
+}
+valid_runtime_class {
+    input.spec.port > 0
+    input.spec.runtimeClass == "runsc"
+}
+
 # Main authorization rules
 allow {
     input.role == "admin"
     image_approved
+    not has_host_path_mount
+    valid_runtime_class
     input.spec.replicas <= 50
 }
 
 allow {
     input.role == "operator"
     image_approved
+    not has_host_path_mount
     input.spec.replicas <= 50
     input.action == "read"
 }
@@ -51,6 +70,8 @@ allow {
 allow {
     input.role == "operator"
     image_approved
+    not has_host_path_mount
+    valid_runtime_class
     input.spec.replicas <= 50
     input.action == "apply"
 }
@@ -63,6 +84,17 @@ reason = "replica count exceeds maximum absolute limit of 50" {
 # Rejects if image prefix is unapproved
 reason = "image registry prefix is not in allowlist" {
     not image_approved
+}
+
+# Rejects if host path mount is detected
+reason = "host path volume mounts are prohibited for security containment" {
+    has_host_path_mount
+}
+
+# Rejects if port binding is requested without runsc
+reason = "workloads binding network ports must declare runtimeClass = 'runsc' for gVisor isolation" {
+    input.spec.port > 0
+    not input.spec.runtimeClass == "runsc"
 }
 
 # Requires human approval (PTE gate) rules:

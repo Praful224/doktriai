@@ -37,6 +37,9 @@ func (p *PostgresStorage) Migrate(ctx context.Context) error {
 			deploy_strategy VARCHAR(50) NOT NULL DEFAULT 'recreate',
 			max_surge INTEGER NOT NULL DEFAULT 1,
 			max_unavailable INTEGER NOT NULL DEFAULT 0,
+			runtime_class VARCHAR(50) NOT NULL DEFAULT '',
+			ttl_seconds INTEGER NOT NULL DEFAULT 0,
+			depends_on TEXT NOT NULL DEFAULT '[]',
 			created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 			updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 		);`,
@@ -100,15 +103,18 @@ func (p *PostgresStorage) Migrate(ctx context.Context) error {
 	_, _ = p.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN IF NOT EXISTS deploy_strategy VARCHAR(50) DEFAULT 'recreate'")
 	_, _ = p.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN IF NOT EXISTS max_surge INTEGER DEFAULT 1")
 	_, _ = p.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN IF NOT EXISTS max_unavailable INTEGER DEFAULT 0")
+	_, _ = p.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN IF NOT EXISTS runtime_class VARCHAR(50) DEFAULT ''")
+	_, _ = p.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN IF NOT EXISTS ttl_seconds INTEGER DEFAULT 0")
+	_, _ = p.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN IF NOT EXISTS depends_on TEXT DEFAULT '[]'")
 
 	// Seed initial workloads if table is empty
 	var count int
 	_ = p.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM workloads").Scan(&count)
 	if count == 0 {
-		_, _ = p.db.ExecContext(ctx, `INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable) VALUES 
-		('secure-ingress', 'nginx:alpine', 2, 8080, 80, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'recreate', 1, 0),
-		('reconciler-daemon', 'busybox:latest', 1, 0, 0, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'recreate', 1, 0),
-		('agent-gateway', 'python:3.11-alpine', 1, 9000, 9000, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'recreate', 1, 0)`)
+		_, _ = p.db.ExecContext(ctx, `INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable, runtime_class, ttl_seconds) VALUES 
+		('secure-ingress', 'nginx:alpine', 2, 8080, 80, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'recreate', 1, 0, '', 0),
+		('reconciler-daemon', 'busybox:latest', 1, 0, 0, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'recreate', 1, 0, '', 0),
+		('agent-gateway', 'python:3.11-alpine', 1, 9000, 9000, 'docker', '{}'::jsonb, '{}'::jsonb, '[]'::jsonb, '{}'::jsonb, 'dev', 'recreate', 1, 0, '', 0)`)
 	}
 
 	return nil
@@ -117,7 +123,7 @@ func (p *PostgresStorage) Migrate(ctx context.Context) error {
 // --- Workloads ---
 
 func (p *PostgresStorage) ListWorkloads(ctx context.Context) ([]packages.WorkloadSpec, error) {
-	rows, err := p.db.QueryContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable FROM workloads ORDER BY name ASC")
+	rows, err := p.db.QueryContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable, runtime_class, ttl_seconds, depends_on FROM workloads ORDER BY name ASC")
 	if err != nil {
 		return nil, err
 	}
@@ -126,11 +132,12 @@ func (p *PostgresStorage) ListWorkloads(ctx context.Context) ([]packages.Workloa
 	var specs []packages.WorkloadSpec
 	for rows.Next() {
 		var spec packages.WorkloadSpec
-		var envJSON, resJSON, volJSON, lblJSON []byte
+		var envJSON, resJSON, volJSON, lblJSON, depJSON []byte
 		err := rows.Scan(
 			&spec.Name, &spec.Image, &spec.Replicas, &spec.Port, &spec.ContainerPort, &spec.Runtime,
 			&envJSON, &resJSON, &volJSON, &lblJSON, &spec.SecurityMode,
 			&spec.DeployStrategy, &spec.MaxSurge, &spec.MaxUnavailable,
+			&spec.RuntimeClass, &spec.TTLSeconds, &depJSON,
 		)
 		if err != nil {
 			return nil, err
@@ -139,6 +146,7 @@ func (p *PostgresStorage) ListWorkloads(ctx context.Context) ([]packages.Workloa
 		_ = json.Unmarshal(resJSON, &spec.Resources)
 		_ = json.Unmarshal(volJSON, &spec.Volumes)
 		_ = json.Unmarshal(lblJSON, &spec.Labels)
+		_ = json.Unmarshal(depJSON, &spec.DependsOn)
 		specs = append(specs, spec)
 	}
 	return specs, nil
@@ -146,11 +154,12 @@ func (p *PostgresStorage) ListWorkloads(ctx context.Context) ([]packages.Workloa
 
 func (p *PostgresStorage) GetWorkload(ctx context.Context, name string) (packages.WorkloadSpec, bool, error) {
 	var spec packages.WorkloadSpec
-	var envJSON, resJSON, volJSON, lblJSON []byte
-	err := p.db.QueryRowContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable FROM workloads WHERE name = $1", name).Scan(
+	var envJSON, resJSON, volJSON, lblJSON, depJSON []byte
+	err := p.db.QueryRowContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable, runtime_class, ttl_seconds, depends_on FROM workloads WHERE name = $1", name).Scan(
 		&spec.Name, &spec.Image, &spec.Replicas, &spec.Port, &spec.ContainerPort, &spec.Runtime,
 		&envJSON, &resJSON, &volJSON, &lblJSON, &spec.SecurityMode,
 		&spec.DeployStrategy, &spec.MaxSurge, &spec.MaxUnavailable,
+		&spec.RuntimeClass, &spec.TTLSeconds, &depJSON,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		return spec, false, nil
@@ -162,6 +171,7 @@ func (p *PostgresStorage) GetWorkload(ctx context.Context, name string) (package
 	_ = json.Unmarshal(resJSON, &spec.Resources)
 	_ = json.Unmarshal(volJSON, &spec.Volumes)
 	_ = json.Unmarshal(lblJSON, &spec.Labels)
+	_ = json.Unmarshal(depJSON, &spec.DependsOn)
 	return spec, true, nil
 }
 
@@ -170,6 +180,7 @@ func (p *PostgresStorage) PutWorkload(ctx context.Context, spec packages.Workloa
 	resJSON, _ := json.Marshal(spec.Resources)
 	volJSON, _ := json.Marshal(spec.Volumes)
 	lblJSON, _ := json.Marshal(spec.Labels)
+	depJSON, _ := json.Marshal(spec.DependsOn)
 
 	if spec.DeployStrategy == "" {
 		spec.DeployStrategy = "recreate"
@@ -179,8 +190,8 @@ func (p *PostgresStorage) PutWorkload(ctx context.Context, spec packages.Workloa
 	}
 
 	query := `
-		INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, CURRENT_TIMESTAMP)
+		INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable, runtime_class, ttl_seconds, depends_on, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, CURRENT_TIMESTAMP)
 		ON CONFLICT (name) DO UPDATE SET
 			image = EXCLUDED.image,
 			replicas = EXCLUDED.replicas,
@@ -195,12 +206,16 @@ func (p *PostgresStorage) PutWorkload(ctx context.Context, spec packages.Workloa
 			deploy_strategy = EXCLUDED.deploy_strategy,
 			max_surge = EXCLUDED.max_surge,
 			max_unavailable = EXCLUDED.max_unavailable,
+			runtime_class = EXCLUDED.runtime_class,
+			ttl_seconds = EXCLUDED.ttl_seconds,
+			depends_on = EXCLUDED.depends_on,
 			updated_at = CURRENT_TIMESTAMP
 	`
 	_, err := p.db.ExecContext(ctx, query,
 		spec.Name, spec.Image, spec.Replicas, spec.Port, spec.ContainerPort, spec.Runtime,
 		envJSON, resJSON, volJSON, lblJSON, spec.SecurityMode,
 		spec.DeployStrategy, spec.MaxSurge, spec.MaxUnavailable,
+		spec.RuntimeClass, spec.TTLSeconds, depJSON,
 	)
 	return err
 }

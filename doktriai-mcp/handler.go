@@ -143,24 +143,51 @@ func (h *ProtocolHandler) executeTool(
 			return nil, fmt.Errorf("environment locked by %s: %s", lockState.AcquiredBy, lockState.Reason)
 		}
 
-		// Layer 1: Intent guard (multi-stage)
-		if err := core.CheckAgentIntent(spec); err != nil {
-			return nil, err
+		// Extract role from context
+		role, _ := ctx.Value("role").(string)
+		if role == "" {
+			role = "operator" // default fallback
 		}
 
-		// Layer 2: PTE Gate — check if human approval required
-		if needsApproval, reason := core.RequiresHumanApproval(spec); needsApproval {
-			plan, err := h.plans.Submit(actor, agentID, goal, reason, spec)
+		if core.GetPolicy().Security.UseOPA {
+			allow, requiresApproval, reason, err := core.EvaluateOPAPolicy(ctx, actor, role, "apply", spec)
 			if err != nil {
-				return nil, fmt.Errorf("failed to create approval plan: %w", err)
+				return nil, fmt.Errorf("DOKTRIAI OPA Error: %w", err)
 			}
-			return map[string]any{
-				"status":         "pending_approval",
-				"planId":         plan.ID,
-				"approvalReason": reason,
-				"message":        fmt.Sprintf("This operation requires human approval. Plan %s created, expires in 15 minutes.", plan.ID),
-				"expiresAt":      plan.ExpiresAt,
-			}, nil
+			if !allow && !requiresApproval {
+				return nil, fmt.Errorf("DOKTRIAI Security Violation: %s", reason)
+			}
+			if requiresApproval {
+				plan, err := h.plans.Submit(actor, agentID, goal, reason, spec)
+				if err != nil {
+					return nil, fmt.Errorf("failed to create approval plan: %w", err)
+				}
+				return map[string]any{
+					"status":         "pending_approval",
+					"planId":         plan.ID,
+					"approvalReason": reason,
+					"message":        fmt.Sprintf("This operation requires human approval. Plan %s created, expires in 15 minutes.", plan.ID),
+					"expiresAt":      plan.ExpiresAt,
+				}, nil
+			}
+		} else {
+			// Fallback to legacy checks
+			if err := core.CheckAgentIntent(spec); err != nil {
+				return nil, err
+			}
+			if needsApproval, reason := core.RequiresHumanApproval(spec); needsApproval {
+				plan, err := h.plans.Submit(actor, agentID, goal, reason, spec)
+				if err != nil {
+					return nil, fmt.Errorf("failed to create approval plan: %w", err)
+				}
+				return map[string]any{
+					"status":         "pending_approval",
+					"planId":         plan.ID,
+					"approvalReason": reason,
+					"message":        fmt.Sprintf("This operation requires human approval. Plan %s created, expires in 15 minutes.", plan.ID),
+					"expiresAt":      plan.ExpiresAt,
+				}, nil
+			}
 		}
 
 		return map[string]string{"status": "accepted"}, h.engine.Apply(ctx, actor, spec)
@@ -178,19 +205,48 @@ func (h *ProtocolHandler) executeTool(
 			return nil, fmt.Errorf("environment locked by %s: %s", lockState.AcquiredBy, lockState.Reason)
 		}
 
-		// ALL deletes via MCP require PTE approval (ASI09 — prevents autonomous mass deletion)
-		needsApproval, reason := core.RequiresDeleteApproval(payload.Name)
-		if needsApproval {
-			plan, err := h.plans.Submit(actor, agentID, goal, reason, packages.WorkloadSpec{Name: payload.Name})
+		// Extract role from context
+		role, _ := ctx.Value("role").(string)
+		if role == "" {
+			role = "operator"
+		}
+
+		spec := packages.WorkloadSpec{Name: payload.Name}
+		if core.GetPolicy().Security.UseOPA {
+			allow, requiresApproval, reason, err := core.EvaluateOPAPolicy(ctx, actor, role, "delete", spec)
 			if err != nil {
-				return nil, fmt.Errorf("failed to create delete approval plan: %w", err)
+				return nil, fmt.Errorf("DOKTRIAI OPA Error: %w", err)
 			}
-			return map[string]any{
-				"status":         "pending_approval",
-				"planId":         plan.ID,
-				"approvalReason": reason,
-				"message":        fmt.Sprintf("Deletion of %q requires human approval. Plan %s created.", payload.Name, plan.ID),
-			}, nil
+			if !allow && !requiresApproval {
+				return nil, fmt.Errorf("DOKTRIAI Security Violation: %s", reason)
+			}
+			if requiresApproval {
+				plan, err := h.plans.Submit(actor, agentID, goal, reason, spec)
+				if err != nil {
+					return nil, fmt.Errorf("failed to create delete approval plan: %w", err)
+				}
+				return map[string]any{
+					"status":         "pending_approval",
+					"planId":         plan.ID,
+					"approvalReason": reason,
+					"message":        fmt.Sprintf("Deletion of %q requires human approval. Plan %s created.", payload.Name, plan.ID),
+				}, nil
+			}
+		} else {
+			// Fallback to legacy checks
+			needsApproval, reason := core.RequiresDeleteApproval(payload.Name)
+			if needsApproval {
+				plan, err := h.plans.Submit(actor, agentID, goal, reason, spec)
+				if err != nil {
+					return nil, fmt.Errorf("failed to create delete approval plan: %w", err)
+				}
+				return map[string]any{
+					"status":         "pending_approval",
+					"planId":         plan.ID,
+					"approvalReason": reason,
+					"message":        fmt.Sprintf("Deletion of %q requires human approval. Plan %s created.", payload.Name, plan.ID),
+				}, nil
+			}
 		}
 
 		return map[string]string{"status": "deleted"}, h.engine.Delete(ctx, actor, payload.Name)

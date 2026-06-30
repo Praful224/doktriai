@@ -501,3 +501,132 @@ func TestRateLimit_NotTriggeredUnderLimit(t *testing.T) {
 		}
 	}
 }
+
+// ─── Checkpoints ──────────────────────────────────────────────────────────────
+
+func TestCheckpoints(t *testing.T) {
+	_, handler := testServer(t)
+
+	// Save Checkpoint
+	cpBody := makeJSON(t, map[string]any{
+		"threadId":     "test-thread-1",
+		"checkpointId": "test-cp-1",
+		"parentId":     "",
+		"checkpoint":   `{"state": "active"}`,
+		"metadata":     `{"step": 1}`,
+		"channels":     `{}`,
+	})
+
+	req := httptest.NewRequest("POST", "/api/checkpoints", bytes.NewReader(cpBody))
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200 for save checkpoint, got %d: %s", rr.Code, rr.Body.String())
+	}
+
+	// Get Checkpoint
+	req = httptest.NewRequest("GET", "/api/checkpoints/test-thread-1/test-cp-1", nil)
+	rr = httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200 for get checkpoint, got %d", rr.Code)
+	}
+
+	var cp packages.CheckpointEntry
+	json.Unmarshal(rr.Body.Bytes(), &cp)
+	if cp.CheckpointID != "test-cp-1" {
+		t.Errorf("expected checkpointId 'test-cp-1', got %s", cp.CheckpointID)
+	}
+
+	// List Checkpoints
+	req = httptest.NewRequest("GET", "/api/checkpoints/test-thread-1", nil)
+	rr = httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200 for list checkpoints, got %d", rr.Code)
+	}
+
+	var list []packages.CheckpointEntry
+	json.Unmarshal(rr.Body.Bytes(), &list)
+	if len(list) != 1 {
+		t.Errorf("expected 1 checkpoint, got %d", len(list))
+	}
+}
+
+// ─── GitHub Webhook ───────────────────────────────────────────────────────────
+
+func TestGitHubWebhook(t *testing.T) {
+	_, handler := testServer(t)
+
+	// Simulate PR opened
+	prBody := makeJSON(t, map[string]any{
+		"action": "opened",
+		"number": 45,
+		"pull_request": map[string]any{
+			"head": map[string]any{
+				"ref": "feature-auth",
+				"sha": "abc123sha",
+			},
+			"base": map[string]any{
+				"repo": map[string]any{
+					"name": "auth-service",
+				},
+			},
+		},
+	})
+
+	req := httptest.NewRequest("POST", "/api/webhooks/github", bytes.NewReader(prBody))
+	req.Header.Set("X-GitHub-Event", "pull_request")
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200 for PR opened, got %d: %s", rr.Code, rr.Body.String())
+	}
+
+	var resp map[string]string
+	json.Unmarshal(rr.Body.Bytes(), &resp)
+	if resp["status"] != "deployed" {
+		t.Errorf("expected status 'deployed', got %s", resp["status"])
+	}
+	if resp["workload"] != "pr-45-auth-service" {
+		t.Errorf("expected workload name 'pr-45-auth-service', got %s", resp["workload"])
+	}
+
+	// Simulate PR closed
+	prClosedBody := makeJSON(t, map[string]any{
+		"action": "closed",
+		"number": 45,
+		"pull_request": map[string]any{
+			"head": map[string]any{
+				"ref": "feature-auth",
+				"sha": "abc123sha",
+			},
+			"base": map[string]any{
+				"repo": map[string]any{
+					"name": "auth-service",
+				},
+			},
+		},
+	})
+
+	req = httptest.NewRequest("POST", "/api/webhooks/github", bytes.NewReader(prClosedBody))
+	req.Header.Set("X-GitHub-Event", "pull_request")
+	req.Header.Set("Content-Type", "application/json")
+	rr = httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200 for PR closed, got %d: %s", rr.Code, rr.Body.String())
+	}
+
+	json.Unmarshal(rr.Body.Bytes(), &resp)
+	if resp["status"] != "deleted" {
+		t.Errorf("expected status 'deleted', got %s", resp["status"])
+	}
+}

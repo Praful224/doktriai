@@ -39,6 +39,9 @@ func (s *SQLiteStorage) Migrate(ctx context.Context) error {
 			deploy_strategy TEXT NOT NULL DEFAULT 'recreate',
 			max_surge INTEGER NOT NULL DEFAULT 1,
 			max_unavailable INTEGER NOT NULL DEFAULT 0,
+			runtime_class TEXT NOT NULL DEFAULT '',
+			ttl_seconds INTEGER NOT NULL DEFAULT 0,
+			depends_on TEXT NOT NULL DEFAULT '[]',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
@@ -98,6 +101,16 @@ func (s *SQLiteStorage) Migrate(ctx context.Context) error {
 			applied_by  TEXT NOT NULL DEFAULT '',
 			applied_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);`,
+		`CREATE TABLE IF NOT EXISTS checkpoints (
+			thread_id TEXT NOT NULL,
+			checkpoint_id TEXT NOT NULL,
+			parent_id TEXT,
+			checkpoint TEXT NOT NULL,
+			metadata TEXT NOT NULL,
+			channels TEXT NOT NULL DEFAULT '{}',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY (thread_id, checkpoint_id)
+		);`,
 	}
 
 	for _, q := range queries {
@@ -110,15 +123,18 @@ func (s *SQLiteStorage) Migrate(ctx context.Context) error {
 	_, _ = s.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN deploy_strategy TEXT DEFAULT 'recreate'")
 	_, _ = s.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN max_surge INTEGER DEFAULT 1")
 	_, _ = s.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN max_unavailable INTEGER DEFAULT 0")
+	_, _ = s.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN runtime_class TEXT DEFAULT ''")
+	_, _ = s.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN ttl_seconds INTEGER DEFAULT 0")
+	_, _ = s.db.ExecContext(ctx, "ALTER TABLE workloads ADD COLUMN depends_on TEXT DEFAULT '[]'")
 
 	// Seed initial workloads if table is empty
 	var count int
 	_ = s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM workloads").Scan(&count)
 	if count == 0 {
-		_, _ = s.db.ExecContext(ctx, `INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable) VALUES 
-		('secure-ingress', 'nginx:alpine', 2, 8080, 80, 'docker', '{}', '{}', '[]', '{}', 'dev', 'recreate', 1, 0),
-		('reconciler-daemon', 'busybox:latest', 1, 0, 0, 'docker', '{}', '{}', '[]', '{}', 'dev', 'recreate', 1, 0),
-		('agent-gateway', 'python:3.11-alpine', 1, 9000, 9000, 'docker', '{}', '{}', '[]', '{}', 'dev', 'recreate', 1, 0)`)
+		_, _ = s.db.ExecContext(ctx, `INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable, runtime_class, ttl_seconds) VALUES 
+		('secure-ingress', 'nginx:alpine', 2, 8080, 80, 'docker', '{}', '{}', '[]', '{}', 'dev', 'recreate', 1, 0, '', 0),
+		('reconciler-daemon', 'busybox:latest', 1, 0, 0, 'docker', '{}', '{}', '[]', '{}', 'dev', 'recreate', 1, 0, '', 0),
+		('agent-gateway', 'python:3.11-alpine', 1, 9000, 9000, 'docker', '{}', '{}', '[]', '{}', 'dev', 'recreate', 1, 0, '', 0)`)
 	}
 
 	return nil
@@ -127,7 +143,7 @@ func (s *SQLiteStorage) Migrate(ctx context.Context) error {
 // --- Workloads ---
 
 func (s *SQLiteStorage) ListWorkloads(ctx context.Context) ([]packages.WorkloadSpec, error) {
-	rows, err := s.db.QueryContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable FROM workloads ORDER BY name ASC")
+	rows, err := s.db.QueryContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable, runtime_class, ttl_seconds, depends_on FROM workloads ORDER BY name ASC")
 	if err != nil {
 		return nil, err
 	}
@@ -136,11 +152,12 @@ func (s *SQLiteStorage) ListWorkloads(ctx context.Context) ([]packages.WorkloadS
 	var specs []packages.WorkloadSpec
 	for rows.Next() {
 		var spec packages.WorkloadSpec
-		var envJSON, resJSON, volJSON, lblJSON string
+		var envJSON, resJSON, volJSON, lblJSON, depJSON string
 		err := rows.Scan(
 			&spec.Name, &spec.Image, &spec.Replicas, &spec.Port, &spec.ContainerPort, &spec.Runtime,
 			&envJSON, &resJSON, &volJSON, &lblJSON, &spec.SecurityMode,
 			&spec.DeployStrategy, &spec.MaxSurge, &spec.MaxUnavailable,
+			&spec.RuntimeClass, &spec.TTLSeconds, &depJSON,
 		)
 		if err != nil {
 			return nil, err
@@ -149,6 +166,7 @@ func (s *SQLiteStorage) ListWorkloads(ctx context.Context) ([]packages.WorkloadS
 		_ = json.Unmarshal([]byte(resJSON), &spec.Resources)
 		_ = json.Unmarshal([]byte(volJSON), &spec.Volumes)
 		_ = json.Unmarshal([]byte(lblJSON), &spec.Labels)
+		_ = json.Unmarshal([]byte(depJSON), &spec.DependsOn)
 		specs = append(specs, spec)
 	}
 	return specs, nil
@@ -156,11 +174,12 @@ func (s *SQLiteStorage) ListWorkloads(ctx context.Context) ([]packages.WorkloadS
 
 func (s *SQLiteStorage) GetWorkload(ctx context.Context, name string) (packages.WorkloadSpec, bool, error) {
 	var spec packages.WorkloadSpec
-	var envJSON, resJSON, volJSON, lblJSON string
-	err := s.db.QueryRowContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable FROM workloads WHERE name = ?", name).Scan(
+	var envJSON, resJSON, volJSON, lblJSON, depJSON string
+	err := s.db.QueryRowContext(ctx, "SELECT name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable, runtime_class, ttl_seconds, depends_on FROM workloads WHERE name = ?", name).Scan(
 		&spec.Name, &spec.Image, &spec.Replicas, &spec.Port, &spec.ContainerPort, &spec.Runtime,
 		&envJSON, &resJSON, &volJSON, &lblJSON, &spec.SecurityMode,
 		&spec.DeployStrategy, &spec.MaxSurge, &spec.MaxUnavailable,
+		&spec.RuntimeClass, &spec.TTLSeconds, &depJSON,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		return spec, false, nil
@@ -172,6 +191,7 @@ func (s *SQLiteStorage) GetWorkload(ctx context.Context, name string) (packages.
 	_ = json.Unmarshal([]byte(resJSON), &spec.Resources)
 	_ = json.Unmarshal([]byte(volJSON), &spec.Volumes)
 	_ = json.Unmarshal([]byte(lblJSON), &spec.Labels)
+	_ = json.Unmarshal([]byte(depJSON), &spec.DependsOn)
 	return spec, true, nil
 }
 
@@ -180,6 +200,7 @@ func (s *SQLiteStorage) PutWorkload(ctx context.Context, spec packages.WorkloadS
 	resJSON, _ := json.Marshal(spec.Resources)
 	volJSON, _ := json.Marshal(spec.Volumes)
 	lblJSON, _ := json.Marshal(spec.Labels)
+	depJSON, _ := json.Marshal(spec.DependsOn)
 
 	if spec.DeployStrategy == "" {
 		spec.DeployStrategy = "recreate"
@@ -189,8 +210,8 @@ func (s *SQLiteStorage) PutWorkload(ctx context.Context, spec packages.WorkloadS
 	}
 
 	query := `
-		INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+		INSERT INTO workloads (name, image, replicas, port, container_port, runtime, env, resources, volumes, labels, security_mode, deploy_strategy, max_surge, max_unavailable, runtime_class, ttl_seconds, depends_on, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
 		ON CONFLICT (name) DO UPDATE SET
 			image = EXCLUDED.image,
 			replicas = EXCLUDED.replicas,
@@ -205,12 +226,16 @@ func (s *SQLiteStorage) PutWorkload(ctx context.Context, spec packages.WorkloadS
 			deploy_strategy = EXCLUDED.deploy_strategy,
 			max_surge = EXCLUDED.max_surge,
 			max_unavailable = EXCLUDED.max_unavailable,
+			runtime_class = EXCLUDED.runtime_class,
+			ttl_seconds = EXCLUDED.ttl_seconds,
+			depends_on = EXCLUDED.depends_on,
 			updated_at = CURRENT_TIMESTAMP
 	`
 	_, err := s.db.ExecContext(ctx, query,
 		spec.Name, spec.Image, spec.Replicas, spec.Port, spec.ContainerPort, spec.Runtime,
 		string(envJSON), string(resJSON), string(volJSON), string(lblJSON), spec.SecurityMode,
 		spec.DeployStrategy, spec.MaxSurge, spec.MaxUnavailable,
+		spec.RuntimeClass, spec.TTLSeconds, string(depJSON),
 	)
 	return err
 }
@@ -586,4 +611,60 @@ func (s *SQLiteStorage) GetHistoryVersion(ctx context.Context, name string, vers
 	}
 	err = json.Unmarshal([]byte(specJSON), &spec)
 	return spec, err
+}
+
+// --- Checkpoints ---
+
+func (s *SQLiteStorage) SaveCheckpoint(ctx context.Context, cp packages.CheckpointEntry) error {
+	_, err := s.db.ExecContext(ctx, `
+		INSERT INTO checkpoints (thread_id, checkpoint_id, parent_id, checkpoint, metadata, channels)
+		VALUES (?, ?, ?, ?, ?, ?)
+		ON CONFLICT(thread_id, checkpoint_id) DO UPDATE SET
+			parent_id = excluded.parent_id,
+			checkpoint = excluded.checkpoint,
+			metadata = excluded.metadata,
+			channels = excluded.channels,
+			created_at = CURRENT_TIMESTAMP
+	`, cp.ThreadID, cp.CheckpointID, cp.ParentID, cp.Checkpoint, cp.Metadata, cp.Channels)
+	return err
+}
+
+func (s *SQLiteStorage) GetCheckpoint(ctx context.Context, threadID, checkpointID string) (packages.CheckpointEntry, bool, error) {
+	var cp packages.CheckpointEntry
+	err := s.db.QueryRowContext(ctx, `
+		SELECT thread_id, checkpoint_id, parent_id, checkpoint, metadata, channels, created_at
+		FROM checkpoints
+		WHERE thread_id = ? AND checkpoint_id = ?
+	`, threadID, checkpointID).Scan(&cp.ThreadID, &cp.CheckpointID, &cp.ParentID, &cp.Checkpoint, &cp.Metadata, &cp.Channels, &cp.CreatedAt)
+	if err == sql.ErrNoRows {
+		return cp, false, nil
+	}
+	if err != nil {
+		return cp, false, err
+	}
+	return cp, true, nil
+}
+
+func (s *SQLiteStorage) ListCheckpoints(ctx context.Context, threadID string) ([]packages.CheckpointEntry, error) {
+	rows, err := s.db.QueryContext(ctx, `
+		SELECT thread_id, checkpoint_id, parent_id, checkpoint, metadata, channels, created_at
+		FROM checkpoints
+		WHERE thread_id = ?
+		ORDER BY created_at DESC
+	`, threadID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []packages.CheckpointEntry
+	for rows.Next() {
+		var cp packages.CheckpointEntry
+		err := rows.Scan(&cp.ThreadID, &cp.CheckpointID, &cp.ParentID, &cp.Checkpoint, &cp.Metadata, &cp.Channels, &cp.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, cp)
+	}
+	return list, nil
 }

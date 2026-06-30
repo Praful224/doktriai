@@ -1516,7 +1516,13 @@ async function refreshPolicy() {
 
 
 function bind() {
-  qsa(".tree, .menu-item, .sub-item").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
+  qsa(".tree, .menu-item, .sub-item, .quick-start-btn").forEach((button) => button.addEventListener("click", () => {
+    switchView(button.dataset.view);
+    const ide = document.querySelector(".ide");
+    if (window.innerWidth <= 760 && ide) {
+      ide.classList.remove("sidebar-mobile-active");
+    }
+  }));
 
   // Project Name Inline Editing
   const nameContainer = qs("#projectNameContainer");
@@ -2498,7 +2504,11 @@ spec:
   const ideContainer = qs(".ide");
   if (sidebarBtn && ideContainer) {
     sidebarBtn.addEventListener("click", () => {
-      ideContainer.classList.toggle("sidebar-hidden");
+      if (window.innerWidth <= 760) {
+        ideContainer.classList.toggle("sidebar-mobile-active");
+      } else {
+        ideContainer.classList.toggle("sidebar-hidden");
+      }
       writeTerminal("Sidebar visibility toggled.");
     });
   }
@@ -2610,6 +2620,18 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", (e) => {
     if (roleDropdown && profileCard && !profileCard.contains(e.target) && !roleDropdown.contains(e.target)) {
       roleDropdown.style.display = "none";
+    }
+  });
+
+  // Event delegation for Quick Start buttons
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".quick-start-btn");
+    if (btn) {
+      switchView(btn.dataset.view);
+      const ide = document.querySelector(".ide");
+      if (window.innerWidth <= 760 && ide) {
+        ide.classList.remove("sidebar-mobile-active");
+      }
     }
   });
 

@@ -62,6 +62,12 @@ func main() {
 	defer stop()
 
 	engine.Start(ctx)
+	server.StartSlack(ctx)
+	store.Leader.Start(ctx, func() {
+		bus.Publish(packages.Event{Level: "ok", Source: "cluster", Message: "Node acquired leadership"})
+	}, func() {
+		bus.Publish(packages.Event{Level: "warn", Source: "cluster", Message: "Node lost leadership"})
+	})
 	bus.Publish(packages.Event{Level: "ok", Source: "api", Message: "DOKTRIAI API core cluster online"})
 
 	httpServer := &http.Server{

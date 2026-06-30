@@ -66,6 +66,9 @@ type WorkloadSpec struct {
 	DeployStrategy string            `json:"deployStrategy,omitempty" yaml:"deployStrategy,omitempty"` // "recreate" (default) or "rolling"
 	MaxSurge       int               `json:"maxSurge,omitempty" yaml:"maxSurge,omitempty"`
 	MaxUnavailable int               `json:"maxUnavailable,omitempty" yaml:"maxUnavailable,omitempty"`
+	RuntimeClass   string            `json:"runtimeClass,omitempty" yaml:"runtimeClass,omitempty"`     // "runsc" (gVisor), "kata", etc.
+	TTLSeconds     int               `json:"ttlSeconds,omitempty" yaml:"ttlSeconds,omitempty"`         // Ephemeral lease TTL in seconds
+	DependsOn      []string          `json:"dependsOn,omitempty" yaml:"dependsOn,omitempty"`           // Workloads this workload depends on
 }
 
 // ActualWorkload is the observed container state from the runtime driver.
@@ -182,5 +185,16 @@ type RuntimeDriver interface {
 	Delete(ctx context.Context, workload string, replica int) error
 	DeleteWorkload(ctx context.Context, workload string) error
 	Logs(ctx context.Context, workload string, tail int) ([]string, error)
+}
+
+// CheckpointEntry matches the langgraphgo checkpoint database structure.
+type CheckpointEntry struct {
+	ThreadID     string    `json:"threadId"`
+	CheckpointID string    `json:"checkpointId"`
+	ParentID     string    `json:"parentId,omitempty"`
+	Checkpoint   string    `json:"checkpoint"` // JSON string representation
+	Metadata     string    `json:"metadata"`   // JSON string representation
+	Channels     string    `json:"channels"`   // JSON string representation
+	CreatedAt    time.Time `json:"createdAt"`
 }
 

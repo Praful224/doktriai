@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -98,6 +99,14 @@ func (s *Server) Routes() http.Handler {
 	// Canary endpoints
 	mux.HandleFunc("GET /api/workloads/{name}/canary", s.getCanary)
 	mux.HandleFunc("POST /api/workloads/{name}/canary/promote", s.promoteCanary)
+
+	// Checkpoints endpoints (langgraphgo compat)
+	mux.HandleFunc("POST /api/checkpoints", s.saveCheckpoint)
+	mux.HandleFunc("GET /api/checkpoints/{threadId}", s.listCheckpoints)
+	mux.HandleFunc("GET /api/checkpoints/{threadId}/{checkpointId}", s.getCheckpoint)
+
+	// Webhooks
+	mux.HandleFunc("POST /api/webhooks/github", s.githubWebhook)
 	mux.HandleFunc("POST /api/workloads/{name}/canary/rollback", s.rollbackCanary)
 
 	// Prometheus-compatible metrics
@@ -584,7 +593,8 @@ func (s *Server) mcpHandler(w http.ResponseWriter, r *http.Request) {
 	if claims == nil {
 		return
 	}
-	result, err := s.mcp.HandleRPC(r.Context(), claims.ActorName, body)
+	ctx := context.WithValue(r.Context(), "role", claims.Role)
+	result, err := s.mcp.HandleRPC(ctx, claims.ActorName, body)
 	if err != nil {
 		writeJSON(w, http.StatusOK, map[string]any{"jsonrpc": "2.0", "error": map[string]any{"code": -32000, "message": err.Error()}})
 		return
@@ -1423,6 +1433,134 @@ func (s *Server) rollbackCanary(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]string{"status": "rolled_back"})
+}
+
+// --- Checkpoints ---
+
+func (s *Server) saveCheckpoint(w http.ResponseWriter, r *http.Request) {
+	var cp packages.CheckpointEntry
+	if err := json.NewDecoder(r.Body).Decode(&cp); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	if cp.ThreadID == "" || cp.CheckpointID == "" {
+		writeError(w, http.StatusBadRequest, fmt.Errorf("threadId and checkpointId are required"))
+		return
+	}
+	if err := s.store.SaveCheckpoint(cp); err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"status": "saved"})
+}
+
+func (s *Server) listCheckpoints(w http.ResponseWriter, r *http.Request) {
+	threadID := r.PathValue("threadId")
+	if threadID == "" {
+		writeError(w, http.StatusBadRequest, fmt.Errorf("threadId is required"))
+		return
+	}
+	list, err := s.store.ListCheckpoints(threadID)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, list)
+}
+
+func (s *Server) getCheckpoint(w http.ResponseWriter, r *http.Request) {
+	threadID := r.PathValue("threadId")
+	checkpointID := r.PathValue("checkpointId")
+	if threadID == "" || checkpointID == "" {
+		writeError(w, http.StatusBadRequest, fmt.Errorf("threadId and checkpointId are required"))
+		return
+	}
+	cp, ok, err := s.store.GetCheckpoint(threadID, checkpointID)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	if !ok {
+		writeError(w, http.StatusNotFound, fmt.Errorf("checkpoint not found"))
+		return
+	}
+	writeJSON(w, http.StatusOK, cp)
+}
+
+// --- Webhooks ---
+
+func (s *Server) githubWebhook(w http.ResponseWriter, r *http.Request) {
+	event := r.Header.Get("X-GitHub-Event")
+	if event != "pull_request" {
+		writeJSON(w, http.StatusOK, map[string]string{"status": "ignored"})
+		return
+	}
+
+	var payload struct {
+		Action      string `json:"action"`
+		Number      int    `json:"number"`
+		PullRequest struct {
+			Head struct {
+				Ref string `json:"ref"`
+				SHA string `json:"sha"`
+			} `json:"head"`
+			Base struct {
+				Repo struct {
+					Name string `json:"name"`
+				} `json:"repo"`
+			} `json:"base"`
+		} `json:"pull_request"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	repoName := payload.PullRequest.Base.Repo.Name
+	prNumber := payload.Number
+	branchName := payload.PullRequest.Head.Ref
+	workloadName := fmt.Sprintf("pr-%d-%s", prNumber, repoName)
+	
+	// Sanitize to DNS label style
+	workloadName = strings.ReplaceAll(strings.ToLower(workloadName), "_", "-")
+	if len(workloadName) > 45 {
+		workloadName = workloadName[:45]
+	}
+
+	if payload.Action == "opened" || payload.Action == "synchronize" {
+		spec := packages.WorkloadSpec{
+			Name:         workloadName,
+			Image:        fmt.Sprintf("nginx:alpine"), // Fallback to safe seeder image for verification
+			Replicas:     1,
+			TTLSeconds:   3600, // 1 hour lease
+			Runtime:      "docker",
+			Labels: map[string]string{
+				"github.pull_request": fmt.Sprintf("%d", prNumber),
+				"github.branch":       branchName,
+				"github.sha":          payload.PullRequest.Head.SHA,
+			},
+		}
+		if err := s.engine.Apply(r.Context(), "github-webhook", spec); err != nil {
+			writeError(w, http.StatusInternalServerError, err)
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]string{
+			"status":   "deployed",
+			"workload": workloadName,
+		})
+	} else if payload.Action == "closed" {
+		if err := s.engine.Delete(r.Context(), "github-webhook", workloadName); err != nil {
+			writeError(w, http.StatusInternalServerError, err)
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]string{
+			"status":   "deleted",
+			"workload": workloadName,
+		})
+	} else {
+		writeJSON(w, http.StatusOK, map[string]string{"status": "ignored_action"})
+	}
 }
 
 
