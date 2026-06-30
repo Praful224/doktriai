@@ -1246,7 +1246,6 @@
                     <script>
                         function copySnippet(btn) {
                             const pre = btn.nextElementSibling;
-                            // Clean up span styling tags if browser copies raw html, copy innerText
                             const text = pre.innerText || pre.textContent;
                             navigator.clipboard.writeText(text).then(() => {
                                 btn.innerText = 'Copied!';
@@ -1269,524 +1268,8 @@
                     <p class="lede">Complete developer reference: server flags, REST API endpoints, MCP agent tools, WorkloadSpec schema, OPA security policy, and runnable cURL/CLI examples — all sourced from the live control-plane codebase.</p>
 
                     <div class="split-docs-layout">
-                        <!-- ===================== LEFT GUIDE COLUMN ===================== -->
-                        <div class="docs-guide-col" style="max-height:72vh; overflow-y:auto; padding-right:10px;">
-
-                            <!-- SECTION 1 - STARTING THE SERVER -->
-                            <div style="margin-bottom:28px;">
-                                <h3 style="color:#fff;font-size:13px;margin-top:0;border-bottom:1px solid var(--line);padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">1. Starting the Control Plane</h3>
-                                <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:8px 0;">
-                                    The server is a Go binary (<code>cmd/doktriai-api/main.go</code>) that integrates the store, reconciler engine, event bus, Docker driver, and HTTP router. Launch it with the flags below.
-                                </p>
-                                <table style="width:100%;border-collapse:collapse;font-size:10.5px;margin-top:10px;color:var(--text);">
-                                    <thead>
-                                        <tr style="border-bottom:1px solid var(--line);color:#fff;text-align:left;">
-                                            <th style="padding:6px 4px;width:30%;">Flag</th>
-                                            <th style="padding:6px 4px;width:20%;">Default</th>
-                                            <th style="padding:6px 4px;">What it controls</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">-addr</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">:18080</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">TCP address and port the HTTP server binds to.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">-data-dir</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">data/</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Directory for <code>state.json</code> (workload store) and <code>audit.json</code>.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">-web-dir</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">web/</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Static files directory served at <code>/</code>.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">-reconcile-every</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">5s</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Reconciler loop tick interval. Lower = faster drift detection.</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">-policy</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">doktri-policy.yaml</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Path to OPA RBAC policy YAML configuration file.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <div class="doc-callout" style="margin-top:12px;">
-                                    <strong>&#128204; Environment Variable Override</strong>
-                                    Set <code>DOKTRIAI_OTEL_DISABLED=true</code> to skip OpenTelemetry tracing startup when no Jaeger/OTLP collector is running locally.<br/>
-                                    Set <code>DOKTRIAI_DEV_MODE=true</code> (default in dev) to allow header-based role fallback without JWT tokens.
-                                </div>
-                            </div>
-
-                            <!-- SECTION 2 - REST API ENDPOINTS -->
-                            <div style="margin-bottom:28px;">
-                                <h3 style="color:#fff;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">2. REST API Endpoint Reference</h3>
-                                <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:8px 0 10px;">All endpoints are HTTP/1.1. Dev mode accepts <code>X-Doktri-Role</code> + <code>X-Doktri-Actor</code> headers. Production mode requires <code>X-Doktri-Token: &lt;jwt&gt;</code>.</p>
-
-                                <div style="margin-bottom:14px;">
-                                    <div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:.08em;margin-bottom:6px;">SYSTEM</div>
-                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
-                                        <tbody>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;width:45%;color:var(--green);font-family:monospace;">GET /api/health</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Returns <code>{"status":"ok"}</code>. Use for liveness probes.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/schema</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Returns the live JSON schema for <code>WorkloadSpec</code>.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/policy</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Returns the active OPA policy matrix (roles &amp; actions).</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/metrics</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Prometheus metrics: desired/actual replicas, audit counts, plan states.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div style="margin-bottom:14px;">
-                                    <div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:.08em;margin-bottom:6px;">WORKLOADS</div>
-                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
-                                        <tbody>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;width:52%;color:var(--green);font-family:monospace;">GET /api/workloads</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">List all workloads with desired spec and actual container states.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/workloads/{name}</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Get a single workload by name, including live replica status.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/workloads</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Create or update a workload (upsert). Body = <code>WorkloadSpec</code> JSON. Requires <strong>admin</strong> role.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/workloads/deploy-manifest</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Deploy via raw YAML manifest body. Parsed into <code>WorkloadSpec</code> server-side.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">PATCH /api/workloads/{name}</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Partial update (e.g. change replicas only). Merges into existing spec.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:#e74c3c;font-family:monospace;">DELETE /api/workloads/{name}</td>
-                                                <td style="padding:6px 4px;color:var(--muted);"><strong>PTE gated.</strong> Removes workload spec and stops all containers. Always requires approval.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/workloads/{name}/history</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Returns all stored version snapshots of this workload spec.</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/workloads/{name}/rollback</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Rollback to a specific version. Body: <code>{"version": 3}</code>.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div style="margin-bottom:14px;">
-                                    <div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:.08em;margin-bottom:6px;">CANARY DEPLOYMENTS</div>
-                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
-                                        <tbody>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;width:52%;color:var(--green);font-family:monospace;">GET /api/workloads/{name}/canary</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Get current canary status (split traffic %, image version).</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/workloads/{name}/canary/promote</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Promote canary to stable (100% traffic shift). Irreversible.</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/workloads/{name}/canary/rollback</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Roll back canary to previous stable version.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div style="margin-bottom:14px;">
-                                    <div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:.08em;margin-bottom:6px;">RECONCILER &amp; LOCK</div>
-                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
-                                        <tbody>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;width:52%;color:var(--orange);font-family:monospace;">POST /api/reconcile</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Trigger an immediate reconcile cycle (outside the auto-tick). Role: <strong>admin/operator</strong>.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/validate</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Validate a <code>WorkloadSpec</code> payload without applying it. Useful for CI dry-runs.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/lock</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Returns lock state: <code>{"locked":true,"acquiredBy":"alice","reason":"..."}</code>.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/lock</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Freeze the reconciler. Body: <code>{"reason":"maintenance"}</code>.</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding:6px 4px;color:#e74c3c;font-family:monospace;">DELETE /api/lock</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Release the reconciler lock. No body required.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div style="margin-bottom:14px;">
-                                    <div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:.08em;margin-bottom:6px;">PTE APPROVAL GATE</div>
-                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
-                                        <tbody>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;width:52%;color:var(--green);font-family:monospace;">GET /api/plan</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">List all PTE plans (pending, approved, rejected, expired).</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/plan</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Manually submit a plan for approval. Used by operators before high-risk ops.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/plan/{id}/approve</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Admin approves a pending plan. Immediately applies the spec.</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/plan/{id}/reject</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Admin rejects a plan. Body: <code>{"comment":"reason"}</code>.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div style="margin-bottom:14px;">
-                                    <div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:.08em;margin-bottom:6px;">STREAMING &amp; OBSERVABILITY</div>
-                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
-                                        <tbody>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;width:52%;color:var(--green);font-family:monospace;">GET /api/events</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Server-Sent Events (SSE) stream. Emits real-time reconciler, deploy, and anomaly events.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/audit</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Immutable append-only audit log of all actions with actor, role, plan, and state-hash fields.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/logs/{name}</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Tail container stdout/stderr. Add <code>?tail=100</code> query param to limit lines.</td>
-                                            </tr>
-                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/behavior</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Per-actor anomaly metrics: deploy/delete/reject counts in 5-min sliding window.</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/runtime/status</td>
-                                                <td style="padding:6px 4px;color:var(--muted);">Raw runtime provider status (Docker daemon, container count, etc.).</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- SECTION 3 — MCP TOOLS -->
-                            <div style="margin-bottom:28px;">
-                                <h3 style="color:#fff;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">3. MCP Agent Tool Reference</h3>
-                                <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:8px 0 10px;">
-                                    AI agents (Claude, GPT, Gemini) interact over the Model Context Protocol (MCP) endpoint at <code>POST /api/mcp</code>. All calls use a JSON-RPC 2.0 envelope: <code>{"jsonrpc":"2.0","method":"tools/call","params":{...}}</code>
-                                </p>
-                                <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
-                                    <thead>
-                                        <tr style="border-bottom:1px solid var(--line);color:#fff;text-align:left;">
-                                            <th style="padding:6px 4px;width:30%;">Tool Name</th>
-                                            <th style="padding:6px 4px;width:15%;">PTE Gated?</th>
-                                            <th style="padding:6px 4px;">Description &amp; Arguments</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">tools/list</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">No</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Returns the schema of all callable tools with descriptions and approval flags.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">deploy_workload</td>
-                                            <td style="padding:8px 4px;color:#e74c3c;">Yes*</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Creates or updates a workload. Args = full <code>WorkloadSpec</code> JSON. If replicas &gt; 5 or high-risk image, returns <code>pending_approval</code> status with a <code>planId</code>.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">list_workloads</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">No</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Returns array of <code>WorkloadStatus</code> objects with desired spec and actual containers.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">get_workload</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">No</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Args: <code>{"name":"hello-web"}</code>. Returns single workload status or 404 error.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">delete_workload</td>
-                                            <td style="padding:8px 4px;color:#e74c3c;">Always</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Args: <code>{"name":"hello-web"}</code>. All autonomous deletions route through PTE Gate. Returns <code>pending_approval</code>.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">get_logs</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">No</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Args: <code>{"name":"hello-web","tail":50}</code>. Returns last N lines from container stdout.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">list_pending_plans</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">No</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Returns all PTE plans awaiting human approval. Use before calling <code>approve_plan</code>.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">approve_plan</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">No</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Args: <code>{"id":"plan-uuid"}</code>. Marks plan approved and immediately applies the stored spec.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">reject_plan</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">No</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Args: <code>{"id":"plan-uuid","comment":"reason"}</code>. Permanently rejects the plan.</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">get_behavior_metrics</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">No</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Returns per-actor anomaly counters for security dashboards.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <div class="doc-callout" style="margin-top:12px;">
-                                    <strong>&#128272; MCP Scope Claim</strong>
-                                    Agents must declare their scope in the <code>params.scope</code> field, e.g. <code>"scope": "list_workloads,deploy_workload"</code>. Any tool call outside the declared scope is rejected by <code>ValidateAgentScope()</code> before execution.
-                                </div>
-                            </div>
-
-                            <!-- SECTION 4 — WORKLOADSPEC FIELD GLOSSARY -->
-                            <div style="margin-bottom:28px;">
-                                <h3 style="color:#fff;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">4. WorkloadSpec Field Glossary</h3>
-                                <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:8px 0 10px;">
-                                    Every deploy call (REST or MCP) requires a <code>WorkloadSpec</code> JSON body. These are the exact struct fields from <code>doktriai-packages/types.go</code>:
-                                </p>
-                                <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
-                                    <thead>
-                                        <tr style="border-bottom:1px solid var(--line);color:#fff;text-align:left;">
-                                            <th style="padding:6px 4px;width:28%;">Field (JSON key)</th>
-                                            <th style="padding:6px 4px;width:14%;">Type</th>
-                                            <th style="padding:6px 4px;">Meaning &amp; Valid Values</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">name</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">string</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Unique workload identifier. Lowercase alphanumeric + hyphens. e.g. <code>nginx-web</code>.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">image</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">string</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Docker image reference: <code>nginx:alpine</code>, <code>redis:7.2</code>, or fully-qualified digest.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">replicas</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">integer</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Desired container count. Range <code>1-50</code>. Values &gt; 5 trigger PTE Gate automatically.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">port</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">integer</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Host port exposed on the Docker network (0 = no port binding).</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">containerPort</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">integer</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Port the process listens on inside the container. Typically matches <code>port</code>.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">runtime</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">string</td>
-                                            <td style="padding:7px 4px;color:var(--muted);"><code>"docker"</code> (default). Future: <code>"kubernetes"</code>.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">deployStrategy</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">string</td>
-                                            <td style="padding:7px 4px;color:var(--muted);"><code>"recreate"</code> (default) - stop all, start new. <code>"rolling"</code> - replace one-at-a-time with zero downtime.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">maxSurge</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">integer</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Max extra containers allowed above <code>replicas</code> during rolling update.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">maxUnavailable</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">integer</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Max containers that may be stopped simultaneously during rolling update.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">securityMode</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">string</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Validation tier: <code>"dev"</code> | <code>"staging"</code> | <code>"production"</code>. Production enforces registry allowlist + digest pinning.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">env</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">map[str]str</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Environment variables injected into containers. Values max 4096 chars. No <code>SECRET_</code> prefix in dev.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">resources.cpuShares</td>
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">int64</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Relative CPU weight. <code>512</code> = half a core, <code>1024</code> = 1 core. Docker default: 1024.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">resources.memoryMb</td>
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">int64</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Memory limit in megabytes. <code>0</code> = unlimited. e.g. <code>256</code> = 256 MB cap.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">healthCheck.httpPath</td>
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">string</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">HTTP GET path for health probe, e.g. <code>/healthz</code>. Reconciler marks container unhealthy if probe fails.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">healthCheck.intervalSec</td>
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">int</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Seconds between liveness checks. Default <code>30</code>.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">volumes[].hostPath</td>
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">string</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Absolute path on the host to bind-mount into the container.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">volumes[].containerPath</td>
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">string</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Mount target path inside the container.</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">labels</td>
-                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">map[str]str</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">Key-value labels attached to Docker containers (for filtering/grouping). e.g. <code>{"team":"platform"}</code>.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- SECTION 5 — OPA RBAC PERMISSION MATRIX -->
-                            <div style="margin-bottom:28px;">
-                                <h3 style="color:#fff;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">5. OPA RBAC Permission Matrix</h3>
-                                <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:8px 0 10px;">
-                                    Every request is evaluated by <code>core.RoleCan(role, action)</code> against the following matrix. Role is resolved from JWT claims or the <code>X-Doktri-Role</code> header in dev mode.
-                                </p>
-                                <table style="width:100%;border-collapse:collapse;font-size:10.5px;text-align:center;">
-                                    <thead>
-                                        <tr style="border-bottom:1px solid var(--line);color:#fff;">
-                                            <th style="padding:6px 4px;text-align:left;">Action</th>
-                                            <th style="padding:6px 4px;">admin</th>
-                                            <th style="padding:6px 4px;">operator</th>
-                                            <th style="padding:6px 4px;">reader</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;text-align:left;color:var(--muted);font-family:monospace;">read</td>
-                                            <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
-                                            <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
-                                            <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;text-align:left;color:var(--muted);font-family:monospace;">apply (deploy)</td>
-                                            <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
-                                            <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
-                                            <td style="padding:7px 4px;color:#e74c3c;">&#10007;</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;text-align:left;color:var(--muted);font-family:monospace;">reconcile</td>
-                                            <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
-                                            <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
-                                            <td style="padding:7px 4px;color:#e74c3c;">&#10007;</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:7px 4px;text-align:left;color:var(--muted);font-family:monospace;">delete</td>
-                                            <td style="padding:7px 4px;color:#27ae60;">&#10003; (PTE)</td>
-                                            <td style="padding:7px 4px;color:#e74c3c;">&#10007;</td>
-                                            <td style="padding:7px 4px;color:#e74c3c;">&#10007;</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding:7px 4px;text-align:left;color:var(--muted);font-family:monospace;">approve plan</td>
-                                            <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
-                                            <td style="padding:7px 4px;color:#e74c3c;">&#10007;</td>
-                                            <td style="padding:7px 4px;color:#e74c3c;">&#10007;</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <div class="doc-callout" style="margin-top:12px;">
-                                    <strong>&#9888; PTE Automatic Escalation</strong>
-                                    Even admin deploys with <code>replicas &gt; 5</code> are automatically routed through the PTE Gate. The plan expires in <strong>15 minutes</strong> if not approved. Expired plans are rejected automatically.
-                                </div>
-                            </div>
-
-                            <!-- SECTION 6 — KEY TERMS GLOSSARY -->
-                            <div style="margin-bottom:16px;">
-                                <h3 style="color:#fff;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">6. Key Terms &amp; Acronyms</h3>
-                                <table style="width:100%;border-collapse:collapse;font-size:10.5px;margin-top:10px;">
-                                    <tbody>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;width:28%;color:#fff;font-weight:700;">Control Plane</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">The central system (this server) that maintains desired state and continuously drives actual runtime state to match it.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:#fff;font-weight:700;">Reconciler Loop</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Background goroutine that ticks every <code>-reconcile-every</code> interval, compares spec vs actual, and applies corrections (start/stop containers).</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:var(--muted);">When actual container count differs from <code>replicas</code> in the spec. The reconciler auto-heals drift within one loop tick.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:#fff;font-weight:700;">OPA (Open Policy Agent)</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Policy-as-code engine. DOKTRIAI uses an OPA YAML policy file to define role permissions and declare which images are allow-listed.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:#fff;font-weight:700;">PTE Gate</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Plan-To-Execute Gate. High-risk operations are paused here; an Admin must approve the plan before execution proceeds.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:#fff;font-weight:700;">MCP</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Model Context Protocol. JSON-RPC 2.0 bridge that lets AI agents call control-plane operations as typed tool calls.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:#fff;font-weight:700;">SSE</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Server-Sent Events. Long-lived HTTP stream (<code>GET /api/events</code>) that pushes real-time control-plane events to the browser.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:#fff;font-weight:700;">Behavioral Tracker</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Sliding-window anomaly engine. Tracks deploy/delete/reject rates per actor in a 5-minute window and flags suspicious patterns.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:#fff;font-weight:700;">JWT</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">JSON Web Token. Signed token used for agent authentication. Verified by <code>core.VerifyAgentJWT()</code>.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:#fff;font-weight:700;">HMAC Token</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Hash-based request token for short-lived CLI authentication. Verified by <code>core.VerifyRequestToken()</code>.</td>
-                                        </tr>
-                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
-                                            <td style="padding:8px 4px;color:#fff;font-weight:700;">Rolling Strategy</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Replaces containers one-at-a-time during updates. Controlled by <code>maxSurge</code> (extra containers) and <code>maxUnavailable</code> (offline limit).</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding:8px 4px;color:#fff;font-weight:700;">OTEL / OpenTelemetry</td>
-                                            <td style="padding:8px 4px;color:var(--muted);">Distributed tracing framework. Each MCP tool call and reconcile tick emits a span to Jaeger/OTLP. Disable with <code>DOKTRIAI_OTEL_DISABLED=true</code>.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                        </div>
-
-                        <!-- ===================== RIGHT CODE COLUMN ===================== -->
-                        <div class="docs-code-col" style="max-height:72vh; overflow-y:auto; padding-right:5px;">
+                        <!-- ===================== TOP CODE COLUMN ===================== -->
+                        <div class="docs-code-col">
                             <div class="code-tabs-header" style="position: sticky; top: 0; background: var(--panel); z-index: 10;">
                                 <button class="code-tab-btn active" data-tab="curl">cURL Examples</button>
                                 <button class="code-tab-btn" data-tab="python">Python SDK</button>
@@ -2177,6 +1660,521 @@ result = mcp_r.json()[<span style="color:#e6db74">"result"</span>]
 <span style="color:#75715e">#      --data-binary @api-service.yaml</span></pre>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- ===================== BOTTOM GUIDE COLUMN ===================== -->
+                        <div class="docs-guide-col">
+
+                            <!-- SECTION 1 - STARTING THE SERVER -->
+                            <div style="margin-bottom:28px;">
+                                <h3 style="color:#fff;font-size:13px;margin-top:0;border-bottom:1px solid var(--line);padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">1. Starting the Control Plane</h3>
+                                <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:8px 0;">
+                                    The server is a Go binary (<code>cmd/doktriai-api/main.go</code>) that integrates the store, reconciler engine, event bus, Docker driver, and HTTP router. Launch it with the flags below.
+                                </p>
+                                <table style="width:100%;border-collapse:collapse;font-size:10.5px;margin-top:10px;color:var(--text);">
+                                    <thead>
+                                        <tr style="border-bottom:1px solid var(--line);color:#fff;text-align:left;">
+                                            <th style="padding:6px 4px;width:30%;">Flag</th>
+                                            <th style="padding:6px 4px;width:20%;">Default</th>
+                                            <th style="padding:6px 4px;">What it controls</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">-addr</td>
+                                            <td style="padding:7px 4px;color:var(--muted);">:18080</td>
+                                            <td style="padding:7px 4px;color:var(--muted);">TCP address and port the HTTP server binds to.</td>
+                                        </tr>
+                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">-data-dir</td>
+                                            <td style="padding:7px 4px;color:var(--muted);">data/</td>
+                                            <td style="padding:7px 4px;color:var(--muted);">Directory for <code>state.json</code> (workload store) and <code>audit.json</code>.</td>
+                                        </tr>
+                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">-web-dir</td>
+                                            <td style="padding:7px 4px;color:var(--muted);">web/</td>
+                                            <td style="padding:7px 4px;color:var(--muted);">Static files directory served at <code>/</code>.</td>
+                                        </tr>
+                                        <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">-reconcile-every</td>
+                                            <td style="padding:7px 4px;color:var(--muted);">5s</td>
+                                            <td style="padding:7px 4px;color:var(--muted);">Reconciler loop tick interval. Lower = faster drift detection.</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">-policy</td>
+                                            <td style="padding:7px 4px;color:var(--muted);">doktri-policy.yaml</td>
+                                            <td style="padding:7px 4px;color:var(--muted);">Path to OPA RBAC policy YAML configuration file.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="doc-callout" style="margin-top:12px;">
+                                    <strong>&#128204; Environment Variable Override</strong>
+                                    Set <code>DOKTRIAI_OTEL_DISABLED=true</code> to skip OpenTelemetry tracing startup when no Jaeger/OTLP collector is running locally.<br/>
+                                    Set <code>DOKTRIAI_DEV_MODE=true</code> (default in dev) to allow header-based role fallback without JWT tokens.
+                                </div>
+                            </div>
+
+                            <!-- SECTION 2 - REST API ENDPOINTS -->
+                            <div style="margin-bottom:28px;">
+                                <h3 style="color:#fff;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">2. REST API Endpoint Reference</h3>
+                                <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:8px 0 10px;">All endpoints are HTTP/1.1. Dev mode accepts <code>X-Doktri-Role</code> + <code>X-Doktri-Actor</code> headers. Production mode requires <code>X-Doktri-Token: &lt;jwt&gt;</code>.</p>
+
+                                <div style="margin-bottom:14px;">
+                                    <div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:.08em;margin-bottom:6px;">SYSTEM</div>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
+                                        <tbody>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;width:45%;color:var(--green);font-family:monospace;">GET /api/health</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Returns <code>{"status":"ok"}</code>. Use for liveness probes.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/schema</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Returns the live JSON schema for <code>WorkloadSpec</code>.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/policy</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Returns the active OPA policy matrix (roles &amp; actions).</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/metrics</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Prometheus metrics: desired/actual replicas, audit counts, plan states.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div style="margin-bottom:14px;">
+                                    <div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:.08em;margin-bottom:6px;">WORKLOADS</div>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
+                                        <tbody>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;width:52%;color:var(--green);font-family:monospace;">GET /api/workloads</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">List all workloads with desired spec and actual container states.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/workloads/{name}</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Get a single workload by name, including live replica status.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/workloads</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Create or update a workload (upsert). Body = <code>WorkloadSpec</code> JSON. Requires <strong>admin</strong> role.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/workloads/deploy-manifest</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Deploy via raw YAML manifest body. Parsed into <code>WorkloadSpec</code> server-side.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">PATCH /api/workloads/{name}</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Partial update (e.g. change replicas only). Merges into existing spec.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:#e74c3c;font-family:monospace;">DELETE /api/workloads/{name}</td>
+                                                <td style="padding:6px 4px;color:var(--muted);"><strong>PTE gated.</strong> Removes workload spec and stops all containers. Always requires approval.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/workloads/{name}/history</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Returns all stored version snapshots of this workload spec.</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/workloads/{name}/rollback</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Rollback to a specific version. Body: <code>{"version": 3}</code>.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div style="margin-bottom:14px;">
+                                    <div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:.08em;margin-bottom:6px;">CANARY DEPLOYMENTS</div>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
+                                        <tbody>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;width:52%;color:var(--green);font-family:monospace;">GET /api/workloads/{name}/canary</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Get current canary status (split traffic %, image version).</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/workloads/{name}/canary/promote</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Promote canary to stable (100% traffic shift). Irreversible.</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/workloads/{name}/canary/rollback</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Roll back canary to previous stable version.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div style="margin-bottom:14px;">
+                                    <div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:.08em;margin-bottom:6px;">RECONCILER &amp; LOCK</div>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
+                                        <tbody>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;width:52%;color:var(--orange);font-family:monospace;">POST /api/reconcile</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Trigger an immediate reconcile cycle (outside the auto-tick). Role: <strong>admin/operator</strong>.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/validate</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Validate a <code>WorkloadSpec</code> payload without applying it. Useful for CI dry-runs.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/lock</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Returns lock state: <code>{"locked":true,"acquiredBy":"alice","reason":"..."}</code>.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/lock</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Freeze the reconciler. Body: <code>{"reason":"maintenance"}</code>.</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:6px 4px;color:#e74c3c;font-family:monospace;">DELETE /api/lock</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Release the reconciler lock. No body required.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div style="margin-bottom:14px;">
+                                    <div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:.08em;margin-bottom:6px;">PTE APPROVAL GATE</div>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
+                                        <tbody>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;width:52%;color:var(--green);font-family:monospace;">GET /api/plan</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">List all PTE plans (pending, approved, rejected, expired).</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/plan</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Manually submit a plan for approval. Used by operators before high-risk ops.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/plan/{id}/approve</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Admin approves a pending plan. Immediately applies the spec.</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:6px 4px;color:var(--orange);font-family:monospace;">POST /api/plan/{id}/reject</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Admin rejects a plan. Body: <code>{"comment":"reason"}</code>.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div style="margin-bottom:14px;">
+                                    <div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:.08em;margin-bottom:6px;">STREAMING &amp; OBSERVABILITY</div>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
+                                        <tbody>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;width:52%;color:var(--green);font-family:monospace;">GET /api/events</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Server-Sent Events (SSE) stream. Emits real-time reconciler, deploy, and anomaly events.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/audit</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Immutable append-only audit log of all actions with actor, role, plan, and state-hash fields.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/logs/{name}</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Tail container stdout/stderr. Add <code>?tail=100</code> query param to limit lines.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/behavior</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Per-actor anomaly metrics: deploy/delete/reject counts in 5-min sliding window.</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:6px 4px;color:var(--green);font-family:monospace;">GET /api/runtime/status</td>
+                                                <td style="padding:6px 4px;color:var(--muted);">Raw runtime provider status (Docker daemon, container count, etc.).</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- SECTION 3 — MCP TOOLS -->
+                                <div style="margin-top:28px; margin-bottom:28px;">
+                                    <h3 style="color:#fff;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">3. MCP Agent Tool Reference</h3>
+                                    <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:8px 0 10px;">
+                                        AI agents (Claude, GPT, Gemini) interact over the Model Context Protocol (MCP) endpoint at <code>POST /api/mcp</code>. All calls use a JSON-RPC 2.0 envelope: <code>{"jsonrpc":"2.0","method":"tools/call","params":{...}}</code>
+                                    </p>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
+                                        <thead>
+                                            <tr style="border-bottom:1px solid var(--line);color:#fff;text-align:left;">
+                                                <th style="padding:6px 4px;width:30%;">Tool Name</th>
+                                                <th style="padding:6px 4px;width:15%;">PTE Gated?</th>
+                                                <th style="padding:6px 4px;">Description &amp; Arguments</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">tools/list</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">No</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Returns the schema of all callable tools with descriptions and approval flags.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">deploy_workload</td>
+                                                <td style="padding:8px 4px;color:#e74c3c;">Yes*</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Creates or updates a workload. Args = full <code>WorkloadSpec</code> JSON. If replicas &gt; 5 or high-risk image, returns <code>pending_approval</code> status with a <code>planId</code>.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">list_workloads</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">No</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Returns array of <code>WorkloadStatus</code> objects with desired spec and actual containers.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">get_workload</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">No</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Args: <code>{"name":"hello-web"}</code>. Returns single workload status or 404 error.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">delete_workload</td>
+                                                <td style="padding:8px 4px;color:#e74c3c;">Always</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Args: <code>{"name":"hello-web"}</code>. All autonomous deletions route through PTE Gate. Returns <code>pending_approval</code>.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">get_logs</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">No</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Args: <code>{"name":"hello-web","tail":50}</code>. Returns last N lines from container stdout.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">list_pending_plans</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">No</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Returns all PTE plans awaiting human approval. Use before calling <code>approve_plan</code>.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">approve_plan</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">No</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Args: <code>{"id":"plan-uuid"}</code>. Marks plan approved and immediately applies the stored spec.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">reject_plan</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">No</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Args: <code>{"id":"plan-uuid","comment":"reason"}</code>. Permanently rejects the plan.</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:8px 4px;color:var(--orange);font-family:monospace;">get_behavior_metrics</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">No</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Returns per-actor anomaly counters for security dashboards.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="doc-callout" style="margin-top:12px;">
+                                        <strong>&#128272; MCP Scope Claim</strong>
+                                        Agents must declare their scope in the <code>params.scope</code> field, e.g. <code>"scope": "list_workloads,deploy_workload"</code>. Any tool call outside the declared scope is rejected by <code>ValidateAgentScope()</code> before execution.
+                                    </div>
+                                </div>
+
+                                <!-- SECTION 4 — WORKLOADSPEC FIELD GLOSSARY -->
+                                <div style="margin-bottom:28px;">
+                                    <h3 style="color:#fff;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">4. WorkloadSpec Field Glossary</h3>
+                                    <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:8px 0 10px;">
+                                        Every deploy call (REST or MCP) requires a <code>WorkloadSpec</code> JSON body. These are the exact struct fields from <code>doktriai-packages/types.go</code>:
+                                    </p>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
+                                        <thead>
+                                            <tr style="border-bottom:1px solid var(--line);color:#fff;text-align:left;">
+                                                <th style="padding:6px 4px;width:28%;">Field (JSON key)</th>
+                                                <th style="padding:6px 4px;width:14%;">Type</th>
+                                                <th style="padding:6px 4px;">Meaning &amp; Valid Values</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">name</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">string</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Unique workload identifier. Lowercase alphanumeric + hyphens. e.g. <code>nginx-web</code>.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">image</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">string</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Docker image reference: <code>nginx:alpine</code>, <code>redis:7.2</code>, or fully-qualified digest.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">replicas</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">integer</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Desired container count. Range <code>1-50</code>. Values &gt; 5 trigger PTE Gate automatically.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">port</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">integer</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Host port exposed on the Docker network (0 = no port binding).</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">containerPort</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">integer</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Port the process listens on inside the container. Typically matches <code>port</code>.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">runtime</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">string</td>
+                                                <td style="padding:7px 4px;color:var(--muted);"><code>"docker"</code> (default). Future: <code>"kubernetes"</code>.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">deployStrategy</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">string</td>
+                                                <td style="padding:7px 4px;color:var(--muted);"><code>"recreate"</code> (default) - stop all, start new. <code>"rolling"</code> - replace one-at-a-time with zero downtime.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">maxSurge</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">integer</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Max extra containers allowed above <code>replicas</code> during rolling update.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">maxUnavailable</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">integer</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Max containers that may be stopped simultaneously during rolling update.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">securityMode</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">string</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Validation tier: <code>"dev"</code> | <code>"staging"</code> | <code>"production"</code>. Production enforces registry allowlist + digest pinning.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">env</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">map[str]str</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Environment variables injected into containers. Values max 4096 chars. No <code>SECRET_</code> prefix in dev.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">resources.cpuShares</td>
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">int64</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Relative CPU weight. <code>512</code> = half a core, <code>1024</code> = 1 core. Docker default: 1024.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">resources.memoryMb</td>
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">int64</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Memory limit in megabytes. <code>0</code> = unlimited. e.g. <code>256</code> = 256 MB cap.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">healthCheck.httpPath</td>
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">string</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">HTTP GET path for health probe, e.g. <code>/healthz</code>. Reconciler marks container unhealthy if probe fails.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">healthCheck.intervalSec</td>
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">int</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Seconds between liveness checks. Default <code>30</code>.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">volumes[].hostPath</td>
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">string</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Absolute path on the host to bind-mount into the container.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">volumes[].containerPath</td>
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">string</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Mount target path inside the container.</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">labels</td>
+                                                <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">map[str]str</td>
+                                                <td style="padding:7px 4px;color:var(--muted);">Key-value labels attached to Docker containers (for filtering/grouping). e.g. <code>{"team":"platform"}</code>.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- SECTION 5 — OPA RBAC PERMISSION MATRIX -->
+                                <div style="margin-bottom:28px;">
+                                    <h3 style="color:#fff;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">5. OPA RBAC Permission Matrix</h3>
+                                    <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:8px 0 10px;">
+                                        Every request is evaluated by <code>core.RoleCan(role, action)</code> against the following matrix. Role is resolved from JWT claims or the <code>X-Doktri-Role</code> header in dev mode.
+                                    </p>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;text-align:center;">
+                                        <thead>
+                                            <tr style="border-bottom:1px solid var(--line);color:#fff;">
+                                                <th style="padding:6px 4px;text-align:left;">Action</th>
+                                                <th style="padding:6px 4px;">admin</th>
+                                                <th style="padding:6px 4px;">operator</th>
+                                                <th style="padding:6px 4px;">reader</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;text-align:left;color:var(--muted);font-family:monospace;">read</td>
+                                                <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
+                                                <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
+                                                <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;text-align:left;color:var(--muted);font-family:monospace;">apply (deploy)</td>
+                                                <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
+                                                <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
+                                                <td style="padding:7px 4px;color:#e74c3c;">&#10007;</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;text-align:left;color:var(--muted);font-family:monospace;">reconcile</td>
+                                                <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
+                                                <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
+                                                <td style="padding:7px 4px;color:#e74c3c;">&#10007;</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:7px 4px;text-align:left;color:var(--muted);font-family:monospace;">delete</td>
+                                                <td style="padding:7px 4px;color:#27ae60;">&#10003; (PTE)</td>
+                                                <td style="padding:7px 4px;color:#e74c3c;">&#10007;</td>
+                                                <td style="padding:7px 4px;color:#e74c3c;">&#10007;</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:7px 4px;text-align:left;color:var(--muted);font-family:monospace;">approve plan</td>
+                                                <td style="padding:7px 4px;color:#27ae60;">&#10003;</td>
+                                                <td style="padding:7px 4px;color:#e74c3c;">&#10007;</td>
+                                                <td style="padding:7px 4px;color:#e74c3c;">&#10007;</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="doc-callout" style="margin-top:12px;">
+                                        <strong>&#9888; PTE Automatic Escalation</strong>
+                                        Even admin deploys with <code>replicas &gt; 5</code> are automatically routed through the PTE Gate. The plan expires in <strong>15 minutes</strong> if not approved. Expired plans are rejected automatically.
+                                    </div>
+                                </div>
+
+                                <!-- SECTION 6 — KEY TERMS GLOSSARY -->
+                                <div style="margin-bottom:16px;">
+                                    <h3 style="color:#fff;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">6. Key Terms &amp; Acronyms</h3>
+                                    <table style="width:100%;border-collapse:collapse;font-size:10.5px;margin-top:10px;">
+                                        <tbody>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;width:28%;color:#fff;font-weight:700;">Control Plane</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">The central system (this server) that maintains desired state and continuously drives actual runtime state to match it.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:#fff;font-weight:700;">Reconciler Loop</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Background goroutine that ticks every <code>-reconcile-every</code> interval, compares spec vs actual, and applies corrections (start/stop containers).</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:var(--muted);">When actual container count differs from <code>replicas</code> in the spec. The reconciler auto-heals drift within one loop tick.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:#fff;font-weight:700;">OPA (Open Policy Agent)</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Policy-as-code engine. DOKTRIAI uses an OPA YAML policy file to define role permissions and declare which images are allow-listed.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:#fff;font-weight:700;">PTE Gate</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Plan-To-Execute Gate. High-risk operations are paused here; an Admin must approve the plan before execution proceeds.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:#fff;font-weight:700;">MCP</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Model Context Protocol. JSON-RPC 2.0 bridge that lets AI agents call control-plane operations as typed tool calls.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:#fff;font-weight:700;">SSE</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Server-Sent Events. Long-lived HTTP stream (<code>GET /api/events</code>) that pushes real-time control-plane events to the browser.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:#fff;font-weight:700;">Behavioral Tracker</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Sliding-window anomaly engine. Tracks deploy/delete/reject rates per actor in a 5-minute window and flags suspicious patterns.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:#fff;font-weight:700;">JWT</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">JSON Web Token. Signed token used for agent authentication. Verified by <code>core.VerifyAgentJWT()</code>.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:#fff;font-weight:700;">HMAC Token</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Hash-based request token for short-lived CLI authentication. Verified by <code>core.VerifyRequestToken()</code>.</td>
+                                            </tr>
+                                            <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
+                                                <td style="padding:8px 4px;color:#fff;font-weight:700;">Rolling Strategy</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Replaces containers one-at-a-time during updates. Controlled by <code>maxSurge</code> (extra containers) and <code>maxUnavailable</code> (offline limit).</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:8px 4px;color:#fff;font-weight:700;">OTEL / OpenTelemetry</td>
+                                                <td style="padding:8px 4px;color:var(--muted);">Distributed tracing framework. Each MCP tool call and reconcile tick emits a span to Jaeger/OTLP. Disable with <code>DOKTRIAI_OTEL_DISABLED=true</code>.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
                         </div>
                     </div>
                 </article>
