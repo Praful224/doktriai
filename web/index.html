@@ -1242,6 +1242,27 @@
 
                 <!-- Writing View -->
                 <article id="writing" class="view">
+                    <!-- Copy Snippet JavaScript Helper -->
+                    <script>
+                        function copySnippet(btn) {
+                            const pre = btn.nextElementSibling;
+                            // Clean up span styling tags if browser copies raw html, copy innerText
+                            const text = pre.innerText || pre.textContent;
+                            navigator.clipboard.writeText(text).then(() => {
+                                btn.innerText = 'Copied!';
+                                btn.style.borderColor = '#27ae60';
+                                btn.style.color = '#27ae60';
+                                setTimeout(() => {
+                                    btn.innerText = 'Copy';
+                                    btn.style.borderColor = 'var(--line)';
+                                    btn.style.color = 'var(--muted)';
+                                }, 1500);
+                            }).catch(err => {
+                                console.error('Failed to copy text: ', err);
+                            });
+                        }
+                    </script>
+
                     <div class="doc-title"><span>&gt;_</span>
                         <h1>workspace://documentation</h1>
                     </div>
@@ -1615,37 +1636,37 @@
                                         </tr>
                                         <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
                                             <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">resources.cpuShares</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">int64</td>
+                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">int64</td>
                                             <td style="padding:7px 4px;color:var(--muted);">Relative CPU weight. <code>512</code> = half a core, <code>1024</code> = 1 core. Docker default: 1024.</td>
                                         </tr>
                                         <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
                                             <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">resources.memoryMb</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">int64</td>
+                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">int64</td>
                                             <td style="padding:7px 4px;color:var(--muted);">Memory limit in megabytes. <code>0</code> = unlimited. e.g. <code>256</code> = 256 MB cap.</td>
                                         </tr>
                                         <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
                                             <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">healthCheck.httpPath</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">string</td>
+                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">string</td>
                                             <td style="padding:7px 4px;color:var(--muted);">HTTP GET path for health probe, e.g. <code>/healthz</code>. Reconciler marks container unhealthy if probe fails.</td>
                                         </tr>
                                         <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
                                             <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">healthCheck.intervalSec</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">int</td>
+                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">int</td>
                                             <td style="padding:7px 4px;color:var(--muted);">Seconds between liveness checks. Default <code>30</code>.</td>
                                         </tr>
                                         <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
                                             <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">volumes[].hostPath</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">string</td>
+                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">string</td>
                                             <td style="padding:7px 4px;color:var(--muted);">Absolute path on the host to bind-mount into the container.</td>
                                         </tr>
                                         <tr style="border-bottom:1px dashed rgba(255,255,255,.05);">
                                             <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">volumes[].containerPath</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">string</td>
+                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">string</td>
                                             <td style="padding:7px 4px;color:var(--muted);">Mount target path inside the container.</td>
                                         </tr>
                                         <tr>
                                             <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">labels</td>
-                                            <td style="padding:7px 4px;color:var(--muted);">map[str]str</td>
+                                            <td style="padding:7px 4px;color:var(--orange);font-family:monospace;">map[str]str</td>
                                             <td style="padding:7px 4px;color:var(--muted);">Key-value labels attached to Docker containers (for filtering/grouping). e.g. <code>{"team":"platform"}</code>.</td>
                                         </tr>
                                     </tbody>
@@ -1779,21 +1800,29 @@
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">1. Health diagnostics probe</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Check liveness status. Returns status string indicating internal database/driver connectivity.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Send a health check request to check server status</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Send a health check request to check server status</span>
 <span style="color:#f92672">curl</span> http://localhost:18080/api/health</pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">2. List Active Workload Specifications</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Fetch all declared applications and active running containers. Requires authentication.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Fetch all active specs and runtime workloads</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Fetch all active specs and runtime workloads</span>
 <span style="color:#f92672">curl</span> -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>      http://localhost:18080/api/workloads</pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">3. Deploy Container App (Upsert)</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Deploy a new container or update an existing one. Pass key properties like <code>image</code>, <code>replicas</code>, and <code>ports</code>.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Deploy / update a container using standard REST API</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Deploy / update a container using standard REST API</span>
 <span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/workloads   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -H <span style="color:#e6db74">"X-Doktri-Actor: alice"</span>   -d <span style="color:#e6db74">'{
     "name":           "hello-web",
     "image":          "nginx:alpine",
@@ -1804,75 +1833,105 @@
     "env":            {"APP_ENV": "production"},
     "resources":      {"memoryMb": 128, "cpuShares": 512}
   }'</span></pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">4. Spec Dry-run Validation</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Validate format and verify permissions against policy without deploying to runtime.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Dry-run validation check</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Dry-run validation check</span>
 <span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/validate   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: operator"</span>   -d <span style="color:#e6db74">'{"name":"test-app","image":"ubuntu:22.04","replicas":1,"port":9000,"containerPort":9000}'</span></pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">5. Tail Container Logs</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Get raw output streams from the running containers of a specified workload.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Tail stdout/stderr stream from container</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Tail stdout/stderr stream from container</span>
 <span style="color:#f92672">curl</span> -H <span style="color:#e6db74">"X-Doktri-Role: reader"</span>      "http://localhost:18080/api/logs/hello-web?tail=30"</pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">6. Acquire Reconciler Lock</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Lock control plane to stop background reconciliation loop operations for manual repairs.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Acquire global control plane lock</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Acquire global control plane lock</span>
 <span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/lock   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -H <span style="color:#e6db74">"X-Doktri-Actor: alice"</span>   -d <span style="color:#e6db74">'{"reason":"planned maintenance window"}'</span></pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">7. Release Reconciler Lock</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Unlock control plane and resume automatic reconciliation loop drift corrections.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Release the control plane lock</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Release the control plane lock</span>
 <span style="color:#f92672">curl</span> -X DELETE http://localhost:18080/api/lock   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span></pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">8. Force Reconcile Trigger</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Execute a reconciliation run instantly instead of waiting for the background tick.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Trigger immediate loop run</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Trigger immediate loop run</span>
 <span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/reconcile   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span></pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">9. Query Pending PTE plans</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Retrieve a list of high-risk plans currently stuck in the Plan-To-Execute queue.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Fetch all plans waiting for approval</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Fetch all plans waiting for approval</span>
 <span style="color:#f92672">curl</span> -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>      http://localhost:18080/api/plan</pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">10. Approve Pending PTE Plan</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Authorize a paused operation (e.g. scale &gt; 5) and execute the configuration changes.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Approve a plan by plan ID</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Approve a plan by plan ID</span>
 <span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/plan/PLAN-ID-HERE/approve   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span></pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">11. Rollback Version</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Restore configuration metadata parameters back to a specific version number.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Rollback workload to version 2</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Rollback workload to version 2</span>
 <span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/workloads/hello-web/rollback   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -d <span style="color:#e6db74">'{"version":2}'</span></pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">12. MCP tools list discovery</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Discover available tools for AI agents (Claude, GPT, Gemini) using JSON-RPC standard.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Get MCP server tools spec</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Get MCP server tools spec</span>
 <span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/mcp   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -d <span style="color:#e6db74">'{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</span></pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">13. MCP deploy workload call</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Instruct an AI agent to execute container workload deployments via standard protocol schemas.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Call MCP tool to deploy a workload</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Call MCP tool to deploy a workload</span>
 <span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/mcp   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -d <span style="color:#e6db74">'{
     "jsonrpc": "2.0", "id": 2,
     "method": "tools/call",
@@ -1889,13 +1948,17 @@
       }
     }
   }'</span></pre>
+                                </div>
 
                                 <div style="margin: 20px 0 6px; padding: 0 4px;">
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">14. SSE Real-Time Event Feed</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Establish SSE stream to monitor loop logs, lock alerts, and OPA policy drifts.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># Listen to real-time events push stream</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># Listen to real-time events push stream</span>
 <span style="color:#f92672">curl</span> -H <span style="color:#e6db74">"Accept: text/event-stream"</span>      -H <span style="color:#e6db74">"X-Doktri-Role: reader"</span>      http://localhost:18080/api/events</pre>
+                                </div>
                             </div>
 
                             <!-- Python SDK Content -->
@@ -1904,7 +1967,9 @@
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">Python requests library calls</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Below are script references to automate deployment logic, handle validation dry-runs, and make MCP agent tool calls using Python.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># DOKTRIAI Python client examples</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># DOKTRIAI Python client examples</span>
 <span style="color:#f92672">import</span> requests, json
 
 BASE  = <span style="color:#e6db74">"http://localhost:18080"</span>
@@ -1962,6 +2027,7 @@ result = mcp_r.json()[<span style="color:#e6db74">"result"</span>]
     print(<span style="color:#e6db74">"PTE plan created:"</span>, result[<span style="color:#e6db74">"planId"</span>])
 <span style="color:#f92672">else</span>:
     print(<span style="color:#e6db74">"Deployed:"</span>, result[<span style="color:#e6db74">"status"</span>])</pre>
+                                </div>
                             </div>
 
                             <!-- Go Client Content -->
@@ -1970,7 +2036,9 @@ result = mcp_r.json()[<span style="color:#e6db74">"result"</span>]
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">Go net/http client implementation</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Use standard library net/http structs to execute declarative JSON requests, fetch workload parameters, and manage lock mutexes natively.</p>
                                 </div>
-                                <pre><span style="color:#75715e">// DOKTRIAI Go client examples</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e">// DOKTRIAI Go client examples</span>
 <span style="color:#f92672">package</span> main
 
 <span style="color:#f92672">import</span> (
@@ -2045,6 +2113,7 @@ result = mcp_r.json()[<span style="color:#e6db74">"result"</span>]
   }
   fmt.Println(<span style="color:#66d9ef">string</span>(doktriReq(<span style="color:#e6db74">"POST"</span>, <span style="color:#e6db74">"/api/mcp"</span>, mcp)))
 }</pre>
+                                </div>
                             </div>
 
                             <!-- YAML Spec Content -->
@@ -2053,7 +2122,9 @@ result = mcp_r.json()[<span style="color:#e6db74">"result"</span>]
                                     <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">Declarative YAML configurations</h4>
                                     <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Below are templates showing how to define container parameters inside flat metadata blocks.</p>
                                 </div>
-                                <pre><span style="color:#75715e"># -- Minimal workload ----------------------------------</span>
+                                <div class="code-snippet-container" style="position: relative; margin-bottom: 12px;">
+                                    <button class="copy-btn" onclick="copySnippet(this)" style="position: absolute; right: 10px; top: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--muted)';">Copy</button>
+                                    <pre style="margin: 0;"><span style="color:#75715e"># -- Minimal workload ----------------------------------</span>
 <span style="color:#f92672">apiVersion</span>: doktri.io/v1alpha1
 <span style="color:#f92672">kind</span>: Workload
 <span style="color:#f92672">metadata</span>:
@@ -2104,6 +2175,7 @@ result = mcp_r.json()[<span style="color:#e6db74">"result"</span>]
 <span style="color:#75715e"># curl -X POST http://localhost:18080/api/workloads/deploy-manifest</span>
 <span style="color:#75715e">#      -H "X-Doktri-Role: admin"</span>
 <span style="color:#75715e">#      --data-binary @api-service.yaml</span></pre>
+                                </div>
                             </div>
                         </div>
                     </div>
