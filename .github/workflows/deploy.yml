@@ -1,8 +1,7 @@
 name: DoktriAI Git-to-Deploy
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   deploy:
