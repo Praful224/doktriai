@@ -1765,8 +1765,8 @@
                         </div>
 
                         <!-- ===================== RIGHT CODE COLUMN ===================== -->
-                        <div class="docs-code-col">
-                            <div class="code-tabs-header">
+                        <div class="docs-code-col" style="max-height:72vh; overflow-y:auto; padding-right:5px;">
+                            <div class="code-tabs-header" style="position: sticky; top: 0; background: var(--panel); z-index: 10;">
                                 <button class="code-tab-btn active" data-tab="curl">cURL Examples</button>
                                 <button class="code-tab-btn" data-tab="python">Python SDK</button>
                                 <button class="code-tab-btn" data-tab="go">Go Client</button>
@@ -1775,13 +1775,25 @@
 
                             <!-- cURL Content -->
                             <div class="code-tab-content active" data-tab="curl">
-                                <pre><span style="color:#75715e"># -- 1. Health check -----------------------------------</span>
-<span style="color:#f92672">curl</span> http://localhost:18080/api/health
+                                <div style="margin: 15px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">1. Health diagnostics probe</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Check liveness status. Returns status string indicating internal database/driver connectivity.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Send a health check request to check server status</span>
+<span style="color:#f92672">curl</span> http://localhost:18080/api/health</pre>
 
-<span style="color:#75715e"># -- 2. List all workloads -----------------------------</span>
-<span style="color:#f92672">curl</span> -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>      http://localhost:18080/api/workloads
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">2. List Active Workload Specifications</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Fetch all declared applications and active running containers. Requires authentication.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Fetch all active specs and runtime workloads</span>
+<span style="color:#f92672">curl</span> -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>      http://localhost:18080/api/workloads</pre>
 
-<span style="color:#75715e"># -- 3. Deploy a workload (upsert) --------------------</span>
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">3. Deploy Container App (Upsert)</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Deploy a new container or update an existing one. Pass key properties like <code>image</code>, <code>replicas</code>, and <code>ports</code>.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Deploy / update a container using standard REST API</span>
 <span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/workloads   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -H <span style="color:#e6db74">"X-Doktri-Actor: alice"</span>   -d <span style="color:#e6db74">'{
     "name":           "hello-web",
     "image":          "nginx:alpine",
@@ -1791,36 +1803,76 @@
     "deployStrategy": "rolling",
     "env":            {"APP_ENV": "production"},
     "resources":      {"memoryMb": 128, "cpuShares": 512}
-  }'</span>
+  }'</span></pre>
 
-<span style="color:#75715e"># -- 4. Validate spec (dry-run, no apply) --------------</span>
-<span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/validate   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: operator"</span>   -d <span style="color:#e6db74">'{"name":"test-app","image":"ubuntu:22.04","replicas":1,"port":9000,"containerPort":9000}'</span>
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">4. Spec Dry-run Validation</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Validate format and verify permissions against policy without deploying to runtime.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Dry-run validation check</span>
+<span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/validate   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: operator"</span>   -d <span style="color:#e6db74">'{"name":"test-app","image":"ubuntu:22.04","replicas":1,"port":9000,"containerPort":9000}'</span></pre>
 
-<span style="color:#75715e"># -- 5. Tail container logs (last 30 lines) ------------</span>
-<span style="color:#f92672">curl</span> -H <span style="color:#e6db74">"X-Doktri-Role: reader"</span>      "http://localhost:18080/api/logs/hello-web?tail=30"
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">5. Tail Container Logs</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Get raw output streams from the running containers of a specified workload.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Tail stdout/stderr stream from container</span>
+<span style="color:#f92672">curl</span> -H <span style="color:#e6db74">"X-Doktri-Role: reader"</span>      "http://localhost:18080/api/logs/hello-web?tail=30"</pre>
 
-<span style="color:#75715e"># -- 6. Acquire reconciler lock ------------------------</span>
-<span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/lock   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -H <span style="color:#e6db74">"X-Doktri-Actor: alice"</span>   -d <span style="color:#e6db74">'{"reason":"planned maintenance window"}'</span>
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">6. Acquire Reconciler Lock</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Lock control plane to stop background reconciliation loop operations for manual repairs.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Acquire global control plane lock</span>
+<span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/lock   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -H <span style="color:#e6db74">"X-Doktri-Actor: alice"</span>   -d <span style="color:#e6db74">'{"reason":"planned maintenance window"}'</span></pre>
 
-<span style="color:#75715e"># -- 7. Release reconciler lock ------------------------</span>
-<span style="color:#f92672">curl</span> -X DELETE http://localhost:18080/api/lock   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">7. Release Reconciler Lock</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Unlock control plane and resume automatic reconciliation loop drift corrections.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Release the control plane lock</span>
+<span style="color:#f92672">curl</span> -X DELETE http://localhost:18080/api/lock   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span></pre>
 
-<span style="color:#75715e"># -- 8. Force immediate reconcile cycle ---------------</span>
-<span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/reconcile   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">8. Force Reconcile Trigger</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Execute a reconciliation run instantly instead of waiting for the background tick.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Trigger immediate loop run</span>
+<span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/reconcile   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span></pre>
 
-<span style="color:#75715e"># -- 9. List pending PTE plans -------------------------</span>
-<span style="color:#f92672">curl</span> -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>      http://localhost:18080/api/plan
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">9. Query Pending PTE plans</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Retrieve a list of high-risk plans currently stuck in the Plan-To-Execute queue.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Fetch all plans waiting for approval</span>
+<span style="color:#f92672">curl</span> -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>      http://localhost:18080/api/plan</pre>
 
-<span style="color:#75715e"># -- 10. Approve a plan -------------------------------</span>
-<span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/plan/PLAN-ID-HERE/approve   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">10. Approve Pending PTE Plan</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Authorize a paused operation (e.g. scale &gt; 5) and execute the configuration changes.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Approve a plan by plan ID</span>
+<span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/plan/PLAN-ID-HERE/approve   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span></pre>
 
-<span style="color:#75715e"># -- 11. Rollback to version 2 ------------------------</span>
-<span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/workloads/hello-web/rollback   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -d <span style="color:#e6db74">'{"version":2}'</span>
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">11. Rollback Version</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Restore configuration metadata parameters back to a specific version number.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Rollback workload to version 2</span>
+<span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/workloads/hello-web/rollback   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -d <span style="color:#e6db74">'{"version":2}'</span></pre>
 
-<span style="color:#75715e"># -- 12. MCP: list tools ------------------------------</span>
-<span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/mcp   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -d <span style="color:#e6db74">'{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</span>
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">12. MCP tools list discovery</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Discover available tools for AI agents (Claude, GPT, Gemini) using JSON-RPC standard.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Get MCP server tools spec</span>
+<span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/mcp   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -d <span style="color:#e6db74">'{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</span></pre>
 
-<span style="color:#75715e"># -- 13. MCP: deploy via agent ------------------------</span>
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">13. MCP deploy workload call</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Instruct an AI agent to execute container workload deployments via standard protocol schemas.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Call MCP tool to deploy a workload</span>
 <span style="color:#f92672">curl</span> -X POST http://localhost:18080/api/mcp   -H <span style="color:#e6db74">"Content-Type: application/json"</span>   -H <span style="color:#e6db74">"X-Doktri-Role: admin"</span>   -d <span style="color:#e6db74">'{
     "jsonrpc": "2.0", "id": 2,
     "method": "tools/call",
@@ -1836,15 +1888,23 @@
         "containerPort": 80
       }
     }
-  }'</span>
+  }'</span></pre>
 
-<span style="color:#75715e"># -- 14. Subscribe to live event stream (SSE) ---------</span>
+                                <div style="margin: 20px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">14. SSE Real-Time Event Feed</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Establish SSE stream to monitor loop logs, lock alerts, and OPA policy drifts.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># Listen to real-time events push stream</span>
 <span style="color:#f92672">curl</span> -H <span style="color:#e6db74">"Accept: text/event-stream"</span>      -H <span style="color:#e6db74">"X-Doktri-Role: reader"</span>      http://localhost:18080/api/events</pre>
                             </div>
 
                             <!-- Python SDK Content -->
                             <div class="code-tab-content" data-tab="python">
-                                <pre><span style="color:#75715e">"""DOKTRIAI Python client examples."""</span>
+                                <div style="margin: 15px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">Python requests library calls</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Below are script references to automate deployment logic, handle validation dry-runs, and make MCP agent tool calls using Python.</p>
+                                </div>
+                                <pre><span style="color:#75715e"># DOKTRIAI Python client examples</span>
 <span style="color:#f92672">import</span> requests, json
 
 BASE  = <span style="color:#e6db74">"http://localhost:18080"</span>
@@ -1906,6 +1966,10 @@ result = mcp_r.json()[<span style="color:#e6db74">"result"</span>]
 
                             <!-- Go Client Content -->
                             <div class="code-tab-content" data-tab="go">
+                                <div style="margin: 15px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">Go net/http client implementation</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Use standard library net/http structs to execute declarative JSON requests, fetch workload parameters, and manage lock mutexes natively.</p>
+                                </div>
                                 <pre><span style="color:#75715e">// DOKTRIAI Go client examples</span>
 <span style="color:#f92672">package</span> main
 
@@ -1938,7 +2002,7 @@ result = mcp_r.json()[<span style="color:#e6db74">"result"</span>]
 }
 
 <span style="color:#f92672">func</span> main() {
-  // 1 - Deploy workload with rolling strategy + health probe
+  <span style="color:#75715e">// 1 - Deploy workload with rolling strategy + health probe</span>
   spec := map[<span style="color:#66d9ef">string</span>]any{
     <span style="color:#e6db74">"name"</span>:           <span style="color:#e6db74">"api-service"</span>,
     <span style="color:#e6db74">"image"</span>:          <span style="color:#e6db74">"myapp:v2.1.0"</span>,
@@ -1958,17 +2022,17 @@ result = mcp_r.json()[<span style="color:#e6db74">"result"</span>]
   }
   fmt.Println(<span style="color:#66d9ef">string</span>(doktriReq(<span style="color:#e6db74">"POST"</span>, <span style="color:#e6db74">"/api/workloads"</span>, spec)))
 
-  // 2 - Validate spec (dry-run)
+  <span style="color:#75715e">// 2 - Validate spec (dry-run)</span>
   fmt.Println(<span style="color:#66d9ef">string</span>(doktriReq(<span style="color:#e6db74">"POST"</span>, <span style="color:#e6db74">"/api/validate"</span>, spec)))
 
-  // 3 - Get workload status
+  <span style="color:#75715e">// 3 - Get workload status</span>
   fmt.Println(<span style="color:#66d9ef">string</span>(doktriReq(<span style="color:#e6db74">"GET"</span>, <span style="color:#e6db74">"/api/workloads/api-service"</span>, nil)))
 
-  // 4 - Rollback to version 1
+  <span style="color:#75715e">// 4 - Rollback to version 1</span>
   fmt.Println(<span style="color:#66d9ef">string</span>(doktriReq(<span style="color:#e6db74">"POST"</span>, <span style="color:#e6db74">"/api/workloads/api-service/rollback"</span>,
     map[<span style="color:#66d9ef">string</span>]any{<span style="color:#e6db74">"version"</span>: 1})))
 
-  // 5 - MCP deploy via agent
+  <span style="color:#75715e">// 5 - MCP deploy via agent</span>
   mcp := map[<span style="color:#66d9ef">string</span>]any{
     <span style="color:#e6db74">"jsonrpc"</span>: <span style="color:#e6db74">"2.0"</span>, <span style="color:#e6db74">"id"</span>: 1,
     <span style="color:#e6db74">"method"</span>:  <span style="color:#e6db74">"tools/call"</span>,
@@ -1985,6 +2049,10 @@ result = mcp_r.json()[<span style="color:#e6db74">"result"</span>]
 
                             <!-- YAML Spec Content -->
                             <div class="code-tab-content" data-tab="yaml">
+                                <div style="margin: 15px 0 6px; padding: 0 4px;">
+                                    <h4 style="color: #fff; font-size: 11px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.05em;">Declarative YAML configurations</h4>
+                                    <p style="color: var(--muted); font-size: 10.5px; margin: 0; line-height: 1.5;">Below are templates showing how to define container parameters inside flat metadata blocks.</p>
+                                </div>
                                 <pre><span style="color:#75715e"># -- Minimal workload ----------------------------------</span>
 <span style="color:#f92672">apiVersion</span>: doktri.io/v1alpha1
 <span style="color:#f92672">kind</span>: Workload
